@@ -19,7 +19,7 @@ public class ParseCommandLineArgs {
 	public ParseCommandLineArgs(String[] args){
 		
 		this.args = args;
-		argMap = new HashMap();
+		argMap = new HashMap<String, String>();
 	}
 	
 	
@@ -123,13 +123,11 @@ public class ParseCommandLineArgs {
 			// means the arguments passed from CommandLine is in correct format, flags and value
 			return true;
 		}							
-		catch (IllegalArgumentException e){
-//			e.printStackTrace();
+		catch (IllegalArgumentException e){			
 			System.out.println(e);			
 			return false;
 		}
-		catch (Exception e){
-//			e.printStackTrace();
+		catch (Exception e){			
 			System.out.println(e);			
 			return false;
 		}
@@ -142,10 +140,5 @@ public class ParseCommandLineArgs {
 		return argMap;
 		
 	}
-	
-	
-
-	
-	
 	
 }

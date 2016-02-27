@@ -1,6 +1,3 @@
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class Driver {
 	
 	public static void main(String[] args) {
@@ -13,7 +10,7 @@ public class Driver {
 			System.out.println("Program exit.");			
 		}	
 		else {
-		// reach this line means no problem in args, continue all the process
+			// reach this line means no problem in args, continue all the process
 			SongDataProcessor songData = new SongDataProcessor(commandLineParser.getArgsMap());		
 			songData.writeToTextFile();
 		}
