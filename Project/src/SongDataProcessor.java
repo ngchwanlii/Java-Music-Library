@@ -113,7 +113,9 @@ public class SongDataProcessor {
 	
 	public void writeToTextFile(){
 		
-		
+//TODO: it is not guarnateed that your input/output paths will always be one of the ones you assume here.
+//TODO: please modify your logic so that any valid directory may be provided as -input and any valid 
+//TODO: file may be provided as -outout.
 		try {
 			if(orderType.equals("artist")) {
 				
