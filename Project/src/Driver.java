@@ -2,17 +2,18 @@ public class Driver {
 	
 	public static void main(String[] args) {
 		
-		ParseCommandLineArgs commandLineParser = new ParseCommandLineArgs(args);
-		
-		// if command-line passed in arguments has error, exit the program
-		if(!commandLineParser.checkArgument()){
+		try {
+			// if commandLineParser has exception, it will be catch under IllegalArgumentException 
+			ParseCommandLineArgs commandLineParser = new ParseCommandLineArgs(args);		
+						
+			MusicLibrary musicLibrary = new MusicLibrary(commandLineParser.getArgsMap());			
+			musicLibrary.writeToTextFile();
 			
-			System.out.println("Program exit.");			
-		}	
-		else {
-			// reach this line means no problem in args, continue all the process
-			SongDataProcessor songData = new SongDataProcessor(commandLineParser.getArgsMap());		
-			songData.writeToTextFile();
+		}			
+		catch (IllegalArgumentException e){	
+			System.out.println("Program exit.");
+			System.out.println(e);			
+			
 		}
 
 	}

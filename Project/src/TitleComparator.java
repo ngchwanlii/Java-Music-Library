@@ -5,15 +5,14 @@ public class TitleComparator implements Comparator<Song> {
 	@Override
 	public int compare(Song song1, Song song2) {
 		
-		
+		// if song has same title & artist, sort by trackID
 		if(song1.getTitle().equals(song2.getTitle()) && song1.getArtistName().equals(song2.getArtistName())){
-			
-			// if song has equal title & artist, sort by trackID
+						
 			return song1.getTrackID().compareTo(song2.getTrackID());
 		}
+		// if two song has same title, sort by artist name
 		else if(song1.getTitle().equals(song2.getTitle())){
-			
-			// if song has equal title, sort by artist name
+	
 			return song1.getArtistName().compareTo(song2.getArtistName());
 		}
 		
