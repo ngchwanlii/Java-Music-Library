@@ -28,6 +28,7 @@ public class MusicLibrary {
 		this.outputPath = Paths.get(argMap.get("-output"));
 		this.order = argMap.get("-order");
 		
+//TODO: save the data sorted in all ways for each execution of the program.		
 		// instantiate TreeMap for artist, title and tag based on order type
 		if(order.equals("artist")){
 			this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
@@ -38,13 +39,14 @@ public class MusicLibrary {
 		else if (order.equals("tag")){
 			this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
 		}
-			
+
+//TODO: move this logic elsewhere.			
 		// process and add song
 		SongDataProcessor processSongData = new SongDataProcessor(this, argMap);
 	}
 	
 	public void addSong(Song song){
-		
+//TODO: add all data to all maps.		
 		// artist
 		if(order.equals("artist")){
 			
@@ -101,6 +103,7 @@ public class MusicLibrary {
 	
 		
 	// writeToTextFile method
+//TODO: pass order as input	
 	public void writeToTextFile() throws IllegalArgumentException{
 		
 		/** MODIFIED after 1st review **/
@@ -108,7 +111,8 @@ public class MusicLibrary {
 		if(inputPath.toFile().exists() && outputPath.toFile().getParentFile().isDirectory()){
 			// write out path
 			try(PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputPath, Charset.forName("UTF-8")))){
-				
+//TODO: if order is artist tmp=artistMusicLibrary else tmp=titleMusicLibrary 
+//use same for to write data.
 				if(order.equals("artist")){
 					for(String key : artistMusicLibrary.navigableKeySet()){
 						
