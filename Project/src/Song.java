@@ -1,11 +1,14 @@
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+//TODO: add documentation
+
 public class Song {
 	
 	private String artistName;
 	private String title;
 	private String trackID;
+//TODO: store just an arraylist of tags instead.	
 	private JSONArray similars;
 	private JSONArray tag;
 	
