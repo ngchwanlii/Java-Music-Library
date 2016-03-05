@@ -19,6 +19,5 @@ public class TitleComparator implements Comparator<Song> {
 		// initially, sort by title name in lexicographically
 		return song1.getTitle().compareTo(song2.getTitle());
 	}
-
 		
 }

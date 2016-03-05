@@ -5,25 +5,27 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class SongDataProcessor {
-
+	
+	// instance variable
 	private MusicLibrary ml;
 
-	public SongDataProcessor(MusicLibrary musicLibrary, HashMap<String, String> argMap) {
+	// SongDataProcessor constructor
+	public SongDataProcessor(MusicLibrary musicLibrary, String inputStringPath) {
 
 		this.ml = musicLibrary;
-		Path inputPath = Paths.get(argMap.get("-input"));
+		Path inputPath = Paths.get(inputStringPath);
 		findFile(inputPath);
 
 	}
 
+	// traverse and findFiles within the File System
 	public void findFile(Path path) {
-
+		
 		if (Files.isDirectory(path)) {
 
 			try (DirectoryStream<Path> list = Files.newDirectoryStream(path)) {
@@ -50,6 +52,8 @@ public class SongDataProcessor {
 
 	}
 
+	// parse and read the object in JSON object
+	// add song to MusicLibrary
 	public void parseFunction(Path path) {
 
 		JSONParser jsonParser = new JSONParser();
@@ -80,7 +84,8 @@ public class SongDataProcessor {
 		}
 
 	}
-
+	
+	// check if the file format is .json extension
 	public boolean checkFileFormat(Path path) {
 
 		if (path.toString().toLowerCase().trim().endsWith(".json")) {

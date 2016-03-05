@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,13 +6,14 @@ import java.util.HashMap;
 
 public class ParseCommandLineArgs {
 	
+	// instance variable
 	private String[] args;
 	private final int MAX_ARGS = 6;
 	private final int MAX_NUM_FLAGS = 3;
 	private HashMap<String, String> argMap;
 	
 
-	// Constructor
+	// ParseCommandLineArgs constructor
 	public ParseCommandLineArgs(String[] args) throws IllegalArgumentException{
 		
 		this.args = args;
@@ -29,8 +29,7 @@ public class ParseCommandLineArgs {
 		int countFlags = 0;
 		Path path;
 		
-		// initial check arguments
-		
+		// initial check arguments		
 		// test in general the input arguments meet the expected one
 		if(args.length != MAX_ARGS){
 			throw new IllegalArgumentException("\nError: Incorrect command line input argument\n"
