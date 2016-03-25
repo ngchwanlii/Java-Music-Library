@@ -10,7 +10,6 @@ public class Song {
 	private String artistName;
 	private String title;
 	private String trackID;
-//TODO: store just an arraylist of tags instead.		PARTIAL FIXED - check again
 	private ArrayList<String> similarsList;
 	private ArrayList<String> tagList;
 	
@@ -62,6 +61,8 @@ public class Song {
 		
 	}
 
+	
+	// TODO: This is not thread-safe: need to modified this 
 	public String getArtistName() {
 		return artistName;
 	}

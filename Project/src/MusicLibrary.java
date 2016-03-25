@@ -23,23 +23,18 @@ public class MusicLibrary {
 				
 		this.inputPath = Paths.get(inputStringPath);
 		this.outputPath = Paths.get(outStringPath);
-		
-		
-//TODO: save the data sorted in all ways for each execution of the program.  FIXED 	
-		
+	
 		// instantiate all type of MusicLibrary for artist, title and tag		
 		this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
 		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
 		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
 		
-
-//TODO: move this logic elsewhere.	FIXED - SongDataProcessor moved to Driver class		
-		
-		
+			
 	}
 	
+	// addSong method
 	public void addSong(Song song){
-//TODO: add all data to all maps.	FIXED
+
 		
 		// artist					
 		String artistName = song.getArtistName();
@@ -88,7 +83,6 @@ public class MusicLibrary {
 	
 		
 	// writeToTextFile method
-//TODO: pass order as input		- FIXED
 	public void writeToTextFile(String order) throws IllegalArgumentException{
 		
 		TreeMap<String, TreeSet<Song>> tmpLibrary = null;
@@ -99,8 +93,7 @@ public class MusicLibrary {
 		if(inputPath.toFile().exists() && outputPath.toFile().getParentFile().isDirectory()){
 			// write out path
 			try(PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputPath, Charset.forName("UTF-8")))){
-//TODO: if order is artist tmp=artistMusicLibrary else tmp=titleMusicLibrary - 	FIXED
-//use same for to write data.
+
 				
 				// initialize library based on orderType
 				if(order.equals("artist")){

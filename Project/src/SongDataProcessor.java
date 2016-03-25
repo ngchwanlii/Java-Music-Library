@@ -13,15 +13,30 @@ public class SongDataProcessor {
 	
 	// instance variable
 	private MusicLibrary ml;
-
-	// SongDataProcessor constructor
+	private ThreadSafeMusicLibrary threadSafeML;
+	private ThreadPool threadPool;
+	private int nThreads;
+	// SongDataProcessor constructor - single thread version
 	public SongDataProcessor(MusicLibrary musicLibrary, String inputStringPath) {
 
 		this.ml = musicLibrary;
 		Path inputPath = Paths.get(inputStringPath);
 		findFile(inputPath);
-
+		
 	}
+	
+	// SongDataProcessor constructor - multi-thread version
+	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String inputStringPath, ThreadPool threadPool, int nThreads) {
+		
+		// initialize threadSafeMusicLibrary once
+		this.threadSafeML = threadSafeMusicLibrary;
+		this.nThreads = nThreads;
+		this.threadPool = threadPool;
+		Path inputPath = Paths.get(inputStringPath);		
+		findFile(inputPath);
+		
+	}
+	
 
 	// traverse and findFiles within the File System
 	public void findFile(Path path) {
@@ -44,36 +59,45 @@ public class SongDataProcessor {
 
 		else {
 
+			// if checkFileFormat = true = found JSON file
 			if (checkFileFormat(path)) {
-				parseFunction(path);
+				
+				// TODO: when meet new JSON files, put it into queue
+				// multi-thread version
+				if(nThreads != 0){
+					// execute new Runnable class - this class has a same logic as parseFunction which is processing the file, add song to musicLibrary
+					threadPool.execute(new ProcessingFile(path, threadSafeML));
+				}
+				// single-thread version
+				else {
+					parseFunction(path);
+				}
 			}
 
 		}
 
 	}
-
-	// parse and read the object in JSON object
+	
+	//parse and read the object in JSON object
 	// add song to MusicLibrary
 	public void parseFunction(Path path) {
 
 		JSONParser jsonParser = new JSONParser();
 
 		try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))) {
+			
+						
+			//TODO: pass in reader instead of line - FIXED
+			JSONObject singleSongObject = (JSONObject) jsonParser.parse(reader);
+			
+			// save as a single song object
+			Song song = new Song(singleSongObject);
 
-			String line = reader.readLine();
+			// use musicLibrary to add song
+			ml.addSong(song);
 
-			while (line != null) {
-
-				JSONObject singleSongObject = (JSONObject) jsonParser.parse(line);
-
-				// save as a single song object
-				Song song = new Song(singleSongObject);
-
-				// use musicLibrary to add song
-				ml.addSong(song);
-
-				line = reader.readLine();
-			}
+				
+			
 		} 
 		catch (IOException e) {
 			System.out.println(e);
