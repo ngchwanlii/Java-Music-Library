@@ -35,6 +35,21 @@ public class SongDataProcessor {
 		Path inputPath = Paths.get(inputStringPath);		
 		findFile(inputPath);
 		
+		//TODO: encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
+		// shutDown threadPool - previously submitted task will still execute
+		this.threadPool.shutDown();
+		
+		// threadPool - awaiTermination 
+		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
+		// whichever happens first.
+		try {
+			this.threadPool.awaitTermination();
+		}
+		catch (InterruptedException e){
+			e.printStackTrace();
+		}
+						
+	
 	}
 	
 
