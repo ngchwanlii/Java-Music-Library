@@ -27,7 +27,7 @@ public class Driver {
 				ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath);
 				// threadPool will execute task 
 				SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, threadPool, nThreads);
-				
+//TODO: move threadPool creation, shutdown, awaitTermination to SongDataProcessor.
 				// shutDown threadPool - previously submitted task will still execute
 				threadPool.shutDown();
 				
