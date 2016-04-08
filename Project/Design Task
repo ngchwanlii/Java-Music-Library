@@ -1,0 +1,35 @@
+
+# The search function only design in multi-thread version (don't need in single-thread version) 
+
+
+
+# SongDataProcessor
+1. 
+2. (OK) new constructor - multi-thread - allow search functionality 
+
+3. # create a new runnable class [SearchQuery] 
+   - fire 3 different searchTask here  (multi-thread)
+   		- searchByArtist
+   		- searchByTitle
+   		- searchByTag
+
+
+
+# Driver
+1. (OK) passed in searchInputPath to new constructor - single thread with search function version
+
+
+
+
+
+
+# MusicLibrary
+0. (OK) create new constructor that has searchInput & searchOutput string path as args 
+1. (OK) add searchInputPath & searchOutPath to new constructor 
+2. (OK) add new trackIDMusicLibrary - for efficient search functionality when detect similars song which present in trackID
+
+2. add 3 searchBy method
+
+# ThreadSafeMusicLibrary
+0. (OK) create new constructor that has searchInput & searchOutput string path as args
+1. (OK) passed in searchInput & searchOutput path to new ThreadSafeMusicLibrary
