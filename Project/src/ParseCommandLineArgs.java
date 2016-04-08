@@ -10,8 +10,11 @@ public class ParseCommandLineArgs {
 	
 	// instance variable
 	private String[] args;
-	private final int MAX_ARGS = 8;
-	private final int MAX_NUM_FLAGS = 4; // added -threads as flag
+	private final int MAX_ARGS = 12;	 // added -searchInput, input/queries.json, searchOutput, results/searchResults.json
+	private final int MANDATORY_FLAG = 3; // mandatory flag = -input, -output, -order
+	private final int MAX_NUM_FLAGS = 6; // added -threads as flag
+										 // added -searchInput as flag
+										 // added -searchOutput as flag
 	private HashMap<String, String> argMap;
 	private final String DEFAULT_VALUE = "10";
 	
@@ -36,38 +39,43 @@ public class ParseCommandLineArgs {
 		// test in general the input arguments meet the expected one
 	
 		// allow for -threads or -threads 5 (with numbers of threads)
-		if(args.length < MAX_ARGS-2 || args.length > MAX_ARGS){
+		// allow for optional flag -searchInput & -searchOutput with associate value
+		if(args.length < MAX_ARGS-6 || args.length > MAX_ARGS){
 			throw new IllegalArgumentException("\nError: Incorrect command line input argument\n"
-												+ "The inputs in command line should have at least 4 flags\n"
+												+ "The inputs in command line should have at least 3 flags\n"
 												+ "The 3 flags (-input, -output & -order) should associated with 3 appropriate values\n"
-												+ "While flag (-thread) value can be empty or associate with value.\n");
+												+ "Optional flag (-thread) value can be empty or associate with value.\n"
+												+ "Optional flag (-searchInput) value must be associate with a path to json file\n"
+												+ "Optional flag (-searchOutput) value must be associate with a path to json file\n");
 		}
 		
-		// check if 3 required flags is missing
+		// check if 3 mandatory required flags is missing, count on some option flags
 		for(String arg : args){
 			
 			// detect flag
 			if(arg.startsWith("-")){
 				
-				if(arg.equals("-input")){
+				if(arg.equals("-input") || arg.equals("-output") || arg.equals("-order") || arg.equals("-threads") || arg.equals("-searchInput") || arg.equals("-searchOutput")){
 					countFlags++;
-				}
-				else if(arg.equals("-output")){
-					countFlags++;
-				}
-				else if(arg.equals("-order")){
-					countFlags++;
-				}
-				else if(arg.equals("-threads")){
-					countFlags++;
-				}
-			
+				}				
 			}
 		}
 		
+		
 		// if there is missing flag throw exception, catch exception and print out error message, then exit gracefully
-		if(countFlags < MAX_NUM_FLAGS-1 || countFlags > MAX_NUM_FLAGS){
-			throw new IllegalArgumentException("\nErrors: Missing flags.");
+		if(countFlags < MANDATORY_FLAG || countFlags > MAX_NUM_FLAGS){
+			
+			if(countFlags < MANDATORY_FLAG) {
+				throw new IllegalArgumentException("\nErrors: Missing basic flags. (-input, -output, -order)");
+			}
+			else {
+				throw new IllegalArgumentException("\nErrors: Flags overflow. You've entered extra flags that is not defined.\n"
+													+ "The inputs in command line should have at least 3 flags\n"
+													+ "The 3 flags (-input, -output & -order) should associated with 3 appropriate values\n"
+													+ "Optional flag (-thread) value can be empty or associate with value.\n"
+													+ "Optional flag (-searchInput) value must be associate with a path to json file\n"
+													+ "Optional flag (-searchOutput) value must be associate with a path to json file\n");
+			}
 		}
 		
 		// check if optional flag associate right value
@@ -80,21 +88,22 @@ public class ParseCommandLineArgs {
 				String value = null;
 				String strNum = null;
 				
-				// test special case like -input input/lastfm_subset -output results tag -order ( where the flag is at last)				
-				// means args.length = MAX_ARGS (included -threads 5)
+				// test special case like -input input/lastfm_subset -output results tag -order ( where the flag is at last)
+				//  args.length = MAX_ARGS (included -threads 5)
+				// which means have (-threads 5)
 				if(args.length != MAX_ARGS-1){
 					if((i+1) >= args.length){
 						throw new IllegalArgumentException("\nThe value associated with flags: " + flag + " does not exists" );
 					}	
 					// if it is -thread
 					if(args[i].equals("-threads")) {
-						// set the object value of -threads (can be integer/float/string), parse later
 						
+						// set the object value of -threads (can be integer/float/string), parse later						
 						strNum = args[i+1];
 						
 					}
 					else {
-						// for -input, -output, -order
+						// for the path of (-input, -output, -order, -searchInput, -searchOutput)
 						value = args[i+1];
 					}
 				}
@@ -105,7 +114,7 @@ public class ParseCommandLineArgs {
 						strNum = null;
 					}
 					else {
-						// for -input, -output, -order
+						// for the path of (-input, -output, -order, -searchInput, -searchOutput) 
 						value = args[i+1];
 					}
 				}
@@ -177,7 +186,27 @@ public class ParseCommandLineArgs {
 					// add into HashMap , key - '-threads', value -> 'integer value represent in String type', -> when create thread pool
 					// use Integer.parseInt() to parse this strNum and assigned to integer type.
 					argMap.put(flag, strNum);
-					break;					
+					break;	
+					
+				//TODO: added new -searchInput & -searchOutput
+				case "-searchInput":
+					path = Paths.get(value);
+					if(!Files.exists(path)){
+						
+						// Files.exists will throw 
+						throw new IllegalArgumentException("\nThe filepath value associate with flags: \"" + flag + "\" does not match and is in invalid format.");
+					}
+									
+					// else add into HashMap, key -> flags, value -> input value						
+					argMap.put(flag, value);					
+					break;
+				case "-searchOutput":
+					path = Paths.get(value);
+					if(!path.toFile().getParentFile().isDirectory()){
+						throw new IllegalArgumentException("\nThe filepath value associate with flags: \"" + flag + "\" does not match and is in invalid format.");
+					}
+					argMap.put(flag, value);
+					break;
 				default:
 					break;
 				}
