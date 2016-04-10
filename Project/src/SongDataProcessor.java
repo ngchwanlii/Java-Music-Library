@@ -15,7 +15,9 @@ public class SongDataProcessor {
 	private MusicLibrary ml;
 	private ThreadSafeMusicLibrary threadSafeML;
 	private ThreadPool threadPool;
+	private ThreadPool searchPool;	
 	private int nThreads;
+	
 	// SongDataProcessor constructor - single thread version
 	public SongDataProcessor(MusicLibrary musicLibrary, String inputStringPath) {
 
@@ -51,6 +53,44 @@ public class SongDataProcessor {
 						
 	
 	}
+	
+	
+	// SongDataProcessor constructor - multi-thread version - search function
+	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String inputStringPath, 
+							String searchInPath, ThreadPool threadPool, ThreadPool searchPool, int nThreads) {
+		
+		// initialize threadSafeMusicLibrary once
+		this.threadSafeML = threadSafeMusicLibrary;
+		this.nThreads = nThreads;
+		this.threadPool = threadPool;
+		this.searchPool = searchPool;
+		
+		Path inputPath = Paths.get(inputStringPath);		
+		findFile(inputPath);
+		
+		//TODO: encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
+		// shutDown threadPool - previously submitted task will still execute
+		this.threadPool.shutDown();
+		
+		// threadPool - awaiTermination 
+		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
+		// whichever happens first.
+		try {
+			this.threadPool.awaitTermination();
+		}
+		catch (InterruptedException e){
+			e.printStackTrace();
+		}
+						
+	
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 
 	// traverse and findFiles within the File System

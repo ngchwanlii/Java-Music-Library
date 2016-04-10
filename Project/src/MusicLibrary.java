@@ -14,9 +14,27 @@ public class MusicLibrary {
 	private TreeMap<String, TreeSet<Song>> artistMusicLibrary;
 	private TreeMap<String, TreeSet<Song>> titleMusicLibrary;
 	private TreeMap<String, ArrayList<Song>> tagMusicLibrary;	
+	private TreeMap<String, Song> trackIDMusicLibrary;
 	private Path inputPath; 
 	private Path outputPath;
+	private Path searchInPath;
+	private Path searchOutPath;
 	
+	// MusicLibrary constructor - with search function 
+	public MusicLibrary(String inputStringPath, String outStringPath, String searchIn, String searchOut){
+		
+		this.inputPath = Paths.get(inputStringPath);
+		this.outputPath = Paths.get(outStringPath);
+		this.searchInPath = Paths.get(searchIn);
+		this.searchOutPath = Paths.get(searchOut);
+	
+		// instantiate all type of MusicLibrary for artist, title and tag		
+		this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
+		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
+		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
+		this.trackIDMusicLibrary = new TreeMap<String, Song>();
+			
+	}
 	
 	// MusicLibrary constructor
 	public MusicLibrary(String inputStringPath, String outStringPath){
@@ -27,7 +45,8 @@ public class MusicLibrary {
 		// instantiate all type of MusicLibrary for artist, title and tag		
 		this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
 		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
-		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
+		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();		
+		this.trackIDMusicLibrary = new TreeMap<String, Song>();
 		
 			
 	}
@@ -75,9 +94,10 @@ public class MusicLibrary {
 			if(!this.tagMusicLibrary.get(tag).contains(song)) { 					
 				this.tagMusicLibrary.get(tag).add(song);
 			}
-			
-			
+		
 		}
+		
+		this.trackIDMusicLibrary.put(song.getTrackID(), song);
 		
 	}
 	

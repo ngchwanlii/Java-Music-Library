@@ -3,8 +3,17 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 
 	// instance variable
 	private ReentrantLock lock;
-	// the sharedDataStructure(TreeMap that sort artist/title/tag) is inherited from super class - MusicLibrary
+	
 
+	public ThreadSafeMusicLibrary(String inputStringPath, String outputStringPath, String searchInputPath, String searchOutputPath){
+		
+		super(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);
+		this.lock = new ReentrantLock(); 
+		
+	}
+	
+	
+	// constructor 
 	public ThreadSafeMusicLibrary(String inputStringPath, String outStringPath) {
 		super(inputStringPath, outStringPath);
 		this.lock = new ReentrantLock(); 
