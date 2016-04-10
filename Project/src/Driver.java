@@ -47,6 +47,7 @@ public class Driver {
 				}
 				
 				else {
+					
 					// create threadPool
 					ThreadPool threadPool = new ThreadPool(nThreads);
 					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath);
