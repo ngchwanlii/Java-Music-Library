@@ -15,26 +15,53 @@ public class Driver {
 			String orderStringPath = commandLineParser.getArgsMap().get("-order");
 				
 			int nThreads = 0;
+			String searchInputPath = null;
+			String searchOutputPath = null;
+			boolean searchActive = false;
+			
+			if(commandLineParser.getArgsMap().containsKey("-searchInput") && commandLineParser.getArgsMap().containsKey("-searchOutput")){
+				
+				
+				searchInputPath = commandLineParser.getArgsMap().get("-searchInput");
+				searchOutputPath = commandLineParser.getArgsMap().get("-searchOutput");
+							
+				searchActive = true;
+			
+			}
 					
 			// multi-thread version
 			if(commandLineParser.getArgsMap().containsKey("-threads")){
 				// if the hashmap has -threads flag, get the threadNum by parsing the string representation numeric value stored inside HashMap
 				nThreads = Integer.parseInt(commandLineParser.getArgsMap().get("-threads"));
 				
-				// create threadPool
-				ThreadPool threadPool = new ThreadPool(nThreads);
 				
-				ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath);
-				// threadPool will execute task 
-				SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, threadPool, nThreads);
+				if(searchActive){
+					// create threadPool
+					ThreadPool threadPool = new ThreadPool(nThreads);
+					ThreadPool searchPool = new ThreadPool(nThreads);
+					
+					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);
+					
+					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, searchInputPath, threadPool, searchPool, nThreads);
+					
+				}
 				
-				// write to text file
-				threadSafeMusicLibrary.writeToTextFile(orderStringPath);				
+				else {
+					// create threadPool
+					ThreadPool threadPool = new ThreadPool(nThreads);
+					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath);
+					// threadPool will execute task 
+					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, threadPool, nThreads);
+					
+					// write to text file
+					threadSafeMusicLibrary.writeToTextFile(orderStringPath);	
+				}
 								
 			}
 			// single-thread version
 			else {
 				// instantiate new MusicLibrary
+				
 				MusicLibrary musicLibrary = new MusicLibrary(inputStringPath, outputStringPath);
 				SongDataProcessor processSongData = new SongDataProcessor(musicLibrary, inputStringPath);
 				musicLibrary.writeToTextFile(orderStringPath);
