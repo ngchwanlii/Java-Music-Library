@@ -42,6 +42,11 @@ public class SearchQuery implements Runnable {
 		JSONArray similarsSongJSONArray = threadSafeML.searchByArtist(query);
 		
 		artistLock.lockWrite();
+		
+		/** jay - DEBUG Print **/
+		System.out.println("QUERY: " + query);
+		System.out.println(similarsSongJSONArray);
+		
 		JSONObject songJSON = new JSONObject();
 		songJSON.put("artist", query);
 		songJSON.put("similars", similarsSongJSONArray);

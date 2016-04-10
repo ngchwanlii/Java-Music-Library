@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class MusicLibrary {
 	
@@ -56,11 +57,66 @@ public class MusicLibrary {
 	// searchByArtist method - return similarSongJSON based on query search in JSONArray
 	public JSONArray searchByArtist(String query) {
 		
+		
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
+		/** NOTE: if key is not contain in this map, return an empty resultList **/		
+		if(!artistMusicLibrary.containsKey(query)){
+			
+			return resultList;
+		}
+				
+		// list of songs by given artist
+		TreeSet<Song> songs = artistMusicLibrary.get(query);
 		
+		// for each song in songs
+		for(Song s : songs){
+				
+			// list of songs similar to song			 
+			ArrayList<String> similarSongTrackID = s.getSimilars();
+			
+			/** DEBUG print - confirmed Busta - DJ Quik in trackID **/
+			/** NEED DEBUG **/
+//			System.out.println(trackIDMusicLibrary.containsKey("TRAAMJY128F92F5919"));
+			
+			// for each similarSong by track_ID
+			if(!similarSongTrackID.isEmpty()){
+				for(String trackID : similarSongTrackID){
+					
+					// get song by tracking id found in trackIDMusicLibrary
+					if(trackIDMusicLibrary.containsKey(trackID)){
+						Song song = trackIDMusicLibrary.get(trackID);
+						// convert this songObj to songJSONObj
+						JSONObject songJSONObj = convertToSongJSONObject(song);
+						resultList.add(songJSONObj);
+					}
+						
+				}								
+			}
+			
+			
+		}
 		return resultList;
+	}
+		
+		
+		
+	
+	
+	// thread-safe - share function that could be use for searchByArtist/searchByTitle/searchByTag 
+	private synchronized JSONObject convertToSongJSONObject(Song song){
+		
+		// thread-safe local variable that use for returning back to caller
+		// caller is also a new local variable from its method
+		JSONObject songJSON = new JSONObject();
+	
+		songJSON.put("artist", song.getArtistName());
+		songJSON.put("trackId", song.getTrackID());
+		songJSON.put("title", song.getTitle());
+		
+		return songJSON;
+		
 	}
 	
 	// addSong method
@@ -73,6 +129,18 @@ public class MusicLibrary {
 		String title = song.getTitle();
 		// tag
 		ArrayList<String> tagList = song.getTags();
+		
+		// track_id
+		/** jay - added trackID music library for tracking id **/
+		String trackID = song.getTrackID();
+	
+	
+		/** jay - DEBUG PRINT **/	
+//		System.out.println("trackID: " + trackID + " song: " + song.getArtistName());
+		
+		this.trackIDMusicLibrary.put(trackID, song);
+		
+		
 		
 		// if this is a new artist, create TreeSet to store these song
 		if(!artistMusicLibrary.containsKey(artistName)){
@@ -109,7 +177,8 @@ public class MusicLibrary {
 		
 		}
 		
-		this.trackIDMusicLibrary.put(song.getTrackID(), song);
+		
+		
 		
 	}
 	

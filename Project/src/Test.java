@@ -6,24 +6,35 @@ public class Test {
 	
 	public static void main(String[] args) {
 		
-		JSONArray arr1;
-		ArrayList<JSONArray> record = new ArrayList<JSONArray>();
+		ArrayList<String> arr = new ArrayList<String>();
 		
+		arr.add("Jay");
+		arr.add("Ng");
 		
-		// point to reference changed the content of newArray
-//		JSONArray newArr = new JSONArray();
-		
-		for(int i = 0 ; i < 2; i++){
-			
-			// point to reference changed the content of newArray
-//			arr1 = returnArr(i,newArr);
-			arr1 = returnArr(i);
-			record.add(arr1);
-			
+		for(String s : arr){
+			System.out.println(s);
 		}
 		
 		
-		System.out.println(record);
+		
+//		JSONArray arr1;
+//		ArrayList<JSONArray> record = new ArrayList<JSONArray>();
+//		
+//		
+//		// point to reference changed the content of newArray
+////		JSONArray newArr = new JSONArray();
+//		
+//		for(int i = 0 ; i < 2; i++){
+//			
+//			// point to reference changed the content of newArray
+////			arr1 = returnArr(i,newArr);
+//			arr1 = returnArr(i);
+//			record.add(arr1);
+//			
+//		}
+//		
+//		
+//		System.out.println(record);
 		
 		
 		

@@ -15,8 +15,7 @@ public class Song {
 	
 	// Song constructor
 	public Song(JSONObject song){
-		
-		
+
 		this.artistName = (String)song.get("artist");
 		this.title = (String)song.get("title");
 		this.trackID = (String)song.get("track_id");
@@ -51,7 +50,7 @@ public class Song {
 				
 				String similar = (String)innerArray.get(0);
 								
-				// no duplicate tag added for each song 
+				// no duplicate similar added for each song 
 				if(!similarsList.contains(similar)){
 					this.similarsList.add(similar);
 				}			
