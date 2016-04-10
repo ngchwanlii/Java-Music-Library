@@ -5,6 +5,8 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -16,6 +18,12 @@ public class SongDataProcessor {
 	private ThreadSafeMusicLibrary threadSafeML;
 	private ThreadPool threadPool;
 	private ThreadPool searchPool;	
+	private JSONArray artistResult;
+	private JSONArray titleResult;
+	private JSONArray tagResult;
+	private ReentrantLock aritstLock;
+	private ReentrantLock titleLock;
+	private ReentrantLock tagLock;
 	private int nThreads;
 	
 	// SongDataProcessor constructor - single thread version
@@ -81,13 +89,120 @@ public class SongDataProcessor {
 		catch (InterruptedException e){
 			e.printStackTrace();
 		}
+		
+		
+		/** jay  **/
+		this.artistResult = new JSONArray();
+		this.titleResult = new JSONArray();
+		this.tagResult = new JSONArray();
+		this.aritstLock = new ReentrantLock();
+		this.titleLock = new ReentrantLock();
+		this.tagLock = new ReentrantLock();		
+		Path searchIn = Paths.get(searchInPath);
+		searchQueryFile(searchIn);
 						
 	
 	}
 	
+	// traverse and findFiles within the File System
+	public void searchQueryFile(Path path) {
+		
+		if (Files.isDirectory(path)) {
+
+			try (DirectoryStream<Path> list = Files.newDirectoryStream(path)) {
+
+				for (Path file : list) {
+
+					searchQueryFile(file);
+
+				}
+
+			} 
+			catch (IOException e) {
+				System.out.println(e);
+			}
+		}
+
+		else {
+
+			// if checkFileFormat = true = found JSON file
+			if (checkFileFormat(path)) {
+				
+				// TODO: when meet new JSON files, put it into queue
+				// multi-thread version
+				if(nThreads != 0){
+					
+					JSONObject queryFileObject = parseSearch(path);
+					
+					/** querFileObject BELOW
+					{
+					    "searchByArtist": ["Queen", "Busta Rhymes"],
+					    "searchByTitle": ["Wishlist", "Ode To Billie Joe  (Live @ Fillmore West)"],
+					    "searchByTag": ["50s rockabilly"]
+					}
+					**/
+					for(Object obj : queryFileObject.keySet()){
+						
+						String key = (String)obj;				
+						JSONArray queryArray = new JSONArray();						
+						/** ["Queen", "Busta Rhymes"] **/
+						queryArray = (JSONArray)queryFileObject.get(key);
+						
+						
+						if(key.equals("searchByArtist")){
+							
+							for(int i = 0; i < queryArray.size(); i++){
+								
+								String query = (String)queryArray.get(i);
+								
+								searchPool.execute(new SearchQuery(key, query, threadSafeML, artistResult, aritstLock));
+							}
+						}
+//						else if(key.equals("searchByTag")){
+//							
+//							
+//							
+//						}
+//						else if(key.equals("searchByTitle")){
+//							
+//						}
+						
+						
+					}
+					
+					
+				}
+				
+			}
+
+		}
+
+	}
 	
 	
+	// parseSearch function - return a JSONObject found from queryFile
+	public JSONObject parseSearch(Path path) {
+
+		JSONParser jsonParser = new JSONParser();
+		JSONObject queryFileObj = new JSONObject();
+		
+		
+		try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))) {
+			
 	
+			queryFileObj = (JSONObject) jsonParser.parse(reader);
+		
+		} 
+		catch (IOException e) {
+			System.out.println(e);
+		} 
+		catch (ParseException e) {
+
+			System.out.println(e);
+		}
+		return queryFileObj;
+
+	}
 	
 	
 	

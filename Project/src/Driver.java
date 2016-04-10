@@ -40,9 +40,13 @@ public class Driver {
 					ThreadPool threadPool = new ThreadPool(nThreads);
 					ThreadPool searchPool = new ThreadPool(nThreads);
 					
-					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);
-					
+					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);					
 					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, searchInputPath, threadPool, searchPool, nThreads);
+					
+					threadSafeMusicLibrary.writeToTextFile(orderStringPath);
+					
+					
+					
 					
 				}
 				
