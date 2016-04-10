@@ -1,22 +1,40 @@
+import org.json.simple.JSONArray;
 
 public class ThreadSafeMusicLibrary extends MusicLibrary {
 
 	// instance variable
 	private ReentrantLock lock;
+	private Object artistLock;
+	private Object titleLock;
+	private Object tagLock;
 	
-
+	// ThreadSafeMusicLibrary's constructor - with search function
 	public ThreadSafeMusicLibrary(String inputStringPath, String outputStringPath, String searchInputPath, String searchOutputPath){
 		
 		super(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);
-		this.lock = new ReentrantLock(); 
+		this.lock = new ReentrantLock();
+		this.artistLock = new Object();
+		this.titleLock = new Object();
+		this.tagLock = new Object();
 		
 	}
 	
 	
-	// constructor 
+	// ThreadSafeMusicLibrary's constructor  
 	public ThreadSafeMusicLibrary(String inputStringPath, String outStringPath) {
 		super(inputStringPath, outStringPath);
 		this.lock = new ReentrantLock(); 
+	}
+	
+	@Override
+	public JSONArray searchByArtist(String query){
+		
+		synchronized(artistLock){
+			
+			return super.searchByArtist(query);
+			
+		}
+		
 	}
 	
 	@Override

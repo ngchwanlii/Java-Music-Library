@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.json.simple.JSONArray;
+
 public class MusicLibrary {
 	
 	// instance variable
@@ -49,6 +51,16 @@ public class MusicLibrary {
 		this.trackIDMusicLibrary = new TreeMap<String, Song>();
 		
 			
+	}
+	
+	// searchByArtist method - return similarSongJSON based on query search in JSONArray
+	public JSONArray searchByArtist(String query) {
+		
+		// initialize resultList
+		JSONArray resultList = new JSONArray();
+		
+		
+		return resultList;
 	}
 	
 	// addSong method
@@ -165,5 +177,7 @@ public class MusicLibrary {
 			throw new IllegalArgumentException("\nAttempt to write textFile but the inputpath does not exists or outputpath's parent directory is not exists.");
 		}
 	}
+
+	
 	
 }	

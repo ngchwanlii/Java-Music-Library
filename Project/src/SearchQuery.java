@@ -28,7 +28,7 @@ public class SearchQuery implements Runnable {
 		
 		if(key.equals("searchByArtist")){
 			
-			searchArtist();
+			searchArtist(query, lock);
 			
 		}
 		
@@ -36,16 +36,17 @@ public class SearchQuery implements Runnable {
 	}
 	
 	
-	public void searchArtist(){
+	public void searchArtist(String query, ReentrantLock artistLock){
 	
+		// lock implemented in threadSafeML's class
 		JSONArray similarsSongJSONArray = threadSafeML.searchByArtist(query);
 		
-		lock.lockWrite();
+		artistLock.lockWrite();
 		JSONObject songJSON = new JSONObject();
 		songJSON.put("artist", query);
 		songJSON.put("similars", similarsSongJSONArray);
 		searchResultArray.add(songJSON);
-		lock.unlockWrite();
+		artistLock.unlockWrite();
 		
 		
 		
