@@ -5,23 +5,23 @@ import org.junit.Test;
 
 public class SearchTest {
 
-	@Test
-	public void testValidQueries() {
-
-		String testName = "testValidQueries";
-		Path actualOutput = Paths.get("results/searchResults.json");
-		Path expectedOutput = Paths.get("output/searchResults.json");
-		String[] args = {"-input", "input/lastfm_subset",
-				"-output", "results/songsByArtistSubset.txt",
-				"-order", "artist",
-				"-threads", "5",
-				"-searchInput", "queries/queries.json",
-				"-searchOutput", actualOutput.toString()};
-		ProjectTest.checkProjectJsonOutput(testName, 
-				args,
-				actualOutput,
-				expectedOutput);		
-	}
+//	@Test
+//	public void testValidQueries() {
+//
+//		String testName = "testValidQueries";
+//		Path actualOutput = Paths.get("results/searchResults.json");
+//		Path expectedOutput = Paths.get("output/searchResults.json");
+//		String[] args = {"-input", "input/lastfm_subset",
+//				"-output", "results/songsByArtistSubset.txt",
+//				"-order", "artist",
+//				"-threads", "5",
+//				"-searchInput", "queries/queries.json",
+//				"-searchOutput", actualOutput.toString()};
+//		ProjectTest.checkProjectJsonOutput(testName, 
+//				args,
+//				actualOutput,
+//				expectedOutput);		
+//	}
 
 //	@Test
 //	public void testInvalidSearchInputPath() {
@@ -51,22 +51,22 @@ public class SearchTest {
 //		ProjectTest.checkExceptions(testName, args); 
 //	}
 //
-//	@Test
-//	public void testMissingQueryType() {
-//		String testName = "testMissingQueryType";
-//		Path actualOutput = Paths.get("results/searchResults.json");
-//		Path expectedOutput = Paths.get("output/searchMissingType.json");
-//		
-//		String[] args = {"-input", "input/lastfm_subset",
-//				"-output", "results/songsByArtistSubset.txt",
-//				"-order", "artist",
-//				"-threads", "5",
-//				"-searchInput", "queries/noTitle.json",
-//				"-searchOutput", actualOutput.toString()};
-//		ProjectTest.checkProjectJsonOutput(testName, 
-//				args,
-//				actualOutput,
-//				expectedOutput);		
-//	}
+	@Test
+	public void testMissingQueryType() {
+		String testName = "testMissingQueryType";
+		Path actualOutput = Paths.get("results/searchResults.json");
+		Path expectedOutput = Paths.get("output/searchMissingType.json");
+		
+		String[] args = {"-input", "input/lastfm_subset",
+				"-output", "results/songsByArtistSubset.txt",
+				"-order", "artist",
+				"-threads", "5",
+				"-searchInput", "queries/noTitle.json",
+				"-searchOutput", actualOutput.toString()};
+		ProjectTest.checkProjectJsonOutput(testName, 
+				args,
+				actualOutput,
+				expectedOutput);		
+	}
 	
 }

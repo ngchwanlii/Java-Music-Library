@@ -2,31 +2,68 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+
+
+
 public class Test {
 	
 	public static void main(String[] args) {
 		
 		
-		Path actualOutput = Paths.get("results/searchResultsMy.json");
-		Path expectedOutput = Paths.get("output/searchResultsPro.json");
+		Path actualOutput = Paths.get("results/searchResults.json");
+		Path expectedOutput = Paths.get("output/searchResults.json");
 		 
 		
 		try {
 			
+			
 			JSONParser parser = new JSONParser();
-		
+			
+			// Test with jackson package
+			ObjectMapper om = new ObjectMapper();
+			
+			
+			
+			
 			JSONObject actualObj = (JSONObject) parser.parse(Files.newBufferedReader(actualOutput));
 			JSONObject expectedObj = (JSONObject) parser.parse(Files.newBufferedReader(expectedOutput));
-		
 			
-			System.out.println(actualObj.size());
-			System.out.println(expectedObj.size());
+//			String aObj = actualObj.toJSONString();
+//			String bObj = expectedObj.toJSONString();
+			
+//			String input1 = "{\"state\":1,\"cmd\":1}";
+//	        String input2 = "{\"cmd\":1,\"state\":1}";
+			
+//			Map<String, Object> m1 = (Map<String, Object>)(om.readValue(aObj, Map.class));            
+//			Map<String, Object> m2 = (Map<String, Object>)(om.readValue(bObj, Map.class));
+//			
+//			System.out.println(m1);
+//			System.out.println(m2);
+//			
+//			System.out.println(m1.equals(m2));
+			
+			
+			// using GSON to compare - FAIL
+//			JsonParser p = new JsonParser();			
+//			JsonElement o1 = p.parse(actualObj.toString());
+//			JsonElement o2 = p.parse(expectedObj.toString());
+//			
+//			System.out.println(o1.equals(o2));
+			
+			
+			
+			
 			
 		} 
 		catch (IOException | ParseException e) {

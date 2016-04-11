@@ -79,12 +79,12 @@ public class SearchQuery implements Runnable {
 		
 		JSONArray similarsSongJSONArray = threadSafeML.searchByArtist(query);
 
-		similarsSongJSONArray = sortByTrackID(similarsSongJSONArray);
+		
 		// multiple thread that finished their search task will block here until they acquire the lock 
 		
 		// acquiring lock
 		artistLock.lockWrite();	
-		
+		similarsSongJSONArray = sortByTrackID(similarsSongJSONArray);
 		/** jay - DEBUG Print **/
 //		System.out.println("QUERY: " + query);
 //		System.out.println(similarsSongJSONArray);
@@ -104,11 +104,12 @@ public class SearchQuery implements Runnable {
 		
 		JSONArray similarsSongJSONArray = threadSafeML.searchByTitle(query);
 		
-		similarsSongJSONArray = sortByTrackID(similarsSongJSONArray);
+		
 		// multiple thread that finished their search task will block here until they acquire the lock 
 		
 		// acquiring lock
-		titleLock.lockWrite();		
+		titleLock.lockWrite();
+		similarsSongJSONArray = sortByTrackID(similarsSongJSONArray);
 		/** jay - DEBUG Print **/
 //		System.out.println("QUERY: " + query);
 //		System.out.println(similarsSongJSONArray);
@@ -128,12 +129,12 @@ public class SearchQuery implements Runnable {
 		// lock implemented in threadSafeML's class
 		JSONArray similarsSongJSONArray = threadSafeML.searchByTag(query);
 		
-		similarsSongJSONArray = sortByTrackID(similarsSongJSONArray);
+		
 		// multiple thread that finished their search task will block here until they acquire the lock
 		 		
 		// acquiring lock
 		tagLock.lockWrite();
-		
+		similarsSongJSONArray = sortByTrackID(similarsSongJSONArray);
 		/** jay - DEBUG Print **/
 //		System.out.println("QUERY: " + query);
 //		System.out.println(similarsSongJSONArray);
