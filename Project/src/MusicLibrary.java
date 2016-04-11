@@ -140,6 +140,34 @@ public class MusicLibrary {
 		}
 		return resultList;
 	}
+	
+	// searchByArtist method - return similarSongJSON based on query search in JSONArray
+	public JSONArray searchByTag(String query) {
+		
+		// initialize resultList
+		JSONArray resultList = new JSONArray();
+		
+		/** NOTE: if key is not contain in this map, return an empty resultList **/		
+		if(!tagMusicLibrary.containsKey(query)){
+			
+			return resultList;
+		}
+				
+		// list of songs by given artist
+		ArrayList<Song> songs = tagMusicLibrary.get(query);
+		
+		// for each song in songs
+		for(Song song : songs){
+				
+			if(trackIDMusicLibrary.containsKey(song.getTrackID())){
+				// convert this songObj to songJSONObj
+				JSONObject songJSONObj = convertToSongJSONObject(song);
+				resultList.add(songJSONObj);
+			}			
+		}
+		
+		return resultList;
+	}
 		
 		
 		

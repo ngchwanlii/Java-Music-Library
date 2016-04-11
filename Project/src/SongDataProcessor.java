@@ -104,6 +104,13 @@ public class SongDataProcessor {
 		/** DEBUG artistResult/titleResult/tagResult before forming a last searchResultObj **/
 //		System.out.println(artistResult); - OKAY
 //		System.out.println(titleResult); - OKAY
+//		System.out.println(tagResult); - OKAY
+		
+		// passed each searchByMethod
+		
+		// form a searchResultObject based on artistResult + titleResult + tagResult
+		
+		
 		
 	
 	}
@@ -160,11 +167,11 @@ public class SongDataProcessor {
 							searchTaskExecutor(key, queryArray, artistResult, aritstLock);
 							
 						}
-//						else if(key.equals("searchByTag")){
-//							
-//							
-//							
-//						}
+						else if(key.equals("searchByTag")){
+														
+							searchTaskExecutor(key, queryArray, tagResult, tagLock);
+							
+						}
 						else if(key.equals("searchByTitle")){
 							
 							searchTaskExecutor(key, queryArray, titleResult, titleLock);

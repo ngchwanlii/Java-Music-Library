@@ -30,11 +30,12 @@ public class SearchQuery implements Runnable {
 			
 			searchArtist(query, lock);
 			
+		}		
+		else if(key.equals("searchByTag")){
+			
+			searchTag(query, lock);
+			
 		}
-		/** redo after **/
-//		else if(key.equals("searchByTag")){
-//			searchTag(query, lock);
-//		}
 		else if(key.equals("searchByTitle")){
 			
 			searchTitle(query, lock);
@@ -91,6 +92,29 @@ public class SearchQuery implements Runnable {
 		titleLock.unlockWrite();
 	
 	}
+	
+	
+	// searchTitle method
+		public void searchTag(String query, ReentrantLock tagLock){
+			
+		// lock implemented in threadSafeML's class
+		JSONArray similarsSongJSONArray = threadSafeML.searchByTag(query);
+		
+		// multiple thread that finished their search task will block here until they acquire the lock 
+		
+		// acquiring lock
+		tagLock.lockWrite();
+		/** jay - DEBUG Print **/
+//		System.out.println("QUERY: " + query);
+//		System.out.println(similarsSongJSONArray);
+		
+		JSONObject songJSON = new JSONObject();		
+		songJSON.put("similars", similarsSongJSONArray);
+		songJSON.put("tag", query);
+		searchResultArray.add(songJSON);		
+		tagLock.unlockWrite();
+		
+		}
 	
 	
 	

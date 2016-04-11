@@ -48,6 +48,17 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 		
 	}
 	
+	@Override
+	// searchByTag method
+	public JSONArray searchByTag(String query){
+		
+		synchronized(tagLock){		
+			return super.searchByTag(query);			
+		}
+		
+	}
+	
+	
 	
 	@Override
 	// addSong is a write operation, (each song that has to parse need to be update to the data structure)
