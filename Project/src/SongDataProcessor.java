@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,6 +24,7 @@ public class SongDataProcessor {
 	private JSONArray artistResult;
 	private JSONArray titleResult;
 	private JSONArray tagResult;
+	private JSONObject searchResult;
 	private ReentrantLock aritstLock;
 	private ReentrantLock titleLock;
 	private ReentrantLock tagLock;
@@ -91,6 +93,8 @@ public class SongDataProcessor {
 		this.titleLock = new ReentrantLock();
 		this.tagLock = new ReentrantLock();		
 		this.checkSearchType = new HashSet<String>();
+		this.searchResult = new JSONObject();
+		
 		Path searchIn = Paths.get(searchInPath);
 		searchQueryFile(searchIn);
 					
@@ -105,13 +109,39 @@ public class SongDataProcessor {
 //		System.out.println(artistResult); - OKAY
 //		System.out.println(titleResult); - OKAY
 //		System.out.println(tagResult); - OKAY
+//		System.out.println(searchResult); - OKAY
 		
 		// passed each searchByMethod
 		
-		// form a searchResultObject based on artistResult + titleResult + tagResult
+		// form a searchResult based on artistResult + titleResult + tagResult
+		buildSearchResult(artistResult, titleResult, tagResult, searchResult);
 		
 		
+	
+	}
+	
+	// searchResult method - return a output JSONObject based on searchedType + searchQuery 
+	// group all the searchTypeResult (which formed by JSONArray of each search) to a final searchResultObject  
+	public void buildSearchResult(JSONArray artistResult, JSONArray titleResult, JSONArray tagResult, JSONObject searchResult){
 		
+		
+		Iterator it = checkSearchType.iterator();
+		
+		while(it.hasNext()){
+			
+			String keyType = (String) it.next();
+			
+			if(keyType.equals("searchByArtist")){
+				searchResult.put(keyType, artistResult);
+			}
+			else if(keyType.equals("searchByTag")){
+				searchResult.put(keyType, tagResult);
+			}
+			else if(keyType.equals("searchByTitle")){
+				searchResult.put(keyType, titleResult);
+			}
+			
+		}
 	
 	}
 	

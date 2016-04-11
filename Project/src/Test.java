@@ -1,5 +1,5 @@
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.json.simple.JSONArray;
 
@@ -15,10 +15,37 @@ public class Test {
 		checkInput.add("searchByArtist");
 		
 		
-		System.out.println(checkInput);
+		Iterator it = checkInput.iterator();
 		
-		System.out.println(checkInput.contains("searchByArtist"));
+		while(it.hasNext()){
+			
+			String key = (String)it.next();
+			
+			System.out.println(key);
+			
+			/* EXAMPLE of wrong implementation - it.next() being invoked multiple time so it run out of hashset 
+			if(it.next().equals("searchByArtist")){
+				System.out.println("hi artist");
+			}
+			else if(it.next().equals("searchByTag")){
+				System.out.println("hi tag");
+			}
+			else if(it.next().equals("searchByTitle")){
+				System.out.println("hi title");
+			}
+			*/
+	
+			
+		}
 		
+		
+//		System.out.println(checkInput);
+//		
+//		System.out.println(checkInput.contains("searchByArtist"));
+		
+		
+		
+		/**** breaking line ************/
 		
 //		ArrayList<String> arr = new ArrayList<String>();
 //		
