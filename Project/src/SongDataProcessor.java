@@ -156,16 +156,9 @@ public class SongDataProcessor {
 						
 						if(key.equals("searchByArtist")){
 							
-							// mark searchType
-							checkSearchType.add("searchByArtist");
+							// mark searchType + assigning task to executor +  build JSONArray that contain similarSong as JSONObject based on search type and search query  
+							searchTaskExecutor(key, queryArray, artistResult, aritstLock);
 							
-							for(int i = 0; i < queryArray.size(); i++){
-								
-								String artist = (String)queryArray.get(i);
-								
-								// use artistResult + artistLock
-								searchPool.execute(new SearchQuery(key, artist, threadSafeML, artistResult, aritstLock));
-							}
 						}
 //						else if(key.equals("searchByTag")){
 //							
@@ -174,16 +167,7 @@ public class SongDataProcessor {
 //						}
 						else if(key.equals("searchByTitle")){
 							
-							// mark searchType
-							checkSearchType.add("searchByArtist");
-							
-							for(int i = 0; i < queryArray.size(); i++){
-								
-								String title = (String)queryArray.get(i);
-								
-								// use tagResult + tagLock 
-								searchPool.execute(new SearchQuery(key, title, threadSafeML, titleResult, tagLock));
-							}
+							searchTaskExecutor(key, queryArray, titleResult, titleLock);
 							
 						}
 						
@@ -197,6 +181,22 @@ public class SongDataProcessor {
 
 		}
 
+	}
+	
+	// searchTaskExecutor method - this method mark searchType, assign task to threadpool
+	public void searchTaskExecutor(String keyType, JSONArray queryArray, JSONArray typeResultArray, ReentrantLock lock){
+		
+		// mark searchType
+		checkSearchType.add(keyType);
+		
+		for(int i = 0; i < queryArray.size(); i++){
+			
+			String artist = (String)queryArray.get(i);
+			
+			// use artistResult + artistLock
+			searchPool.execute(new SearchQuery(keyType, artist, threadSafeML, typeResultArray, lock));
+		}
+		
 	}
 	
 	
