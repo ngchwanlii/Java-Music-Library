@@ -5,6 +5,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -16,6 +17,7 @@ public class SongDataProcessor {
 	// instance variable
 	private MusicLibrary ml;
 	private ThreadSafeMusicLibrary threadSafeML;
+	private HashSet<String> checkSearchType;
 	private ThreadPool threadPool;
 	private ThreadPool searchPool;	
 	private JSONArray artistResult;
@@ -24,6 +26,7 @@ public class SongDataProcessor {
 	private ReentrantLock aritstLock;
 	private ReentrantLock titleLock;
 	private ReentrantLock tagLock;
+	
 	private int nThreads;
 	
 	// SongDataProcessor constructor - single thread version
@@ -45,19 +48,14 @@ public class SongDataProcessor {
 		Path inputPath = Paths.get(inputStringPath);		
 		findFile(inputPath);
 		
-		//TODO: encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
+		// encapsulate threadPool shutDown & await inside SongDataProcessor's constructor 		
 		// shutDown threadPool - previously submitted task will still execute
-		this.threadPool.shutDown();
-		
+		this.threadPool.shutDown();		
 		// threadPool - awaiTermination 
 		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
-		// whichever happens first.
-		try {
-			this.threadPool.awaitTermination();
-		}
-		catch (InterruptedException e){
-			e.printStackTrace();
-		}
+		// whichever happens first.		
+		this.threadPool.awaitTermination();	
+		
 						
 	
 	}
@@ -76,20 +74,14 @@ public class SongDataProcessor {
 		Path inputPath = Paths.get(inputStringPath);		
 		findFile(inputPath);
 		
-		//TODO: encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
+		// encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
 		// shutDown threadPool - previously submitted task will still execute
 		this.threadPool.shutDown();
 		
 		// threadPool - awaiTermination 
 		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
-		// whichever happens first.
-		try {
-			this.threadPool.awaitTermination();
-		}
-		catch (InterruptedException e){
-			e.printStackTrace();
-		}
-		
+		// whichever happens first.		
+		this.threadPool.awaitTermination();
 		
 		/** jay  **/
 		this.artistResult = new JSONArray();
@@ -98,9 +90,21 @@ public class SongDataProcessor {
 		this.aritstLock = new ReentrantLock();
 		this.titleLock = new ReentrantLock();
 		this.tagLock = new ReentrantLock();		
+		this.checkSearchType = new HashSet<String>();
 		Path searchIn = Paths.get(searchInPath);
 		searchQueryFile(searchIn);
-						
+					
+		// shut down searchPool
+		this.searchPool.shutDown();
+		
+		// await searchPool termination - wait all searchThread joining here
+		this.searchPool.awaitTermination();
+		
+		
+		/** DEBUG artistResult/titleResult/tagResult before forming a last searchResultObj **/
+//		System.out.println(artistResult); - OKAY
+//		System.out.println(titleResult); - OKAY
+		
 	
 	}
 	
@@ -143,19 +147,24 @@ public class SongDataProcessor {
 					**/
 					for(Object obj : queryFileObject.keySet()){
 						
-						String key = (String)obj;				
-						JSONArray queryArray = new JSONArray();						
-						/** ["Queen", "Busta Rhymes"] **/
-						queryArray = (JSONArray)queryFileObject.get(key);
+						// key = searchByArtist/searchByTitle/searchByTag
+						String key = (String)obj;															
+						
+						// queryArray = an JSONArray value retrieve from key field 
+						JSONArray queryArray = (JSONArray)queryFileObject.get(key);
 						
 						
 						if(key.equals("searchByArtist")){
 							
+							// mark searchType
+							checkSearchType.add("searchByArtist");
+							
 							for(int i = 0; i < queryArray.size(); i++){
 								
-								String query = (String)queryArray.get(i);
+								String artist = (String)queryArray.get(i);
 								
-								searchPool.execute(new SearchQuery(key, query, threadSafeML, artistResult, aritstLock));
+								// use artistResult + artistLock
+								searchPool.execute(new SearchQuery(key, artist, threadSafeML, artistResult, aritstLock));
 							}
 						}
 //						else if(key.equals("searchByTag")){
@@ -163,9 +172,20 @@ public class SongDataProcessor {
 //							
 //							
 //						}
-//						else if(key.equals("searchByTitle")){
-//							
-//						}
+						else if(key.equals("searchByTitle")){
+							
+							// mark searchType
+							checkSearchType.add("searchByArtist");
+							
+							for(int i = 0; i < queryArray.size(); i++){
+								
+								String title = (String)queryArray.get(i);
+								
+								// use tagResult + tagLock 
+								searchPool.execute(new SearchQuery(key, title, threadSafeML, titleResult, tagLock));
+							}
+							
+						}
 						
 						
 					}

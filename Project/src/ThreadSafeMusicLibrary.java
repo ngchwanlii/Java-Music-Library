@@ -27,6 +27,7 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 	}
 	
 	@Override
+	// searchByArtist method
 	public JSONArray searchByArtist(String query){
 		
 		synchronized(artistLock){
@@ -36,6 +37,17 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 		}
 		
 	}
+	
+	@Override
+	// searchByTitle method
+	public JSONArray searchByTitle(String query){
+		
+		synchronized(titleLock){		
+			return super.searchByTitle(query);			
+		}
+		
+	}
+	
 	
 	@Override
 	// addSong is a write operation, (each song that has to parse need to be update to the data structure)

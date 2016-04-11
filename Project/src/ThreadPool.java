@@ -87,14 +87,19 @@ public class ThreadPool {
 	}
 	
 	// awaitTermination method - block all thread and wait for the worker thread's execution to finish
-	public void awaitTermination() throws InterruptedException{
+	public void awaitTermination(){
 		
 		// make if shutDown() methods have been invoked previously
 		if(shutDownActive){
 			
 			// wait for all running threads to join here
 			for(PoolWorkerThread thread: threads){
-				thread.join();
+				try{
+					thread.join();
+				}
+				catch (InterruptedException e){
+					e.printStackTrace();
+				}
 			}
 			
 		}

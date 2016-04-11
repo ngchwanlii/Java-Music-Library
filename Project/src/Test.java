@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.json.simple.JSONArray;
 
@@ -6,14 +7,27 @@ public class Test {
 	
 	public static void main(String[] args) {
 		
-		ArrayList<String> arr = new ArrayList<String>();
+		HashSet<String> checkInput = new HashSet<String>();
 		
-		arr.add("Jay");
-		arr.add("Ng");
+		checkInput.add("searchByArtist");
+		checkInput.add("searchByTitle");
+		checkInput.add("searchByTag");
+		checkInput.add("searchByArtist");
 		
-		for(String s : arr){
-			System.out.println(s);
-		}
+		
+		System.out.println(checkInput);
+		
+		System.out.println(checkInput.contains("searchByArtist"));
+		
+		
+//		ArrayList<String> arr = new ArrayList<String>();
+//		
+//		arr.add("Jay");
+//		arr.add("Ng");
+//		
+//		for(String s : arr){
+//			System.out.println(s);
+//		}
 		
 		
 		
