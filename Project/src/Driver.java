@@ -44,6 +44,7 @@ public class Driver {
 					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, searchInputPath, threadPool, searchPool, nThreads);
 					
 					threadSafeMusicLibrary.writeToTextFile(orderStringPath);
+					threadSafeMusicLibrary.writeSearchResultToTextFile(processSongData.getSearchResult());
 					
 					
 					

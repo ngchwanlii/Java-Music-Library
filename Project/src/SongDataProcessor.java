@@ -106,7 +106,7 @@ public class SongDataProcessor {
 		
 		
 		/** DEBUG artistResult/titleResult/tagResult before forming a last searchResultObj **/
-//		System.out.println(artistResult); - OKAY
+//		System.out.println(artistResult); 
 //		System.out.println(titleResult); - OKAY
 //		System.out.println(tagResult); - OKAY
 //		System.out.println(searchResult); - OKAY
@@ -143,6 +143,11 @@ public class SongDataProcessor {
 			
 		}
 	
+	}
+	
+	// getSearchResult method - calling from Driver class
+	public JSONObject getSearchResult(){
+		return searchResult;
 	}
 	
 	// traverse and findFiles within the File System
@@ -192,7 +197,7 @@ public class SongDataProcessor {
 						
 						
 						if(key.equals("searchByArtist")){
-							
+						
 							// mark searchType + assigning task to executor +  build JSONArray that contain similarSong as JSONObject based on search type and search query  
 							searchTaskExecutor(key, queryArray, artistResult, aritstLock);
 							
@@ -228,10 +233,10 @@ public class SongDataProcessor {
 		
 		for(int i = 0; i < queryArray.size(); i++){
 			
-			String artist = (String)queryArray.get(i);
-			
-			// use artistResult + artistLock
-			searchPool.execute(new SearchQuery(keyType, artist, threadSafeML, typeResultArray, lock));
+			String query = (String)queryArray.get(i);
+		
+			// use typeResultArray + lock
+			searchPool.execute(new SearchQuery(keyType, query, threadSafeML, typeResultArray, lock));
 		}
 		
 	}

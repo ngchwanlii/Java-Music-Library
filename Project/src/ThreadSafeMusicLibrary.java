@@ -1,4 +1,5 @@
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class ThreadSafeMusicLibrary extends MusicLibrary {
 
@@ -81,6 +82,19 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 		lock.lockRead();		
 		// calling to super class - writeToTextFile's method
 		super.writeToTextFile(order);
+		// unlock readLock after finish writing.
+		lock.unlockRead();
+	
+	}
+	
+	@Override	
+	// writeToTextFile is a read operation (nothing will be update to the data structure)
+	public void writeSearchResultToTextFile(JSONObject searchResult) throws IllegalArgumentException{ 
+		
+		// need to acquire readLock first to read
+		lock.lockRead();		
+		// calling to super class - writeToTextFile's method
+		super.writeSearchResultToTextFile(searchResult);
 		// unlock readLock after finish writing.
 		lock.unlockRead();
 	

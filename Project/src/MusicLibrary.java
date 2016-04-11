@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -31,7 +32,7 @@ public class MusicLibrary {
 		this.searchInPath = Paths.get(searchIn);
 		this.searchOutPath = Paths.get(searchOut);
 	
-		// instantiate all type of MusicLibrary for artist, title and tag		
+		// instantiate all type of MusicLibrary for artist, title , tag, trackID		
 		this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
 		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
 		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
@@ -89,7 +90,10 @@ public class MusicLibrary {
 						Song song = trackIDMusicLibrary.get(trackID);
 						// convert this songObj to songJSONObj
 						JSONObject songJSONObj = convertToSongJSONObject(song);
-						resultList.add(songJSONObj);
+						// if this resultList does not contain this songJSONObj, add it to resultList
+						if(!resultList.contains(songJSONObj)){
+							resultList.add(songJSONObj);
+						}
 					}
 						
 				}								
@@ -130,7 +134,11 @@ public class MusicLibrary {
 						Song song = trackIDMusicLibrary.get(trackID);
 						// convert this songObj to songJSONObj
 						JSONObject songJSONObj = convertToSongJSONObject(song);
-						resultList.add(songJSONObj);
+						// if this resultList does not contain this songJSONObj, add it to resultList
+						if(!resultList.contains(songJSONObj)){
+							resultList.add(songJSONObj);
+						}
+						
 					}
 						
 				}								
@@ -147,6 +155,7 @@ public class MusicLibrary {
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
+		
 		/** NOTE: if key is not contain in this map, return an empty resultList **/		
 		if(!tagMusicLibrary.containsKey(query)){
 			
@@ -162,7 +171,10 @@ public class MusicLibrary {
 			if(trackIDMusicLibrary.containsKey(song.getTrackID())){
 				// convert this songObj to songJSONObj
 				JSONObject songJSONObj = convertToSongJSONObject(song);
-				resultList.add(songJSONObj);
+				// if this resultList does not contain this songJSONObj, add it to resultList
+				if(!resultList.contains(songJSONObj)){
+					resultList.add(songJSONObj);
+				}				
 			}			
 		}
 		
@@ -314,6 +326,27 @@ public class MusicLibrary {
 		else {
 			throw new IllegalArgumentException("\nAttempt to write textFile but the inputpath does not exists or outputpath's parent directory is not exists.");
 		}
+	}
+
+	// writeSearchResultToTextFile method - write the searchResult to searchOutputPath
+	public void writeSearchResultToTextFile(JSONObject searchResult) throws IllegalArgumentException {
+		
+		if(searchInPath.toFile().exists() && searchOutPath.toFile().getParentFile().isDirectory()){
+			
+			try(PrintWriter writer = new PrintWriter(Files.newBufferedWriter(searchOutPath, Charset.forName("UTF-8")))){
+				
+				writer.println(searchResult.toJSONString());
+				
+			} 
+			catch (IOException e) {				
+				e.printStackTrace();
+			}
+			
+		}
+		else {
+			throw new IllegalArgumentException("\nAttempt to write searchOutput file but the inputpath or outputpath's parent directory is not exists.");
+		}
+		
 	}
 
 	

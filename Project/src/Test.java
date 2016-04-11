@@ -1,42 +1,74 @@
-import java.util.HashSet;
-import java.util.Iterator;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Test {
 	
 	public static void main(String[] args) {
 		
-		HashSet<String> checkInput = new HashSet<String>();
 		
-		checkInput.add("searchByArtist");
-		checkInput.add("searchByTitle");
-		checkInput.add("searchByTag");
-		checkInput.add("searchByArtist");
+		Path actualOutput = Paths.get("results/searchResultsMy.json");
+		Path expectedOutput = Paths.get("output/searchResultsPro.json");
+		 
 		
+		try {
+			
+			JSONParser parser = new JSONParser();
 		
-		Iterator it = checkInput.iterator();
+			JSONObject actualObj = (JSONObject) parser.parse(Files.newBufferedReader(actualOutput));
+			JSONObject expectedObj = (JSONObject) parser.parse(Files.newBufferedReader(expectedOutput));
 		
-		while(it.hasNext()){
 			
-			String key = (String)it.next();
+			System.out.println(actualObj.size());
+			System.out.println(expectedObj.size());
 			
-			System.out.println(key);
+		} 
+		catch (IOException | ParseException e) {
 			
-			/* EXAMPLE of wrong implementation - it.next() being invoked multiple time so it run out of hashset 
-			if(it.next().equals("searchByArtist")){
-				System.out.println("hi artist");
-			}
-			else if(it.next().equals("searchByTag")){
-				System.out.println("hi tag");
-			}
-			else if(it.next().equals("searchByTitle")){
-				System.out.println("hi title");
-			}
-			*/
-	
-			
+			e.printStackTrace();
 		}
+		
+		
+		
+		
+		
+		
+//		HashSet<String> checkInput = new HashSet<String>();
+//		
+//		checkInput.add("searchByArtist");
+//		checkInput.add("searchByTitle");
+//		checkInput.add("searchByTag");
+//		checkInput.add("searchByArtist");
+//		
+//		
+//		Iterator it = checkInput.iterator();
+//		
+//		while(it.hasNext()){
+//			
+//			String key = (String)it.next();
+//			
+//			System.out.println(key);
+//			
+//			/* EXAMPLE of wrong implementation - it.next() being invoked multiple time so it run out of hashset 
+//			if(it.next().equals("searchByArtist")){
+//				System.out.println("hi artist");
+//			}
+//			else if(it.next().equals("searchByTag")){
+//				System.out.println("hi tag");
+//			}
+//			else if(it.next().equals("searchByTitle")){
+//				System.out.println("hi title");
+//			}
+//			*/
+//	
+//			
+//		}
 		
 		
 //		System.out.println(checkInput);
@@ -80,6 +112,8 @@ public class Test {
 		
 		
 	}
+	
+	
 	
 	// @param int i, JSONArray newArr 
 	public static JSONArray returnArr(int i){
