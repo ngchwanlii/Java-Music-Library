@@ -172,7 +172,7 @@ public class SearchQuery implements Runnable {
 			// remove the 1st element in the queryArray, so it can go in order
 			queryArray.remove(0);
 			// notify the waiting thread above
-			queryArray.notify();			
+			queryArray.notifyAll();			
 		}
 		
 			
