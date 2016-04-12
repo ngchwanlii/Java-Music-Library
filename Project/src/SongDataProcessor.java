@@ -24,11 +24,7 @@ public class SongDataProcessor {
 	private JSONArray artistResult;
 	private JSONArray titleResult;
 	private JSONArray tagResult;
-	private JSONObject searchResult;
-	private ReentrantLock aritstLock;
-	private ReentrantLock titleLock;
-	private ReentrantLock tagLock;
-	
+	private JSONObject searchResult;		
 	private int nThreads;
 	
 	// SongDataProcessor constructor - single thread version
@@ -57,9 +53,7 @@ public class SongDataProcessor {
 		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
 		// whichever happens first.		
 		this.threadPool.awaitTermination();	
-		
-						
-	
+
 	}
 	
 	
@@ -72,8 +66,16 @@ public class SongDataProcessor {
 		this.nThreads = nThreads;
 		this.threadPool = threadPool;
 		this.searchPool = searchPool;
+		this.artistResult = new JSONArray();
+		this.titleResult = new JSONArray();
+		this.tagResult = new JSONArray();		
+		this.checkSearchType = new HashSet<String>();
+		this.searchResult = new JSONObject();
 		
-		Path inputPath = Paths.get(inputStringPath);		
+		Path inputPath = Paths.get(inputStringPath);
+		Path searchIn = Paths.get(searchInPath);
+		
+		// find input json file through file directories
 		findFile(inputPath);
 		
 		// encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
@@ -85,46 +87,25 @@ public class SongDataProcessor {
 		// whichever happens first.		
 		this.threadPool.awaitTermination();
 		
-		/** jay  **/
-		this.artistResult = new JSONArray();
-		this.titleResult = new JSONArray();
-		this.tagResult = new JSONArray();
-		this.aritstLock = new ReentrantLock();
-		this.titleLock = new ReentrantLock();
-		this.tagLock = new ReentrantLock();		
-		this.checkSearchType = new HashSet<String>();
-		this.searchResult = new JSONObject();
-		
-		Path searchIn = Paths.get(searchInPath);
+	
+		// search query file 
 		searchQueryFile(searchIn);
-					
+		
 		// shut down searchPool
 		this.searchPool.shutDown();
 		
 		// await searchPool termination - wait all searchThread joining here
 		this.searchPool.awaitTermination();
-		
-		
-		/** DEBUG artistResult/titleResult/tagResult before forming a last searchResultObj **/
-//		System.out.println(artistResult); 
-//		System.out.println(titleResult); - OKAY
-//		System.out.println(tagResult); - OKAY
-//		System.out.println(searchResult); - OKAY
-		
-		// passed each searchByMethod
-		
+			
 		// form a searchResult based on artistResult + titleResult + tagResult
 		buildSearchResult(artistResult, titleResult, tagResult, searchResult);
 		
-		
-	
 	}
 	
 	// searchResult method - return a output JSONObject based on searchedType + searchQuery 
 	// group all the searchTypeResult (which formed by JSONArray of each search) to a final searchResultObject  
 	public void buildSearchResult(JSONArray artistResult, JSONArray titleResult, JSONArray tagResult, JSONObject searchResult){
-		
-		
+
 		Iterator it = checkSearchType.iterator();
 		
 		while(it.hasNext()){
@@ -144,12 +125,7 @@ public class SongDataProcessor {
 		}
 	
 	}
-	
-	// getSearchResult method - calling from Driver class
-	public JSONObject getSearchResult(){
-		return searchResult;
-	}
-	
+
 	// traverse and findFiles within the File System
 	public void searchQueryFile(Path path) {
 		
@@ -179,37 +155,30 @@ public class SongDataProcessor {
 				if(nThreads != 0){
 					
 					JSONObject queryFileObject = parseSearch(path);
-					
-					/** querFileObject BELOW
-					{
-					    "searchByArtist": ["Queen", "Busta Rhymes"],
-					    "searchByTitle": ["Wishlist", "Ode To Billie Joe  (Live @ Fillmore West)"],
-					    "searchByTag": ["50s rockabilly"]
-					}
-					**/
+	
 					for(Object obj : queryFileObject.keySet()){
 						
 						// key = searchByArtist/searchByTitle/searchByTag
 						String key = (String)obj;															
 						
 						// queryArray = an JSONArray value retrieve from key field 
-						JSONArray queryArray = (JSONArray)queryFileObject.get(key);
-						
-						
+						JSONArray queryArray = new JSONArray();
+						queryArray = (JSONArray)queryFileObject.get(key);
+												
 						if(key.equals("searchByArtist")){
 						
 							// mark searchType + assigning task to executor +  build JSONArray that contain similarSong as JSONObject based on search type and search query  
-							searchTaskExecutor(key, queryArray, artistResult, aritstLock);
+							searchTaskExecutor(key, queryArray, artistResult);
 							
 						}
 						else if(key.equals("searchByTag")){
 														
-							searchTaskExecutor(key, queryArray, tagResult, tagLock);
+							searchTaskExecutor(key, queryArray, tagResult);
 							
 						}
 						else if(key.equals("searchByTitle")){
 							
-							searchTaskExecutor(key, queryArray, titleResult, titleLock);
+							searchTaskExecutor(key, queryArray, titleResult);
 							
 						}
 						
@@ -226,7 +195,7 @@ public class SongDataProcessor {
 	}
 	
 	// searchTaskExecutor method - this method mark searchType, assign task to threadpool
-	public void searchTaskExecutor(String keyType, JSONArray queryArray, JSONArray typeResultArray, ReentrantLock lock){
+	public void searchTaskExecutor(String keyType, JSONArray queryArray, JSONArray typeResultArray){
 		
 		// mark searchType
 		checkSearchType.add(keyType);
@@ -236,7 +205,7 @@ public class SongDataProcessor {
 			String query = (String)queryArray.get(i);
 		
 			// use typeResultArray + lock
-			searchPool.execute(new SearchQuery(keyType, query, threadSafeML, typeResultArray, lock));
+			searchPool.execute(new SearchQuery(keyType, query, queryArray, threadSafeML, typeResultArray));
 		}
 		
 	}
@@ -265,10 +234,6 @@ public class SongDataProcessor {
 		return queryFileObj;
 
 	}
-	
-	
-	
-	
 
 	// traverse and findFiles within the File System
 	public void findFile(Path path) {
@@ -349,6 +314,11 @@ public class SongDataProcessor {
 		} else {
 			return false;
 		}
+	}
+	
+	// getSearchResult method - calling from Driver class
+	public JSONObject getSearchResult(){
+		return searchResult;
 	}
 
 }

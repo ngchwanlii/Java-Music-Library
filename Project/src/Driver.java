@@ -45,12 +45,9 @@ public class Driver {
 					
 					threadSafeMusicLibrary.writeToTextFile(orderStringPath);
 					threadSafeMusicLibrary.writeSearchResultToTextFile(processSongData.getSearchResult());
+										
 					
-					
-					
-					
-				}
-				
+				}				
 				else {
 					
 					// create threadPool

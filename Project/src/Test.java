@@ -9,8 +9,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.core.JsonParser;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -21,23 +21,27 @@ public class Test {
 	public static void main(String[] args) {
 		
 		
-		Path actualOutput = Paths.get("results/searchResults.json");
-		Path expectedOutput = Paths.get("output/searchResults.json");
+		
+		
+		
+		
+//		Path actualOutput = Paths.get("results/searchResults.json");
+//		Path expectedOutput = Paths.get("output/searchResults.json");
 		 
 		
-		try {
+//		try {
 			
 			
-			JSONParser parser = new JSONParser();
-			
-			// Test with jackson package
-			ObjectMapper om = new ObjectMapper();
-			
-			
-			
-			
-			JSONObject actualObj = (JSONObject) parser.parse(Files.newBufferedReader(actualOutput));
-			JSONObject expectedObj = (JSONObject) parser.parse(Files.newBufferedReader(expectedOutput));
+//			JSONParser parser = new JSONParser();
+//			
+//			// Test with jackson package
+//			ObjectMapper om = new ObjectMapper();
+//			
+//			
+//			
+//			
+//			JSONObject actualObj = (JSONObject) parser.parse(Files.newBufferedReader(actualOutput));
+//			JSONObject expectedObj = (JSONObject) parser.parse(Files.newBufferedReader(expectedOutput));
 			
 //			String aObj = actualObj.toJSONString();
 //			String bObj = expectedObj.toJSONString();
@@ -61,16 +65,16 @@ public class Test {
 //			
 //			System.out.println(o1.equals(o2));
 			
-			
-			
-			
-			
-		} 
-		catch (IOException | ParseException e) {
-			
-			e.printStackTrace();
-		}
-		
+//			
+//			
+//			
+//			
+//		} 
+//		catch (IOException | ParseException e) {
+//			
+//			e.printStackTrace();
+//		}
+//		
 		
 		
 		

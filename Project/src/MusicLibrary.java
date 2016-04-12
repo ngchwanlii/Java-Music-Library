@@ -62,7 +62,7 @@ public class MusicLibrary {
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
-		/** NOTE: if key is not contain in this map, return an empty resultList **/		
+		// if key is not contain in this map, return an empty resultList 
 		if(!artistMusicLibrary.containsKey(query)){
 			
 			return resultList;
@@ -76,10 +76,6 @@ public class MusicLibrary {
 				
 			// list of songs similar to song			 
 			ArrayList<String> similarSongTrackID = s.getSimilars();
-			
-			/** DEBUG print - confirmed Busta - DJ Quik in trackID **/
-			/** NEED DEBUG **/
-//			System.out.println(trackIDMusicLibrary.containsKey("TRAAMJY128F92F5919"));
 			
 			// for each similarSong by track_ID
 			if(!similarSongTrackID.isEmpty()){
@@ -110,7 +106,7 @@ public class MusicLibrary {
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
-		/** NOTE: if key is not contain in this map, return an empty resultList **/		
+		// if key is not contain in this map, return an empty resultList 		
 		if(!titleMusicLibrary.containsKey(query)){
 			
 			return resultList;
@@ -156,7 +152,7 @@ public class MusicLibrary {
 		JSONArray resultList = new JSONArray();
 		
 		
-		/** NOTE: if key is not contain in this map, return an empty resultList **/		
+		// if key is not contain in this map, return an empty resultList 		
 		if(!tagMusicLibrary.containsKey(query)){
 			
 			return resultList;
