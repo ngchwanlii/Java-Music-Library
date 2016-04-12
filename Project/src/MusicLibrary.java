@@ -182,17 +182,19 @@ public class MusicLibrary {
 	
 	
 	// thread-safe - share function that could be use for searchByArtist/searchByTitle/searchByTag 
-	private synchronized JSONObject convertToSongJSONObject(Song song){
+	private JSONObject convertToSongJSONObject(Song song){
 		
 		// thread-safe local variable that use for returning back to caller
 		// caller is also a new local variable from its method
-		JSONObject songJSON = new JSONObject();
-	
-		songJSON.put("artist", song.getArtistName());
-		songJSON.put("trackId", song.getTrackID());
-		songJSON.put("title", song.getTitle());
+		synchronized(song){
+			JSONObject songJSON = new JSONObject();
 		
-		return songJSON;
+			songJSON.put("artist", song.getArtistName());
+			songJSON.put("trackId", song.getTrackID());
+			songJSON.put("title", song.getTitle());
+			
+			return songJSON;
+		}
 		
 	}
 	

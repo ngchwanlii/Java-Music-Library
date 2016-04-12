@@ -130,8 +130,8 @@ public class SearchQuery implements Runnable {
 	// insertByQueryOrder - the resultList is inserting songJSONObject based on the queries' order
 	private void insertByQueryOrder(String searchType, String query, JSONArray queryArray, JSONObject songJSON, JSONArray similarsSongJSONArray){
 		
-		
-		while(true){
+		// while still has queries processing
+		while(queryArray.size() != 0){
 			
 			synchronized(queryArray){
 				if(query.equals(queryArray.get(0))){	
@@ -152,7 +152,7 @@ public class SearchQuery implements Runnable {
 		
 		// multi-thread may pass their query order check, example - searchByArtist thread/ searchyTitle thread/ searchByTag thread
 		// implement synchronize block here so the thread that own this intrinsic lock can perform their task and call notify
-		// if no synchronized block here - IllegalMointorStateException
+		// if no synchronized block here - IllegalMointorStateException		
 		synchronized(queryArray){		
 			
 			if(searchType.equals("searchByArtist")){				
@@ -173,7 +173,8 @@ public class SearchQuery implements Runnable {
 			queryArray.remove(0);
 			// notify the waiting thread above
 			queryArray.notify();			
-		}	
+		}
+		
 			
 	}
 	
