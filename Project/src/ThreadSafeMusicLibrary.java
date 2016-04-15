@@ -9,14 +9,22 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 	private Object titleLock;
 	private Object tagLock;
 	
-	// ThreadSafeMusicLibrary's constructor - with search function
+	
+	//TODO:  ThreadSasfeMusicLibrary's constructor - for web search
+	public ThreadSafeMusicLibrary(String musicLibrary_database){
+		
+		super(musicLibrary_database);
+		this.lock = new ReentrantLock();
+
+	}
+	
+	
+	// ThreadSafeMusicLibrary's constructor - with search function (for SearchTest)
 	public ThreadSafeMusicLibrary(String inputStringPath, String outputStringPath, String searchInputPath, String searchOutputPath){
 		
 		super(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);
 		this.lock = new ReentrantLock();
-		this.artistLock = new Object();
-		this.titleLock = new Object();
-		this.tagLock = new Object();
+
 		
 	}
 	
@@ -31,21 +39,32 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 	// searchByArtist method
 	public JSONArray searchByArtist(String query){
 		
-		synchronized(artistLock){
-			
+		// TODO: should change to readLock
+		// use try finally block to unlock		
+		lock.lockRead();
+		try{
 			return super.searchByArtist(query);
-			
 		}
-		
+		finally {
+			lock.unlockRead();
+		}
+			
 	}
 	
 	@Override
 	// searchByTitle method
 	public JSONArray searchByTitle(String query){
 		
-		synchronized(titleLock){		
-			return super.searchByTitle(query);			
+		// TODO: should change to readLock
+		// use try finally block to unlock		
+		lock.lockRead();
+		try{
+			return super.searchByTitle(query);	
 		}
+		finally {
+			lock.unlockRead();
+		}
+		
 		
 	}
 	
@@ -53,13 +72,19 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 	// searchByTag method
 	public JSONArray searchByTag(String query){
 		
-		synchronized(tagLock){		
-			return super.searchByTag(query);			
+		// TODO: should change to readLock
+		// use try finally block to unlock
+		lock.lockRead();
+		try {
+			return super.searchByTag(query);
+		}
+		finally {
+			lock.unlockRead();
 		}
 		
+		
 	}
-	
-	
+
 	
 	@Override
 	// addSong is a write operation, (each song that has to parse need to be update to the data structure)
