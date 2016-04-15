@@ -27,35 +27,7 @@ public class SongDataProcessor {
 	private JSONObject searchResult;		
 	private int nThreads;
 	
-	
-	// TODO: SongDataProcessor constructor - for web search (multi-thread version)
-	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String musiclibrary_database, ThreadPool threadPool, ThreadPool searchPool, int nThreads) {
-		
-		// initialize threadSafeMusicLibrary once
-		this.threadSafeML = threadSafeMusicLibrary;
-		this.nThreads = nThreads;
-		this.threadPool = threadPool;
-			
-		Path musiclibrary_database_path = Paths.get(musiclibrary_database);
-	
-		// find input json file through file directories
-		findFile(musiclibrary_database_path);
-		
-		// encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
-		// shutDown threadPool - previously submitted task will still execute
-		this.threadPool.shutDown();
-		
-		// threadPool - awaiTermination 
-		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
-		// whichever happens first.		
-		this.threadPool.awaitTermination();
-		
-		
-		//TODO: remember how to handle the search selected from drop-down-list from web
-		
-	} 
-	
-	
+
 	// SongDataProcessor constructor - single thread version
 	public SongDataProcessor(MusicLibrary musicLibrary, String inputStringPath) {
 
@@ -65,15 +37,15 @@ public class SongDataProcessor {
 		
 	}
 	
-	// SongDataProcessor constructor - multi-thread version
-	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String inputStringPath, ThreadPool threadPool, int nThreads) {
+	// SongDataProcessor constructor - multi-thread version  - for web search version
+	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String musiclibrary_database, ThreadPool threadPool, int nThreads) {
 		
 		// initialize threadSafeMusicLibrary once
 		this.threadSafeML = threadSafeMusicLibrary;
 		this.nThreads = nThreads;
 		this.threadPool = threadPool;
-		Path inputPath = Paths.get(inputStringPath);		
-		findFile(inputPath);
+		Path musiclibrary_database_path = Paths.get(musiclibrary_database);		
+		findFile(musiclibrary_database_path);
 		
 		// encapsulate threadPool shutDown & await inside SongDataProcessor's constructor 		
 		// shutDown threadPool - previously submitted task will still execute
@@ -82,6 +54,9 @@ public class SongDataProcessor {
 		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
 		// whichever happens first.		
 		this.threadPool.awaitTermination();	
+		
+		// Note: no searchPool required
+		// jetty will handle multiple doGet/doPost as multi-threaded 
 
 	}
 	

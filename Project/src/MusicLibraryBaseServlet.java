@@ -23,15 +23,8 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 
 	}
 	
-	// set the title of header
-	// for Project 3 - part 2 - Web Interface
-	// title = Song Finder
-	protected String header(String title){
-		
-		return "<html><head><title>" + title + "</title></head><body>"; 
-		
-	}
 	
+	// css/js styling
 	protected String style(){
 		
 		return "<style>.center {"
@@ -45,10 +38,105 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	}
 	
 	
+	/************************
+	 * 						*
+	 *  Header zone			*
+	 * 						*
+	 ************************/	
+	// set the title of header
+	// for Project 3 - part 2 - Web Interface
+	// title = Song Finder
+	protected String init_html_and_title(String title){
+		
+		return "<html><head><title>" + title + "</title></head><body>"; 
+		
+	}
+	
+	// return boldHeader
+	protected String header(String boldTitle){
+		
+		return "<div class=\"center\"><center><h1>" + boldTitle + "</h1></center><br/>";
+		
+	}
+	
+	// return a search type with drop downlist + query input text field
+	protected String searchBar(){
+		
+		String search_form = "<label>Search Type:</label>"
+				+ "<form action=\"song\" method=\"get\">"
+				+ "<select name=\"search_type\">"	// note search_type here
+				+ "<option value=\"artist\">Artist</option>"
+				+ "<option value=\"song_title\">Song Title</option>"
+				+ "<option value=\"tag\">Tag</option>"    				
+				+ "</select>"
+				+ "</form>";
+
+		String query_form = "<label>Query:</label>"
+				+ "<form action=\"song\" method=\"get\">"
+				+ "<input type=\"text\" name=\"query\">" // note query here
+				+ "<input type=\"submit\" value=\"Submit\">"
+				+ "</form>";
+		
+		
+		return search_form + query_form;
+		
+	}
+	
+	// return welcome msg
+	protected String welcome_msg(){
+		// welcome message
+		return "<center><p>Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!</p></center>";
+	}
+	
+	
+	/************************
+	 * 						*
+	 *  Body/Content zone	*
+	 * 						*
+	 ************************/
+	
+	// return table format style
+	protected String tableFormat(String col1, String col2){
+		return "<body><table border=\"2px\" width=\"100%\"><tr>"
+				+ "<td><strong> " + col1 + "</strong></td>"
+				+ "<td><strong>" + col2 + "</strong></td>"
+				+ "</tr>";
+	}
+	
+	// return table content 
+	protected String tableContent(String artist, String songTitle){
+		
+		return "<tr><td>" + artist + "</td><td>" + songTitle + "</td></tr>";
+		
+	}
+	
+
+
+	/************************
+	 * 						*
+	 *  Footer zone			*
+	 * 						*
+	 ************************/
 	// return footer of html page
 	protected String footer(){
 		return "</body></html>";
 	}
 	
+
+	/************************
+	 * 						*
+	 *  Utilities tool 		*
+	 * 						*
+	 ************************/
+	// horizontal line
+	protected String horizontal_line(){
+		
+		return "<hr>";
+	}
+
+	// query not found msg
+	protected String notFound(String query){
+		return "<font color=\"red\"><p><b>No " + query + " found in this music-library. Try insert another query." + "</b></p></font>";
+	}
 	
 }

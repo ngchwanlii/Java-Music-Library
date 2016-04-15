@@ -75,6 +75,7 @@ public class MusicLibrary {
 	public JSONArray searchByArtist(String query) {
 		
 		
+		// thread-safe local variable
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
@@ -107,12 +108,9 @@ public class MusicLibrary {
 						if(!resultList.contains(songJSONObj)){
 							resultList.add(songJSONObj);
 						}
-					}
-						
+					}					
 				}								
-			}
-			
-			
+			}					
 		}
 		return resultList;
 	}
@@ -202,16 +200,15 @@ public class MusicLibrary {
 	private JSONObject convertToSongJSONObject(Song song){
 		
 		// thread-safe local variable that use for returning back to caller
-		// caller is also a new local variable from its method
-		synchronized(song){
-			JSONObject songJSON = new JSONObject();
+		// caller is also a new local variable from its method		
+		JSONObject songJSON = new JSONObject();
+	
+		songJSON.put("artist", song.getArtistName());
+		songJSON.put("trackId", song.getTrackID());
+		songJSON.put("title", song.getTitle());
 		
-			songJSON.put("artist", song.getArtistName());
-			songJSON.put("trackId", song.getTrackID());
-			songJSON.put("title", song.getTitle());
-			
-			return songJSON;
-		}
+		return songJSON;
+		
 		
 	}
 	

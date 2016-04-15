@@ -18,39 +18,26 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// set header of html page
-		String responseHtml = header("Search Page");
+		String responseHtml = init_html_and_title("Search Page");
 		
 		// get style (css)
 		String style  = style();
 		
 		// header of search page - Song Finder
-		String header  = "<div class=\"center\"><center><h1>Song Finder</h1></center><br/>";
+		String header  = header("Song Finder");
 			
 		// welcome message
-		String welcome_msg = "<center><p>Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!</p></center>";
+		String welcome_msg = welcome_msg();
 		
 		// horizontal line
-		String horizontalLine = "<hr>";
+		String horizontalLine = horizontal_line();
 		
 		// form that has to be submit to SongServlet.class
-		String search_form = "<label>Search Type:</label>"
-							+ "<form action=\"song\" method=\"get\">"
-							+ "<select name=\"search_type\">"	// note search_type here
-		    				+ "<option value=\"artist\">Artist</option>"
-		    				+ "<option value=\"song_title\">Song Title</option>"
-		    				+ "<option value=\"tag\">Tag</option>"    				
-		    				+ "</select>"
-							+ "</form>";
-		
-		String query_form = "<label>Query:</label>"
-							+ "<form action=\"song\" method=\"get\">"
-							+ "<input type=\"text\" name=\"query\">" // note query here
-							+ "<input type=\"submit\" value=\"Submit\">"
-							+ "</form>";
+		String searchBar = searchBar();
 		
 		responseHtml += (style + header
 						+ welcome_msg + horizontalLine
-						+ search_form + query_form
+						+ searchBar
 						+ footer());
 					
 		PrintWriter writer = prepareResponse(response);
