@@ -24,7 +24,23 @@ public class MusicLibrary {
 	private Path searchInPath;
 	private Path searchOutPath;
 	
-	// MusicLibrary constructor - with search function 
+	// TODO: MusicLibrary constructor - for web search (multi-thread)
+	public MusicLibrary(String musiclibrary_database){
+		
+		// Note: no output file created for web search
+		// the output of search result will be handled by servlet that returning an html result page
+		
+		this.inputPath = Paths.get(musiclibrary_database);		 
+		this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
+		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
+		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
+		this.trackIDMusicLibrary = new TreeMap<String, Song>();
+		
+		
+	} 
+	
+	
+	// MusicLibrary constructor - with search function (for search-test)
 	public MusicLibrary(String inputStringPath, String outStringPath, String searchIn, String searchOut){
 		
 		this.inputPath = Paths.get(inputStringPath);
@@ -40,7 +56,7 @@ public class MusicLibrary {
 			
 	}
 	
-	// MusicLibrary constructor
+	// MusicLibrary constructor - normal version
 	public MusicLibrary(String inputStringPath, String outStringPath){
 				
 		this.inputPath = Paths.get(inputStringPath);
@@ -62,6 +78,7 @@ public class MusicLibrary {
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
+
 		// if key is not contain in this map, return an empty resultList 
 		if(!artistMusicLibrary.containsKey(query)){
 			
