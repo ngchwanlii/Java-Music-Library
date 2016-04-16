@@ -7,7 +7,9 @@ public class MusicLibraryServer {
 	
 	
 	// DEFAULT_PORT assigned
-	public static final int DEFAULT_PORT = 9051;
+	
+	// TODO: remember change back to 9052 after GradeServer has been graded
+	public static final int DEFAULT_PORT = 9052;
 	// MAX_THREADS
 	public static final int MAX_THREADS = 10;
 	
@@ -64,7 +66,10 @@ public class MusicLibraryServer {
 		// song-servlet for executing a search on music library and return an html page
 		servhandler.addServlet(SongServlet.class, "/song");
 		
+		
+		//set the list of handlers for the server
 		server.setHandler(servhandler);
+		
 		// server start
 		server.start();
 		// waiting to join

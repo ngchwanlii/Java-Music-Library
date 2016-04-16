@@ -68,11 +68,9 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "<option value=\"artist\">Artist</option>"
 				+ "<option value=\"song_title\">Song Title</option>"
 				+ "<option value=\"tag\">Tag</option>"    				
-				+ "</select>"
-				+ "</form>";
+				+ "</select>";
 
-		String query_form = "<label>Query:</label>"
-				+ "<form action=\"song\" method=\"get\">"
+		String query_form = "<label>Query:</label>"				
 				+ "<input type=\"text\" name=\"query\">" // note query here
 				+ "<input type=\"submit\" value=\"Submit\">"
 				+ "</form>";

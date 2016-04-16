@@ -17,7 +17,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 	 *  - perform a search task on music library
 	 *  - return an html page of searched result
 	 * 
-	 */
+	 */	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
@@ -25,7 +25,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// if user haven't select any type, this selected_type will be null		
 		// this will return the option value ="artist/song_title/tag" based on user selected drop down list
 		String search_type = request.getParameter("search_type");
-		
+	
 		// get query 
 		// if user haven't key in anything,  this query will be null
 		String query = request.getParameter("query");
@@ -110,5 +110,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		writer.println(responseHtml);  
 			
 	}
+	
+	
 
 }
