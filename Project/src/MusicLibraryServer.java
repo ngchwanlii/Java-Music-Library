@@ -8,7 +8,7 @@ public class MusicLibraryServer {
 	
 	// DEFAULT_PORT assigned
 	
-	// TODO: remember change back to 9052 after GradeServer has been graded
+	// TODO: remember change back to 9051 after GradeServer has been graded
 	public static final int DEFAULT_PORT = 9052;
 	// MAX_THREADS
 	public static final int MAX_THREADS = 10;
@@ -54,6 +54,8 @@ public class MusicLibraryServer {
 						
 				// set attribute 
 				sce.getServletContext().setAttribute("music_library",  threadSafe_musicLibrary);
+				
+				// set this attribute here - not in use in this Project 3 but just in case for further project 4/5
 				sce.getServletContext().setAttribute("song_data_processor",  processSongData);
 								
 			}

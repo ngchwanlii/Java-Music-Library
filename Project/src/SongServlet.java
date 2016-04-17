@@ -80,6 +80,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// table format - artist <-> song title
 		String result_table = tableFormat("Artist", "Song Title");
 		
+		
 		// check if searchResults is empty or have results
 		if(!searchResultsArray.isEmpty()){
 			
@@ -94,13 +95,18 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				result_table += tableContent((String)song.get("artist"), (String)song.get("title"));			
 			}
 			
-			// finish building the table
-			responseHtml += (style + header + welcome_msg + horizontalLine + searchBar + result_table);
+			// closing table </table> <-- NOTE
+			result_table += "</table>";
+			
+			// finish building the table - added footer()
+			responseHtml += (style + header + welcome_msg + horizontalLine + searchBar + result_table + footer());
 			
 		}
 		else {
 			// error message
-			responseHtml += "<font color=\"red\"><p><b>No " + query + " found in this music-library. Try insert another query." + "</b></p></font>";
+			responseHtml += notFound(search_type, query);
+			responseHtml += horizontal_line();
+			responseHtml += backToSearchButton();
 		}
 		
 		

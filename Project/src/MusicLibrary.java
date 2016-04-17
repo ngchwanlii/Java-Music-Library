@@ -79,7 +79,6 @@ public class MusicLibrary {
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
-
 		// if key is not contain in this map, return an empty resultList 
 		if(!artistMusicLibrary.containsKey(query)){
 			
@@ -117,7 +116,7 @@ public class MusicLibrary {
 	
 	// searchByArtist method - return similarSongJSON based on query search in JSONArray
 	public JSONArray searchByTitle(String query) {
-		
+	
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
@@ -226,10 +225,7 @@ public class MusicLibrary {
 		// track_id
 		/** jay - added trackID music library for tracking id **/
 		String trackID = song.getTrackID();
-	
-	
-		/** jay - DEBUG PRINT **/	
-//		System.out.println("trackID: " + trackID + " song: " + song.getArtistName());
+		
 		
 		this.trackIDMusicLibrary.put(trackID, song);
 		

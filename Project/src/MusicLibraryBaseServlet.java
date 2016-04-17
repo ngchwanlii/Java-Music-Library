@@ -133,8 +133,12 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	}
 
 	// query not found msg
-	protected String notFound(String query){
-		return "<font color=\"red\"><p><b>No " + query + " found in this music-library. Try insert another query." + "</b></p></font>";
+	protected String notFound(String searchType, String query){
+		return "<font color=\"red\"><p><b>No similar songs to " + searchType + " \"" + query + "\" found in this music-library. Try search again." + "</b></p></font>";
+	}
+	
+	protected String backToSearchButton(){
+		return "<form action=\"search\" method=\"get\"><input type=\"submit\" value=\"Search Again\"></form>";
 	}
 	
 }
