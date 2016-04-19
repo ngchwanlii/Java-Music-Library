@@ -9,7 +9,7 @@ public class MusicLibraryServer {
 	// DEFAULT_PORT assigned
 	
 	// TODO: remember change back to 9051 after GradeServer has been graded
-	public static final int DEFAULT_PORT = 9052;
+	public static final int DEFAULT_PORT = 9051;
 	// MAX_THREADS
 	public static final int MAX_THREADS = 10;
 	
