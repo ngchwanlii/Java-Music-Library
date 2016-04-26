@@ -39,7 +39,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		// reach this line means user has selected search type and input query
 				
-		// TODO: perform search task on musiclibrary		
+		// perform search task on musiclibrary		
 		// 2. load song_data_processor content
 		
 		// load musicLibrary content
@@ -59,9 +59,10 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		}
 		
 		// prepare to build html page
+		/** FIXED - use camelCase probelm here **/
 		
 		// set header
-		String responseHtml = init_html_and_title("Result Page");
+		String responseHtml = initHtmlAndTitle("Result Page");
 		// set style (css)
 		String style  = style();
 				
@@ -69,16 +70,16 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		String header  = header("Song Finder");
 		
 		// welcome message
-		String welcome_msg = welcome_msg();
+		String welcome = welcomeMsg();
 		
 		// horizontal line
-		String horizontalLine = horizontal_line();
+		String horizontalLine = horizontalLine();
 		
 		// searchBar remain at song result page
 		String searchBar = searchBar();
 		
 		// table format - artist <-> song title
-		String result_table = tableFormat("Artist", "Song Title");
+		String resultTable = tableFormat("Artist", "Song Title");
 		
 		
 		// check if searchResults is empty or have results
@@ -92,20 +93,20 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				JSONObject song = (JSONObject) searchResultsArray.get(i);
 				
 				// build the result table content
-				result_table += tableContent((String)song.get("artist"), (String)song.get("title"));			
+				resultTable += tableContent((String)song.get("artist"), (String)song.get("title"));			
 			}
 			
 			// closing table </table> <-- NOTE
-			result_table += "</table>";
+			resultTable += "</table>";
 			
 			// finish building the table - added footer()
-			responseHtml += (style + header + welcome_msg + horizontalLine + searchBar + result_table + footer());
+			responseHtml += (style + header + welcome + horizontalLine + searchBar + resultTable + footer());
 			
 		}
 		else {
 			// error message
 			responseHtml += notFound(search_type, query);
-			responseHtml += horizontal_line();
+			responseHtml += horizontalLine();
 			responseHtml += backToSearchButton();
 		}
 		

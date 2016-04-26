@@ -18,7 +18,7 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// set header of html page
-		String responseHtml = init_html_and_title("Search Page");
+		String responseHtml = initHtmlAndTitle("Search Page");
 		
 		// get style (css)
 		String style  = style();
@@ -27,10 +27,10 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		String header  = header("Song Finder");
 			
 		// welcome message
-		String welcome_msg = welcome_msg();
+		String welcome_msg = welcomeMsg();
 		
 		// horizontal line
-		String horizontalLine = horizontal_line();
+		String horizontalLine = horizontalLine();
 		
 		// form that has to be submit to SongServlet.class
 		String searchBar = searchBar();

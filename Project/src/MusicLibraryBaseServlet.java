@@ -46,7 +46,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	// set the title of header
 	// for Project 3 - part 2 - Web Interface
 	// title = Song Finder
-	protected String init_html_and_title(String title){
+	protected String initHtmlAndTitle(String title){
 		
 		return "<html><head><title>" + title + "</title></head><body>"; 
 		
@@ -81,7 +81,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	}
 	
 	// return welcome msg
-	protected String welcome_msg(){
+	protected String welcomeMsg(){
 		// welcome message
 		return "<center><p>Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!</p></center>";
 	}
@@ -127,7 +127,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	 * 						*
 	 ************************/
 	// horizontal line
-	protected String horizontal_line(){
+	protected String horizontalLine(){
 		
 		return "<hr>";
 	}

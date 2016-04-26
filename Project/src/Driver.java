@@ -49,12 +49,10 @@ public class Driver {
 					
 				}				
 				else {
-					
-					// create threadPool
-					ThreadPool threadPool = new ThreadPool(nThreads);
+										
 					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath);
 					// threadPool will execute task 
-					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, threadPool, nThreads);
+					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, nThreads);
 					
 					// write to text file
 					threadSafeMusicLibrary.writeToTextFile(orderStringPath);	

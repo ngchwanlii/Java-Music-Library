@@ -8,7 +8,7 @@ public class MusicLibraryServer {
 	
 	// DEFAULT_PORT assigned
 	
-	// TODO: remember change back to 9051 after GradeServer has been graded
+	
 	public static final int DEFAULT_PORT = 9051;
 	// MAX_THREADS
 	public static final int MAX_THREADS = 10;
@@ -44,23 +44,21 @@ public class MusicLibraryServer {
 				
 				
 //TODO: encapsulate threadpool in the songdataprocessor.				
-				// create Threadpool and SearchPool						
-				// ThreadPool for building up the music library concurrently
-				ThreadPool threadPool = new ThreadPool(nThreads);
+/** FIXED - encapsulated creation of threadpool instance in SongDataProcessor's class **/				
 								
 				// create musiclibrary (thread version)		  - [task: set content of musiclibrary and ready for build up]
 				ThreadSafeMusicLibrary threadSafe_musicLibrary = new ThreadSafeMusicLibrary(musicLibraryDataBasePath);
 				
 				// create song_data_processor (thread version) - [task: addSong and build up musiclibrary]
-				SongDataProcessor processSongData = new SongDataProcessor(threadSafe_musicLibrary, musicLibraryDataBasePath, threadPool, nThreads);
+				SongDataProcessor processSongData = new SongDataProcessor(threadSafe_musicLibrary, musicLibraryDataBasePath, nThreads);
 						
 				// set attribute 
 				sce.getServletContext().setAttribute("music_library",  threadSafe_musicLibrary);
 				
-//TODO: the songdataprocessor should not be needed.				
-				// set this attribute here - not in use in this Project 3 but just in case for further project 4/5
-				sce.getServletContext().setAttribute("song_data_processor",  processSongData);
-								
+//TODO: the songdataprocessor should not be needed. 
+/** FIXED - delete songdataprocessor context **/
+							
+							
 			}
 						
 		});

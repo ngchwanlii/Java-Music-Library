@@ -38,12 +38,18 @@ public class SongDataProcessor {
 	}
 	
 	// SongDataProcessor constructor - multi-thread version  - for web search version
-	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String musiclibrary_database, ThreadPool threadPool, int nThreads) {
+	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String musiclibrary_database, int nThreads) {
 		
-		// initialize threadSafeMusicLibrary once
+		// initialize threadSafeMusicLibrary once		
 		this.threadSafeML = threadSafeMusicLibrary;
 		this.nThreads = nThreads;
+		
+		// TODO: encapsulate the creation of thread-pool here!
+		// create Threadpool 						
+		// ThreadPool for building up the music library concurrently
+		ThreadPool threadPool = new ThreadPool(nThreads);
 		this.threadPool = threadPool;
+		
 		Path musiclibrary_database_path = Paths.get(musiclibrary_database);		
 		findFile(musiclibrary_database_path);
 		
