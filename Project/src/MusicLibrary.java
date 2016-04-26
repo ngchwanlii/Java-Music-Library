@@ -336,6 +336,7 @@ public class MusicLibrary {
 		}
 	}
 
+//TODO: move this functionality to a search component.
 	// writeSearchResultToTextFile method - write the searchResult to searchOutputPath
 	public void writeSearchResultToTextFile(JSONObject searchResult) throws IllegalArgumentException {
 		
