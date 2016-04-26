@@ -42,6 +42,8 @@ public class MusicLibraryServer {
 				// number of threads for the thread pool
 				int nThreads = MAX_THREADS;
 				
+				
+//TODO: encapsulate threadpool in the songdataprocessor.				
 				// create Threadpool and SearchPool						
 				// ThreadPool for building up the music library concurrently
 				ThreadPool threadPool = new ThreadPool(nThreads);
@@ -55,6 +57,7 @@ public class MusicLibraryServer {
 				// set attribute 
 				sce.getServletContext().setAttribute("music_library",  threadSafe_musicLibrary);
 				
+//TODO: the songdataprocessor should not be needed.				
 				// set this attribute here - not in use in this Project 3 but just in case for further project 4/5
 				sce.getServletContext().setAttribute("song_data_processor",  processSongData);
 								
