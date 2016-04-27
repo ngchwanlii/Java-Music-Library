@@ -22,7 +22,9 @@ public class ThreadPool {
 	private final PoolWorkerThread[] threads;
 	private final LinkedList<Runnable> taskQueue;
 	
-	//TODO: if I modified this as volatile, should I use synchronize block below (synchronize shutDown())?
+	//Extra Self-Concept Test: 
+	// Q if I modified this as volatile, should I use synchronize block below (synchronize shutDown())? 
+	// Ans: don't need synchronized block if this variable is volatile
 	private volatile boolean shutDownActive = false; 
 	
 	// ThreadPool constructor
@@ -89,7 +91,7 @@ public class ThreadPool {
 	// awaitTermination method - block all thread and wait for the worker thread's execution to finish
 	public void awaitTermination(){
 		
-		// make if shutDown() methods have been invoked previously
+		// if shutDown() methods have been invoked previously
 		if(shutDownActive){
 			
 			// wait for all running threads to join here

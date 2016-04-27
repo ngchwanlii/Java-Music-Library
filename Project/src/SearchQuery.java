@@ -152,7 +152,7 @@ public class SearchQuery implements Runnable {
 		
 		// multi-thread may pass their query order check, example - searchByArtist thread/ searchyTitle thread/ searchByTag thread
 		// implement synchronize block here so the thread that own this intrinsic lock can perform their task and call notify
-		// if no synchronized block here - IllegalMointorStateException		
+		// if no synchronized block here - will cause IllegalMointorStateException		
 		synchronized(queryArray){		
 			
 			if(searchType.equals("searchByArtist")){				

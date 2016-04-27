@@ -36,17 +36,21 @@ public class Driver {
 				
 				
 				if(searchActive){
-					// create threadPool
-					ThreadPool threadPool = new ThreadPool(nThreads);
-					ThreadPool searchPool = new ThreadPool(nThreads);
 					
-					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath, searchInputPath, searchOutputPath);					
-					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, searchInputPath, threadPool, searchPool, nThreads);
+					
+					ThreadSafeMusicLibrary threadSafeMusicLibrary = new ThreadSafeMusicLibrary(inputStringPath, outputStringPath);					
+					SongDataProcessor processSongData = new SongDataProcessor(threadSafeMusicLibrary, inputStringPath, nThreads);
+					SearchFunction searchFeatures = new SearchFunction(searchInputPath, searchOutputPath, threadSafeMusicLibrary, nThreads);
+					
 					
 					threadSafeMusicLibrary.writeToTextFile(orderStringPath);
-					threadSafeMusicLibrary.writeSearchResultToTextFile(processSongData.getSearchResult());
-										
 					
+					// TODO: move this writeSearchResultToTextFile method to a SearchFunction class
+					/** FIXED - migrate to SearchFunction class 
+					 * 	use SearchFunction's writeSearchResultToTextFile method to write the searched result into a text file
+					 * */
+					searchFeatures.writeSearchResultToTextFile();
+															
 				}				
 				else {
 										

@@ -17,14 +17,8 @@ public class SongDataProcessor {
 	
 	// instance variable
 	private MusicLibrary ml;
-	private ThreadSafeMusicLibrary threadSafeML;
-	private HashSet<String> checkSearchType;
-	private ThreadPool threadPool;
-	private ThreadPool searchPool;	
-	private JSONArray artistResult;
-	private JSONArray titleResult;
-	private JSONArray tagResult;
-	private JSONObject searchResult;		
+	private ThreadSafeMusicLibrary threadSafeML;	
+	private ThreadPool threadPool;		
 	private int nThreads;
 	
 
@@ -37,14 +31,15 @@ public class SongDataProcessor {
 		
 	}
 	
-	// SongDataProcessor constructor - multi-thread version  - for web search version
+	// SongDataProcessor constructor - multi-thread version  - for web search version / for search functionality test
 	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String musiclibrary_database, int nThreads) {
 		
 		// initialize threadSafeMusicLibrary once		
 		this.threadSafeML = threadSafeMusicLibrary;
 		this.nThreads = nThreads;
 		
-		// TODO: encapsulate the creation of thread-pool here!
+		
+		/** FIXED: encapsulate the creation of thread-pool here! **/
 		// create Threadpool 						
 		// ThreadPool for building up the music library concurrently
 		ThreadPool threadPool = new ThreadPool(nThreads);
@@ -66,186 +61,6 @@ public class SongDataProcessor {
 
 	}
 	
-	
-	// SongDataProcessor constructor - multi-thread version - search function
-	public SongDataProcessor(ThreadSafeMusicLibrary threadSafeMusicLibrary, String inputStringPath, 
-							String searchInPath, ThreadPool threadPool, ThreadPool searchPool, int nThreads) {
-		
-		// initialize threadSafeMusicLibrary once
-		this.threadSafeML = threadSafeMusicLibrary;
-		this.nThreads = nThreads;
-		this.threadPool = threadPool;
-		this.searchPool = searchPool;
-		this.artistResult = new JSONArray();
-		this.titleResult = new JSONArray();
-		this.tagResult = new JSONArray();		
-		this.checkSearchType = new HashSet<String>();
-		this.searchResult = new JSONObject();
-		
-		Path inputPath = Paths.get(inputStringPath);
-		Path searchIn = Paths.get(searchInPath);
-		
-		// find input json file through file directories
-		findFile(inputPath);
-		
-		// encapsulate threadPool shutDown & await inside SongDataProcessor's constructor - FIXED		
-		// shutDown threadPool - previously submitted task will still execute
-		this.threadPool.shutDown();
-		
-		// threadPool - awaiTermination 
-		// Blocks until all tasks have completed execution after a shutdown request, or the timeout occurs, or the current thread is interrupted, 
-		// whichever happens first.		
-		this.threadPool.awaitTermination();
-		
-	
-		// search query file 
-		searchQueryFile(searchIn);
-		
-		// shut down searchPool
-		this.searchPool.shutDown();
-		
-		// await searchPool termination - wait all searchThread joining here
-		this.searchPool.awaitTermination();
-			
-		// form a searchResult based on artistResult + titleResult + tagResult
-		buildSearchResult(artistResult, titleResult, tagResult, searchResult);
-		
-	}
-	
-	// searchResult method - return a output JSONObject based on searchedType + searchQuery 
-	// group all the searchTypeResult (which formed by JSONArray of each search) to a final searchResultObject  
-	public void buildSearchResult(JSONArray artistResult, JSONArray titleResult, JSONArray tagResult, JSONObject searchResult){
-
-		Iterator it = checkSearchType.iterator();
-		
-		while(it.hasNext()){
-			
-			String keyType = (String) it.next();
-			
-			if(keyType.equals("searchByArtist")){
-				searchResult.put(keyType, artistResult);
-			}
-			else if(keyType.equals("searchByTag")){
-				searchResult.put(keyType, tagResult);
-			}
-			else if(keyType.equals("searchByTitle")){
-				searchResult.put(keyType, titleResult);
-			}
-			
-		}
-	
-	}
-
-	// traverse and findFiles within the File System
-	public void searchQueryFile(Path path) {
-		
-		if (Files.isDirectory(path)) {
-
-			try (DirectoryStream<Path> list = Files.newDirectoryStream(path)) {
-
-				for (Path file : list) {
-
-					searchQueryFile(file);
-
-				}
-
-			} 
-			catch (IOException e) {
-				System.out.println(e);
-			}
-		}
-
-		else {
-
-			// if checkFileFormat = true = found JSON file
-			if (checkFileFormat(path)) {
-				
-				// TODO: when meet new JSON files, put it into queue
-				// multi-thread version
-				if(nThreads != 0){
-					
-					JSONObject queryFileObject = parseSearch(path);
-	
-					for(Object obj : queryFileObject.keySet()){
-						
-						// key = searchByArtist/searchByTitle/searchByTag
-						String key = (String)obj;															
-						
-						// queryArray = an JSONArray value retrieve from key field 
-						JSONArray queryArray = new JSONArray();
-						queryArray = (JSONArray)queryFileObject.get(key);
-												
-						if(key.equals("searchByArtist")){
-						
-							// mark searchType + assigning task to executor +  build JSONArray that contain similarSong as JSONObject based on search type and search query  
-							searchTaskExecutor(key, queryArray, artistResult);
-							
-						}
-						else if(key.equals("searchByTag")){
-														
-							searchTaskExecutor(key, queryArray, tagResult);
-							
-						}
-						else if(key.equals("searchByTitle")){
-							
-							searchTaskExecutor(key, queryArray, titleResult);
-							
-						}
-						
-						
-					}
-					
-					
-				}
-				
-			}
-
-		}
-
-	}
-	
-	/** NOTE THIS METHOD - may use for web search version **/
-	
-	// searchTaskExecutor method - this method mark searchType, assign task to threadpool
-	public void searchTaskExecutor(String keyType, JSONArray queryArray, JSONArray typeResultArray){
-		
-		// mark searchType
-		checkSearchType.add(keyType);
-		
-		for(int i = 0; i < queryArray.size(); i++){
-			
-			String query = (String)queryArray.get(i);
-		
-			// use typeResultArray + lock
-			searchPool.execute(new SearchQuery(keyType, query, queryArray, threadSafeML, typeResultArray));
-		}
-		
-	}
-	
-	
-	// parseSearch function - return a JSONObject found from queryFile
-	public JSONObject parseSearch(Path path) {
-
-		JSONParser jsonParser = new JSONParser();
-		JSONObject queryFileObj = new JSONObject();
-		
-		
-		try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))) {
-			
-	
-			queryFileObj = (JSONObject) jsonParser.parse(reader);
-		
-		} 
-		catch (IOException e) {
-			System.out.println(e);
-		} 
-		catch (ParseException e) {
-
-			System.out.println(e);
-		}
-		return queryFileObj;
-
-	}
 
 	// traverse and findFiles within the File System
 	public void findFile(Path path) {
@@ -271,7 +86,7 @@ public class SongDataProcessor {
 			// if checkFileFormat = true = found JSON file
 			if (checkFileFormat(path)) {
 				
-				// TODO: when meet new JSON files, put it into queue
+				// when meet new JSON files, put it into queue
 				// multi-thread version
 				if(nThreads != 0){
 					// execute new Runnable class - this class has a same logic as parseFunction which is processing the file, add song to musicLibrary
@@ -296,7 +111,7 @@ public class SongDataProcessor {
 		try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))) {
 			
 						
-			//TODO: pass in reader instead of line - FIXED
+			// pass in reader instead of line - FIXED
 			JSONObject singleSongObject = (JSONObject) jsonParser.parse(reader);
 			
 			// save as a single song object
@@ -328,9 +143,5 @@ public class SongDataProcessor {
 		}
 	}
 	
-	// getSearchResult method - calling from Driver class
-	public JSONObject getSearchResult(){
-		return searchResult;
-	}
-
+	
 }

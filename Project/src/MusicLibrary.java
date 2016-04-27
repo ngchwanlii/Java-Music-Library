@@ -21,10 +21,9 @@ public class MusicLibrary {
 	private TreeMap<String, Song> trackIDMusicLibrary;
 	private Path inputPath; 
 	private Path outputPath;
-	private Path searchInPath;
-	private Path searchOutPath;
 	
-	// TODO: MusicLibrary constructor - for web search (multi-thread)
+	
+	// MusicLibrary constructor - for web search (multi-thread)
 	public MusicLibrary(String musiclibrary_database){
 		
 		// Note: no output file created for web search
@@ -40,23 +39,7 @@ public class MusicLibrary {
 	} 
 	
 	
-	// MusicLibrary constructor - with search function (for search-test)
-	public MusicLibrary(String inputStringPath, String outStringPath, String searchIn, String searchOut){
-		
-		this.inputPath = Paths.get(inputStringPath);
-		this.outputPath = Paths.get(outStringPath);
-		this.searchInPath = Paths.get(searchIn);
-		this.searchOutPath = Paths.get(searchOut);
-	
-		// instantiate all type of MusicLibrary for artist, title , tag, trackID		
-		this.artistMusicLibrary = new TreeMap<String, TreeSet<Song>>();
-		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
-		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
-		this.trackIDMusicLibrary = new TreeMap<String, Song>();
-			
-	}
-	
-	// MusicLibrary constructor - normal version
+	// MusicLibrary constructor - normal version / with search function test
 	public MusicLibrary(String inputStringPath, String outStringPath){
 				
 		this.inputPath = Paths.get(inputStringPath);
@@ -336,27 +319,7 @@ public class MusicLibrary {
 		}
 	}
 
-//TODO: move this functionality to a search component.
-	// writeSearchResultToTextFile method - write the searchResult to searchOutputPath
-	public void writeSearchResultToTextFile(JSONObject searchResult) throws IllegalArgumentException {
-		
-		if(searchInPath.toFile().exists() && searchOutPath.toFile().getParentFile().isDirectory()){
-			
-			try(PrintWriter writer = new PrintWriter(Files.newBufferedWriter(searchOutPath, Charset.forName("UTF-8")))){
-				
-				writer.println(searchResult.toJSONString());
-				
-			} 
-			catch (IOException e) {				
-				e.printStackTrace();
-			}
-			
-		}
-		else {
-			throw new IllegalArgumentException("\nAttempt to write searchOutput file but the inputpath or outputpath's parent directory is not exists.");
-		}
-		
-	}
+
 
 	
 	
