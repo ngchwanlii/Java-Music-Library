@@ -1,8 +1,7 @@
+package cs212.data;
 import java.util.ArrayList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-//TODO: add documentation  FIXED
 
 public class Song {
 	

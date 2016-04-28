@@ -1,3 +1,4 @@
+package cs212.data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -5,13 +6,12 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Iterator;
-
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import cs212.util.concurrent.ProcessingFile;
+import cs212.util.concurrent.ThreadPool;
+
 
 public class SongDataProcessor {
 	

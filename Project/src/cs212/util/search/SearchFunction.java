@@ -1,3 +1,4 @@
+package cs212.util.search;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,11 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import cs212.data.ThreadSafeMusicLibrary;
+import cs212.util.concurrent.ThreadPool;
 
 /** FIXED - created new SearchFunctionc class - this class do all the search task **/
 public class SearchFunction {

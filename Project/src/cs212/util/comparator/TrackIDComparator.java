@@ -1,3 +1,4 @@
+package cs212.util.comparator;
 import java.util.Comparator;
 
 import org.json.simple.JSONObject;

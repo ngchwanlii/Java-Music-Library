@@ -1,9 +1,12 @@
+package cs212.util.search;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import cs212.data.ThreadSafeMusicLibrary;
+import cs212.util.comparator.TrackIDComparator;
 
 public class SearchQuery implements Runnable {
 

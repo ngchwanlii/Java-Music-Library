@@ -1,5 +1,8 @@
+package cs212.data;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import cs212.util.concurrent.ReentrantLock;
 
 public class ThreadSafeMusicLibrary extends MusicLibrary {
 

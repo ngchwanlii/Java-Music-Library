@@ -1,4 +1,7 @@
+package cs212.util.comparator;
 import java.util.Comparator;
+
+import cs212.data.Song;
 
 public class ArtistComparator implements Comparator<Song> {
 

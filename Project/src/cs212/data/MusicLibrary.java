@@ -1,3 +1,4 @@
+package cs212.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
@@ -5,12 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import cs212.util.comparator.*;
+
 
 public class MusicLibrary {
 	
