@@ -7,7 +7,7 @@ public class SearchTest {
 
 	@Test
 	public void testValidQueries() {
-		
+
 		String testName = "testValidQueries";
 		Path actualOutput = Paths.get("results/searchResults.json");
 		Path expectedOutput = Paths.get("output/searchResults.json");
