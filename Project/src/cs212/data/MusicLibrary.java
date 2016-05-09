@@ -20,6 +20,7 @@ public class MusicLibrary {
 	private TreeMap<String, TreeSet<Song>> titleMusicLibrary;
 	private TreeMap<String, ArrayList<Song>> tagMusicLibrary;	
 	private TreeMap<String, Song> trackIDMusicLibrary;
+	private TreeSet<String> sortedArtistNameSet;
 	private Path inputPath; 
 	private Path outputPath;
 	
@@ -36,6 +37,9 @@ public class MusicLibrary {
 		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
 		this.trackIDMusicLibrary = new TreeMap<String, Song>();
 		
+		/** Advance Feature **/ 
+		this.sortedArtistNameSet = new TreeSet<String>();
+		
 		
 	} 
 	
@@ -51,6 +55,9 @@ public class MusicLibrary {
 		this.titleMusicLibrary = new TreeMap<String, TreeSet<Song>>(); 
 		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();		
 		this.trackIDMusicLibrary = new TreeMap<String, Song>();
+		
+		/** Advance Feature **/ 
+		this.sortedArtistNameSet = new TreeSet<String>();
 		
 			
 	}
@@ -206,10 +213,13 @@ public class MusicLibrary {
 		// tag
 		ArrayList<String> tagList = song.getTags();
 		
-		// track_id
-		/** jay - added trackID music library for tracking id **/
+		// track_id		
 		String trackID = song.getTrackID();
 		
+		
+		/** Advance Feature [Display artist name alpbaetically] **/
+		this.sortedArtistNameSet.add(artistName);
+		 
 		
 		this.trackIDMusicLibrary.put(trackID, song);
 		
@@ -318,6 +328,22 @@ public class MusicLibrary {
 		else {
 			throw new IllegalArgumentException("\nAttempt to write textFile but the inputpath does not exists or outputpath's parent directory is not exists.");
 		}
+	}
+	
+	// getTreeSet a list of sorted artistname alphabetically
+	// make this thread safe, TreeSet is not thread safe but the element inside is a String type, string element inside is thread-safe 
+	// caller who invoke this method need to ACQUIRE READ LOCK 	
+	public TreeSet<String> getSortedArtistName(){
+		
+		// create a new TreeSet object for returning
+		TreeSet<String> result = new TreeSet<String>();
+		
+		for(String str : this.sortedArtistNameSet){
+			result.add(str);
+		}
+		
+		return result;
+		
 	}
 
 

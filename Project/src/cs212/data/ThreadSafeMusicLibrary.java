@@ -1,4 +1,6 @@
 package cs212.data;
+import java.util.TreeSet;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -101,4 +103,18 @@ public class ThreadSafeMusicLibrary extends MusicLibrary {
 	
 	}
 	
+	@Override
+	// getSortedartistName is a read operation	
+	public TreeSet<String> getSortedArtistName(){
+		
+		// need to acquire read lock first to read
+		lock.lockRead();
+		try {
+			return super.getSortedArtistName();
+		}
+		finally {
+			lock.unlockRead();
+		}
+		
+	}
 }

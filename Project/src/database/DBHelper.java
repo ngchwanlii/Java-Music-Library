@@ -41,7 +41,7 @@ public class DBHelper {
 												+ "username VARCHAR(100) NOT NULL, " 
 												+ "artist TEXT NOT NULL, "
 												+ "songTitle TEXT NOT NULL, "
-												+ "songTrackID VARCHAR(100) NULL PRIMARY KEY" + 												 										
+												+ "songTrackID VARCHAR(100) NULL" + 												 										
 												")";
 	
 	

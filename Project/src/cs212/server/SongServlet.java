@@ -41,21 +41,17 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		StringBuffer buffer = new StringBuffer();
 		
 		
-		/** condition check 1 - CHECK USER LOGIN **/
+		// 1. base case - check user login
+		boolean userLogin = checkUserLogin(session, response);
 		
-		// if not login user, redirect to login page
-		String loggedIn =  (String) session.getAttribute(LOGGED_IN);
-		
-		// base case check
-		// which mean haven't login yet
-		if(loggedIn == null){
-			
-			// redirect to login page			
+		if(!userLogin){
+			// redirect to login page					
 			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS +  "=" + NOT_LOGGED_IN));
 			return;
 		}
 		
-	
+		
+		
 		/** condition check 2 - CHECK USER CORRECTLY SEARCH QUERY **/		
 		// get the search_type - user selected type will go here		
 		String search_type = getParameterValue(request, SEARCH_TYPE); 
@@ -64,17 +60,18 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// if user haven't key in anything,  this query will be null
 		String query = getParameterValue(request, QUERY);
 		
-
-		
-		
-		/** Condition check 1: if user have not do a search on the searchbar, redirect user to /search page **/		
-		// if either 1 of the option is not selected, redirect back to search page
-		if( (search_type == null || query == null)){
+		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
+	
+		// 2. check user clicked search button
+		if(!userClickedSearchButton){
+			
 			// means user haven't select the query or search_type
 			response.sendRedirect(response.encodeRedirectURL("/search"));
-			return;
-		}	
-		
+			// redirect back to search page
+			return;			
+		}
+			
+		// reach this line means user has selected search type and input query
 		
 		/** set condition SESSION for SEARCH TYPE and QUERY **/
 		// else, set the session - useful for adding to favorite star icon display
@@ -84,8 +81,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// get username from session
 		String username = (String) session.getAttribute(USERNAME);
 	
-		// reach this line means user has selected search type and input query
-				
+		
 		// perform search task on musiclibrary		
 		// 2. load song_data_processor content
 		
@@ -143,7 +139,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		buffer.append(divClose());
 		
 		// welcome message
-		buffer.append(welcomeMsg());
+		buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
 		
 		
 		// horizontal line
@@ -151,6 +147,9 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		// searchBar remain at song result page
 		buffer.append(searchBar());
+		
+		// show all artist button
+		buffer.append(showAllArtistsButton());
 		
 		// css style
 		buffer.append(divClass("table_result"));
@@ -172,26 +171,22 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				
 				/** GOOD DEBUG  **/
 //				System.out.println(song.toJSONString());
-				
-				
+					
 				favLock.lockRead();
-				
-				boolean userHashRecordInFavList;
-				
-				
+			
 				// ready to form each table row with added option to add favs song
 				try {
 					
-					userHashRecordInFavList = DBHelper.checkFavUsernameAndSongIDExist(dbconfig, username, (String)song.get("trackId"));
+					boolean userHashRecordInFavList = DBHelper.checkFavUsernameAndSongIDExist(dbconfig, username, (String)song.get("trackId"));
 				
 					// means this has been added to favTable in mySQL
 					if(userHashRecordInFavList){
 						
 						// change to full star icon
 						String imgPath = generateImgPath("fullStar");
-					
-						// build the result table content						
-				
+						
+						
+						// build the result table content										
 						buffer.append(tableContent(username, (String)song.get("artist"), 
 								(String)song.get("title"), (String)song.get("trackId"), imgPath));
 						

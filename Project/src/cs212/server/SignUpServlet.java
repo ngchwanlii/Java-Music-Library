@@ -77,6 +77,8 @@ public class SignUpServlet extends MusicLibraryBaseServlet {
 		// get footer
 		buffer.append(footer());
 		
+		buffer.append("HELLO EHEHE");
+		
 		// write out the html page
 		writer.println(buffer);
 		

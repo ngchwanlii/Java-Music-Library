@@ -56,21 +56,30 @@ public class MusicLibraryServer {
 				// number of threads for the thread pool
 				int nThreads = MAX_THREADS;
 				
-				
-//TODO: encapsulate threadpool in the songdataprocessor.				
-/** FIXED - encapsulated creation of threadpool instance in SongDataProcessor's class **/				
-								
+										
 				// create musiclibrary (thread version)		  - [task: set content of musiclibrary and ready for build up]
 				ThreadSafeMusicLibrary threadSafe_musicLibrary = new ThreadSafeMusicLibrary(MUSIC_DATAPATH);
 				
 				// create song_data_processor (thread version) - [task: addSong and build up musiclibrary]
 				SongDataProcessor processSongData = new SongDataProcessor(threadSafe_musicLibrary, MUSIC_DATAPATH, nThreads);
 						
-				// set attribute music_lib
-				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.MUSIC_LIB,  threadSafe_musicLibrary);
-			
+
 				// create new dbconfig
 				DBConfig dbconfig = setupDBConfig();
+				
+				
+				// create 2 types of reentrant lock (lock logic for addUser to mySQL + retrieve data from mySQL table (for login authentication)
+				
+				// why 2 types? both userLock and favLock has similar features -  (retrieve / update userTable)
+				// but they update to their own table, so we use 2 reentrant lock, where other thread can simultaneously 
+				// update to 2 different table 
+				
+				// this lock is for userLock (retrieve / update userTable) 
+				ReentrantLock userLock = new ReentrantLock();
+				
+				// this lock is for favLock (retrieve / update favListTable);
+				ReentrantLock favLock = new ReentrantLock();
+		
 				
 				// must create user table 1st
 				try {
@@ -89,20 +98,13 @@ public class MusicLibraryServer {
 					e.printStackTrace();
 				}
 				
+				
+			
+				// set attribute music_lib
+				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.MUSIC_LIB,  threadSafe_musicLibrary);
+				
 				// set dbconfig data
 				sce.getServletContext().setAttribute(DBConfig.DBCONFIG,  dbconfig);
-				
-				// create 2 types of reentrant lock (lock logic for addUser to mySQL + retrieve data from mySQL table (for login authentication)
-				
-				// why 2 types? both userLock and favLock has similar features -  (retrieve / update userTable)
-				// but they update to their own table, so we use 2 reentrant lock, where other thread can simultaneously 
-				// update to 2 different table 
-				
-				// this lock is for userLock (retrieve / update userTable) 
-				ReentrantLock userLock = new ReentrantLock();
-				
-				// this lock is for favLock (retrieve / update favListTable);
-				ReentrantLock favLock = new ReentrantLock();
 				
 				// set attribute userLock into web container
 				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.USERTABLE_LOCK,  userLock);
@@ -143,6 +145,12 @@ public class MusicLibraryServer {
 		// consider wild card, where user simply type in an unreachable path
 		// redirect them to sign up page
 		servhandler.addServlet(SignUpServlet.class, "/*");
+		
+		
+		/** Advance Features **/
+		servhandler.addServlet(AllArtistServlet.class, "/allartists");
+		
+		
 		
 		
 		//set the list of handlers for the server

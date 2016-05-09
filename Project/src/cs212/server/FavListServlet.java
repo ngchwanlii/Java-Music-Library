@@ -27,7 +27,7 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 	
 	
 	
-	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// get session
 		HttpSession session = request.getSession();
@@ -40,32 +40,36 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 		ReentrantLock favLock = (ReentrantLock) request.getServletContext().getAttribute(MusicLibraryBaseServlet.FAVTABLE_LOCK);
 		
 		
-		// check if status is correct to access this fav_list page (user should login 1st to get to this page)
-		String loggedIn =  (String) session.getAttribute(LOGGED_IN);
+		// 1. base case - check user login
+		boolean userLogin = checkUserLogin(session, response);
 		
-		// base case check
-		// which mean haven't login yet
-		if(loggedIn == null){
-			
-			// redirect to login page			
+		if(!userLogin){
+			// redirect to login page					
 			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS +  "=" + NOT_LOGGED_IN));
 			return;
 		}
 		
 		
-		/** condition check 2 -  CHECK LOGGED IN USER CLICK SHOW FAV LIST ICON **/
+		// 2. check if logged_in user has click on the display favorite song icon
+		// get searchType and query from session 
 		
-		// check if user has click the showFavList icon
-		String showFavList = request.getParameter("showFavList");
+		String searchType = (String)session.getAttribute(SEARCH_TYPE);
+		String query = (String)session.getAttribute(QUERY);
+		
+		
+		/** FavListServlet condition  - check whether loginUser has click on show Favorite List Icon **/
+		String showFavList = request.getParameter("showFavList");		
 		// check if user already has fav list records on mySQL fav database table
 		String loginUserHasFavList = (String)session.getAttribute(HAS_FAV_SONG_LIST_RECORD);		
 		String loginUsername = (String) session.getAttribute(USERNAME);
 		
-		
-		// if user has clicked show fav table icon + user already has record favList records in mySQL favList database
-		if( showFavList != null && loginUserHasFavList != null ){
+		// check if user has Fav Song Records & CLICKED the show favorite song button
+		boolean userClickedShowFavIcon = checkUserClickOnShowFavListIcon(showFavList, loginUserHasFavList);
+
+		// if user has click show fav icon
+		if(userClickedShowFavIcon){
 			
-		
+			/** Generate favorite list page html inside music ibrary base servlet **/
 			// generate a page that show all favorite added song
 			// get writer
 			PrintWriter writer = prepareResponse(response);
@@ -106,13 +110,16 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			buffer.append(divClose());
 
 			// fav welcome message
-			buffer.append(favListWelcomeMsg());
+			buffer.append(welcomeMsg("Here your favorite song list!"));
 			
 			// horizontal line
 			buffer.append(horizontalLine());
 			
 			// searchBar remain at song result page
 			buffer.append(searchBar());
+			
+			// show all artist button
+			buffer.append(showAllArtistsButton());
 			
 			// css style
 			buffer.append(divClass("table_result"));
@@ -145,84 +152,31 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			// finish building the table - added footer()
 			buffer.append(footer());
 			
+			
 			// print out html page
 			writer.println(buffer);
+						
 			return;
-		}
-			
-		
-		/** condition 3 - CHECK ADD TO FAV SONG ACTION and setting for addToFavorite**/
-		// check if user has clicked add to Fav Song link or not
-		
-		/** RESUME LATER **/
-		// extra condition check if user has clicked the favList icon		
-		String favUsername = request.getParameter("favusername");
-		String artist = request.getParameter("artist");
-		String songTitle = request.getParameter("songtitle");		
-		String songTrackID = request.getParameter("trackid");
-	
-		
-		
-		// get searchType and query from session 
-		 String searchType = (String)session.getAttribute(SEARCH_TYPE);
-		 String query = (String)session.getAttribute(QUERY);
-		 
-		 // remove session after use
-		 session.removeAttribute(SEARCH_TYPE);
-		 session.removeAttribute(QUERY);
-		 
-		 
-		// if user has clicked the link, add the favorite song and update to mySQL table
-		if(favUsername != null && artist != null && songTitle != null && songTrackID != null){
-			
-			// acquire write lock to write to mySQL favTable 
-			favLock.lockWrite();
-	
-			//update to mySQL favTable			
-			boolean userHashRecordInFavList; 
-			
-			try {
-			
-				// added to fav mySQL table
-				// check if user already has a record in fav list, don't add this song because it's already in mySQL favlist table 
-				
-				userHashRecordInFavList = DBHelper.checkFavUsernameAndSongIDExist(dbconfig, favUsername, songTrackID);
-				
-				session.setAttribute(HAS_FAV_SONG_LIST_RECORD, favUsername);
-				
-				if(!userHashRecordInFavList) {
-			
-					DBHelper.addFavorite(dbconfig, favUsername, artist, songTitle, songTrackID);
-			
-					// redirect back to same page, just the star icon changed IMPORTANT STEP - [used searchType & query to identify this]!
-					// send the queried, and search_type back to song page ( this will verified and help display fullstar added favorite song icon)
-					response.sendRedirect(response.encodeRedirectURL("/song?search_type=" + searchType  +  "&query=" +  query));
-					return;
-				}
-				else {
-					
-					response.sendRedirect(response.encodeRedirectURL("/song?search_type=" + searchType  +  "&query=" +  query));
-					return;
-					
-				}
-				
-			
-			} catch (SQLException e) {
-				
-				e.printStackTrace();
-			}
-			finally {
-				// release writelock
-				favLock.unlockWrite();
-			}
 			
 		}
-		else {			
-			
+		
+		
+		// 3. check if user clicked add to Fav Song link 
+		boolean userClickedAddFavSong = checkAddFavSongAction(session, request, response, dbconfig, favLock);
+		
+		if(userClickedAddFavSong){
+			// redirect back to same page, just the star icon changed IMPORTANT STEP - [used searchType & query to identify this]!
+			// send the queried, and search_type back to song page ( this will verified and help display fullstar added favorite song icon)
+			response.sendRedirect(response.encodeRedirectURL("/song?search_type=" + searchType  +  "&query=" +  query));
+			return;
+		
+		}
+		else {
 			response.sendRedirect(response.encodeRedirectURL("/song"));
+			// return the response
 			return;
+		}
 			
-		}		
 	}
 	
 	

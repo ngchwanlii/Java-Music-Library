@@ -165,6 +165,14 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 					
 				}
 				
+				
+				boolean loginUserHasFavSongRecords = DBHelper.favTableUsernameExist(dbconfig, username);
+				
+				if(loginUserHasFavSongRecords){
+					session.setAttribute(HAS_FAV_SONG_LIST_RECORD, username);
+				}
+			
+				
 				// reach this line mean login check passed											
 				
 				// set login status equal to LOGGED in
@@ -172,6 +180,9 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 				
 				// set username = logged in username
 				session.setAttribute(USERNAME, username);
+				
+				
+				
 			
 				// go to fav-song list page
 				response.sendRedirect(response.encodeRedirectURL("/search"));

@@ -43,18 +43,29 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		StringBuffer buffer = new StringBuffer();
 		
 	
-		// check if this user is logged in or not
-		String loggedIn = (String) session.getAttribute(LOGGED_IN);
+		
 		
 		// get username from session's object that bind with attribute name [USERNAME]
 		String username = (String) session.getAttribute(USERNAME);
 		
-		// user must loggedIn or signup to use search function
-		if(loggedIn == null){
-			
+		
+		/****************************************
+		 *	CONDITION 1 - check user login 	 	*
+		 ****************************************/
+		
+		// 1. base case - check user login
+		boolean userLogin = checkUserLogin(session, response);
+		
+		if(!userLogin){
+			// redirect to login page					
 			response.sendRedirect(response.encodeRedirectURL("/login?" + STATUS +  "=" + NOT_LOGGED_IN));
 			return;
 		}
+		
+		
+		/********************************************************************************
+		 *		CONDITION 2 - check user has fav song records 	 						*
+		 ********************************************************************************/
 		
 		// check if the user has Fav Song Records
 		try {
@@ -70,7 +81,8 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 			}
 			
 			
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			
 			e.printStackTrace();
 		}
@@ -78,8 +90,7 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 			favLock.unlockRead();
 		}
 		
-		
-		
+	
 		// set header of html page
 		buffer.append(initHtmlAndTitle("Search Page"));
 		
@@ -113,13 +124,16 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		buffer.append(divClose());
 		
 		// welcome message
-		buffer.append(welcomeMsg());
+		buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
 		
 		// horizontal line
 		buffer.append(horizontalLine());
 		
 		// form that has to be submit to SongServlet.class
 		buffer.append(searchBar());
+		
+		// show all artist button
+		buffer.append(showAllArtistsButton());
 		
 		// footer
 		buffer.append(footer());

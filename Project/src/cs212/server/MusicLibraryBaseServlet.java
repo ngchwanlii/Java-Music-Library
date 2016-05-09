@@ -1,10 +1,17 @@
 package cs212.server;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import cs212.util.concurrent.ReentrantLock;
+import database.DBConfig;
+import database.DBHelper;
 
 /**
  * 
@@ -269,20 +276,11 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	/********************************************END OF Login Logic *********************************************************/
 	
-	 
-	
-	
 	// return welcome msg
-	protected String welcomeMsg(){
+	protected String welcomeMsg(String msg){
 		// welcome message
-		return "<center><p>Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!</p></center>";
+		return "<center><p>" + msg + "</p></center>";
 	}
-	
-	// fav song list page welcome message
-	protected String favListWelcomeMsg(){
-		return "<center><p>Here your favorite song list!</p></center>";
-	}
-	
 	
 	
 	/************************
@@ -425,5 +423,162 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	
 	
+	/**************************************************************************************************************************************
+	 * 														ADVANCE FEATURES 															  *									
+	 **************************************************************************************************************************************/
+	
+	// display all artist table format
+	protected String allArtistTableFormat(String col1){
+				
+		return "<body><table border=\"2px\" width=\"100%\">"				
+					+ "<tr>"
+					+ "<td><strong><center>" + col1 + "</center></strong></td>"									
+					+ "</tr>";
+								
+	} 
+	
+	// display all artist button
+	protected String showAllArtistsButton(){
+		
+		return "<form action=\"allartists\" method=\"get\"><input type=\"submit\" value=\"View all artist\"></form>"; 
+	}
+	
+	
+	// display all artist name table content
+	protected String  displayArtistNameEachRow(String artist){
+		
+		return "<tr><td>" + artist + "</td></tr>";
+		
+	}
+	
+	
+
+
+
+
+
+	
+/**************************************************************************************************************************************
+ * 														CONDITION CHECK															  *									
+ **************************************************************************************************************************************/
+
+	/** General condition **/
+	// check user login - for mostly servlet
+	protected boolean checkUserLogin(HttpSession session, HttpServletResponse response) throws ServletException, IOException{
+		
+	
+		String loggedIn =  (String) session.getAttribute(LOGGED_IN);
+		
+		// base case check
+		// which mean haven't login yet
+		if(loggedIn == null){
+				
+			return false;
+		}
+		
+		return true;
+		
+	}
+	
+	
+	/** SongServlet - check if user clicked search button & insert query properly **/
+	protected boolean checkLoginUserClickedSearchButton(String search_type, String query) throws ServletException, IOException{
+					
+		// if either 1 of the option is not selected, redirect back to search page
+		if( (search_type == null || query == null)){			
+			return false;
+		}	
+		return true;
+		
+	}
+	
+	
+	/** FavListServlet redirect from Song  condition - when user click on add fav song in SongServlet
+	 * 	
+	 * 	1. If the song that wanted to add does not appear in mySQL table, add it to mySQL table
+	 *  2. else, skip it
+	 * 
+	 * **/
+	protected boolean checkAddFavSongAction(HttpSession session, HttpServletRequest request, 
+										HttpServletResponse response, DBConfig dbconfig, ReentrantLock favLock) throws ServletException, IOException {
+		
+		String favUsername = request.getParameter("favusername");
+		String artist = request.getParameter("artist");
+		String songTitle = request.getParameter("songtitle");		
+		String songTrackID = request.getParameter("trackid");
+	
+		
+		 // remove session after use
+		 session.removeAttribute(SEARCH_TYPE);
+		 session.removeAttribute(QUERY);
+		 
+		 
+		// if user has clicked the link, add the favorite song and update to mySQL table
+		if(favUsername != null && artist != null && songTitle != null && songTrackID != null){
+			
+			// acquire write lock to write to mySQL favTable 
+			favLock.lockWrite();
+	
+			//update to mySQL favTable					
+			try {
+				
+				// check if user already has a record in fav list, don't add this song because it's already in mySQL favlist table 				
+				boolean userHasSameSongRecorded  = DBHelper.checkFavUsernameAndSongIDExist(dbconfig, favUsername, songTrackID);
+				
+				// need to set this to determine a user has a favorite song list 
+				session.setAttribute(HAS_FAV_SONG_LIST_RECORD, favUsername);
+				
+				if(!userHasSameSongRecorded) {
+			
+					// added to fav mySQL table
+					DBHelper.addFavorite(dbconfig, favUsername, artist, songTitle, songTrackID);
+				
+				}			
+				return true;
+		
+			} 
+			catch (SQLException e) {
+				
+				e.printStackTrace();
+			}
+			finally {
+				
+				favLock.unlockWrite();
+			}
+			
+		}		
+		return false;
+				
+	}
+	
+	
+	/** FavListServlet condition  - check whether loginUser has click on show Favorite List Icon **/
+	protected boolean checkUserClickOnShowFavListIcon(String showFavList, String loginUserHasFavList) throws ServletException, IOException 
+														 
+	{
+	
+		// if user has clicked show fav table icon + user already has record favList records in mySQL favList database
+		if( showFavList != null && loginUserHasFavList != null ){
+			return true;
+		}
+			
+		// else
+		return false;
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
 	
 }
