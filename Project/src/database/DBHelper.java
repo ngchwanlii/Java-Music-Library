@@ -434,7 +434,7 @@ public class DBHelper {
 	// show fav list table content
 	public static void generateFavTableContent(DBConfig dbconfig, StringBuffer buffer, String loginUsername) throws SQLException{
 			
-		
+//TODO: consider having this method return a data structure containing the relevant information rather than appending to a buffer.		
 			Connection con = getConnection(dbconfig);
 		
 			
