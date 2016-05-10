@@ -64,6 +64,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	// SongServlet page status track
 	public static final String SEARCH_TYPE = "search_type";
 	public static final String QUERY = "query";
+	public static final String SONG_INFO = "songInfo";	
 	public static final String ARTIST = "artist";
 	public static final String SONG_TITLE = "song_title";
 	public static final String TAG = "tag";
@@ -115,6 +116,10 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ ".fav_icon {"
 				+ "padding-right: 80px;"
 				+ "padding-top: 20px;"
+				+ "}"
+				
+				+ "a {"
+				+ "text-decoration: none;"
 				+ "}"
 				
 				+ "</style>";
@@ -320,11 +325,16 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		/** DEBUG USE **/
 //		System.out.println("username: " + username + " artist: " + artist + " songTitle: " + songTitle + " songTrackID: " + songTrackID);
 		
+//		<select name=\"search_type\">"	// note search_type here
+//				+ "<option value=\"artist\">Artist</option>"
+//				+ "<option value=\"song_title\">Song Title</option>"
+//				+ "<option value=\"tag\">Tag</option>"    
 		
-		
+	
 		return "<tr>"
-				+"<td>" + artist + "</td>"
-				+"<td>" + songTitle + "</td>"
+				+"<td>" + artist + "</td>"				
+				// TODO: modified this to clickable
+				+"<td><a href=\"/song?search_type=song_title" +  "&query=" + songTitle + "&songInfo=" + songTitle + "&songArtist=" + artist +  "\">" + songTitle + "</td>"
 				+"<td><center>"
 				+ "<a href=\"/favlist?favusername=" + username + "&artist=" + artist + "&songtitle=" + songTitle + "&trackid=" +   songTrackID  + "\">" 
 				+ "<img src=\"" + imgPath + "\">"
@@ -341,6 +351,14 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				
 		
 	}
+	
+	// show the songInfo "artist + songTitle" when user click on a particular song 
+	protected String songInfoBar(String artist, String songTitle){
+		
+		return "</br></br><h3>Song Info</h3>Artist: " + artist + "</br>Song Title: " + songTitle + "</br>";
+		
+	}
+	
 	
 	// return favorite list table content 
 	public static String favListTableContent(String artist, String songTitle, String songTrackID){

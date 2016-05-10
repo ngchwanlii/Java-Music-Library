@@ -60,6 +60,13 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// if user haven't key in anything,  this query will be null
 		String query = getParameterValue(request, QUERY);
 		
+		// get songInfo (if user has click on a particular song title) 
+		String songInfo = getParameterValue(request, SONG_INFO);
+		
+		// get songArtist (this is the songArtist where the user clicked on the song title previously)
+		String songArtist = getParameterValue(request, "songArtist");
+		
+		
 		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
 	
 		// 2. check user clicked search button
@@ -148,8 +155,16 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// searchBar remain at song result page
 		buffer.append(searchBar());
 		
+		
 		// show all artist button
 		buffer.append(showAllArtistsButton());
+		
+		// if user has click on song_info, display the clicked song artist + song title + returned similar song list
+		if(songInfo != null){
+			
+			buffer.append(songInfoBar(songArtist, query));
+			
+		}
 		
 		// css style
 		buffer.append(divClass("table_result"));

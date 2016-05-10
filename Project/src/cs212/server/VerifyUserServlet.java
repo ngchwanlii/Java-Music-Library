@@ -26,6 +26,8 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 		//VerifyUser does not accept GET requests. Just redirect to login with error status.
 		String formType = request.getParameter(PAGENAME);
 		
+		
+		
 		if(formType.equals(SIGNUPPAGE)) {
 			response.sendRedirect(response.encodeRedirectURL("/signup"));
 		}
