@@ -62,11 +62,13 @@ public class MusicLibraryServer {
 				
 				// create song_data_processor (thread version) - [task: addSong and build up musiclibrary]
 				SongDataProcessor processSongData = new SongDataProcessor(threadSafe_musicLibrary, MUSIC_DATAPATH, nThreads);
-						
-
+				
 				// create new dbconfig
 				DBConfig dbconfig = setupDBConfig();
 				
+				LastFMClient lastFMClient = new LastFMClient();
+				
+		
 				
 				// create 2 types of reentrant lock (lock logic for addUser to mySQL + retrieve data from mySQL table (for login authentication)
 				
@@ -84,14 +86,46 @@ public class MusicLibraryServer {
 				// must create user table 1st
 				try {
 					
+				
 					// create userTable					
-					DBHelper.createUserTable(dbconfig);			
-					// create favTable
+					DBHelper.createUserTable(dbconfig);
+//						
+//					// create favTable
 					DBHelper.createFavTable(dbconfig);
+				
+					
+					
+////				//  create ArtistTable					
+					DBHelper.createArtistTable(dbconfig);
+					
+//					/** DEBUG MSG **/
+//					System.out.println("created Usertable and Favtable and Artist");
+					
+//					// TODO: TEST getSortedArtistName()
+//					
+					// fetch and store artist information using lastFM API					
+					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
+					
+					/** DEBUG MSG **/
+//					System.out.println("finish fetch and store artist in MusicLibraryServer");
+					
+					
+					/** DEBUG USE **/
+//					System.out.println("reach here");
+				
+//					// create ArtistPlayCountTable
+					DBHelper.createArtistPlayCountTable(dbconfig);					
+//					
+//					/** DEBUG MSG **/
+//					System.out.println("finish createArtistPlayCountTable in MusicLibraryServer");
+					
+					
 					
 					/** DEBUG dropUserTable **/
 //					DBHelper.clearTables(dbconfig, "user");					
 //					DBHelper.clearTables(dbconfig, "fav");
+//					DBHelper.clearTables(dbconfig, DBHelper.artistInfoTable);
+//					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				
@@ -146,9 +180,12 @@ public class MusicLibraryServer {
 		// redirect them to sign up page
 		servhandler.addServlet(SignUpServlet.class, "/*");
 		
+		servhandler.addServlet(CheckServlet.class, "/check");
 		
 		/** Advance Features **/
 		servhandler.addServlet(AllArtistServlet.class, "/allartists");
+		
+		servhandler.addServlet(ArtistInfoServlet.class, "/artistinfo");
 		
 		
 		

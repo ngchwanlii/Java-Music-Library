@@ -2,6 +2,7 @@ package cs212.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -9,8 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import cs212.data.ThreadSafeMusicLibrary;
-import cs212.util.concurrent.ReentrantLock;
+import database.DBConfig;
+import database.DBHelper;
 
 public class AllArtistServlet extends MusicLibraryBaseServlet {
 	
@@ -29,7 +34,10 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			
 			// get session
 			HttpSession session = request.getSession();
-		
+			
+			// get dbconfig from web-container
+			DBConfig dbconfig = (DBConfig) request.getServletContext().getAttribute(DBConfig.DBCONFIG);
+			
 			// 1. base case - check user login
 			boolean userLogin = checkUserLogin(session, response);
 			
@@ -40,9 +48,12 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			}
 			
 			
-			// check if user already has fav list records on mySQL fav database table
-			String loginUserHasFavList = (String)session.getAttribute(HAS_FAV_SONG_LIST_RECORD);		
+			// check if user already has fav list records on mySQL fav database table				
 			String loginUsername = (String) session.getAttribute(USERNAME);
+			
+			// check the clicked SHOW ALL BUTTON TYPE
+			String showType = getParameterValue(request, "showtype");
+			
 			
 			// generate html page
 			// get writer
@@ -83,7 +94,12 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			buffer.append(divClose());
 			
 			// fav welcome message
-			buffer.append(welcomeMsg("All Artists' name displayed alphabetically!"));
+			if(showType.equals("byAlphabet")){
+				buffer.append(welcomeMsg("All Artists' name displayed alphabetically!"));
+			}
+			else if(showType.equals("byPlayCount")) {
+				buffer.append(welcomeMsg("All Artists' name displayed based on playcount in ascending order!"));
+			}
 			
 			// horizontal line
 			buffer.append(horizontalLine());
@@ -91,24 +107,61 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			
-			// show all artist button
-			buffer.append(showAllArtistsButton());
+			// show all artist by ALPHABETICALLY button
+			buffer.append(showAllArtistsAlphabeticallyButton());
+			
+			// show all artist by PLAY COUNT button
+			buffer.append(showAllArtistByPlayCountButton());
 			
 			// css style
 			buffer.append(divClass("table_result"));
 			
-			// display all artist table format
-			buffer.append(allArtistTableFormat("Artists"));
+			if(showType.equals("byAlphabet")){
+				// display all artist table format
+				buffer.append(allArtistByAlphabetTableFormat("Artists"));
+			}
+			else if(showType.equals("byPlayCount")){
+				buffer.append(allArtistByPlayCountTableFormat("Artists", "Playcount"));
+			}
 			
-			// load musicLibrary content
-			ThreadSafeMusicLibrary threadSafeML = (ThreadSafeMusicLibrary) request.getServletContext().getAttribute(MUSIC_LIB);
 			
 			
-			TreeSet<String> sortedArtists = threadSafeML.getSortedArtistName();
-			
-			for(String str : sortedArtists){
+			if(showType.equals("byAlphabet")){
+				// load musicLibrary content
+				ThreadSafeMusicLibrary threadSafeML = (ThreadSafeMusicLibrary) request.getServletContext().getAttribute(MUSIC_LIB);
 				
-				buffer.append(displayArtistNameEachRow(str));
+				TreeSet<String> sortedArtists = threadSafeML.getSortedArtistName();
+				
+				for(String str : sortedArtists){
+					
+					buffer.append(displayArtistNameEachRow(str));
+					
+				}
+			}
+			else if(showType.equals("byPlayCount")) {
+				
+				try {
+					
+					// generate artist play count table
+					JSONArray artistPlayCountContentArray = DBHelper.retrieveArtistByPlayCountTableContent(dbconfig, buffer);
+					
+					for(int i = 0; i < artistPlayCountContentArray.size(); i++){
+						
+						
+						JSONObject obj = (JSONObject) artistPlayCountContentArray.get(i);
+						String artist = (String)obj.get("artist");
+						String playcount = (String)obj.get("playcount");
+						
+						buffer.append(displayArtistNameAndPlayCountEachRow(artist, playcount));
+						
+						
+					}
+					
+					
+				} catch (SQLException e) {
+					
+					e.printStackTrace();
+				}
 				
 			}
 			

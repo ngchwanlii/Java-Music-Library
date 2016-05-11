@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import cs212.data.Song;
 import cs212.server.MusicLibraryBaseServlet;
 
 
@@ -54,11 +56,43 @@ public class DBHelper {
 	private static final String checkFavUsernameAndSongTrackIDStmt = "SELECT * FROM fav WHERE username=? AND songTrackID=?";
 	
 	
-	/** userTable **/
+	
+	/** ArtistInfoTable - from lastFMAPI **/
+	private static final String createLastFMArtistInfoTableStmt = "CREATE TABLE IF NOT EXISTS artist" 
+												   + "(" 
+												   + "name LONGTEXT NOT NULL, " 
+												   + "listeners INTEGER, " 
+												   + "playcount INTEGER, "  
+												   + "bio LONGTEXT "  
+												   + ")";
+			
+	private static final String insertLastFMArtistInfoStatement = "INSERT INTO artist (name, listeners, playcount, bio) VALUES (?, ?, ?, ?)";	
+	public static final String artistInfoTable = "artist";
+	private static final String showArtistInfoTableStmt = "SELECT * from artist WHERE name=?";
+	
+	
+	/** ArtistPlayCount table **/
+	private static final String createArtistPlayCountTable = "CREATE TABLE IF NOT EXISTS artistPlayCount"
+															+ "("
+															+ "name LONGTEXT NOT NULL, "
+															+ "playcount INTEGER"
+															+ ")";
+	private static final String insertLastFMArtistPlayCount = "INSERT INTO artistPlayCount (name, playcount) VALUES (?, ?)";
+	public static final String artistPlayCountTable = "artistPlayCount";
+	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artist ORDER BY playcount";
+	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount";
+	
+	
+	
+	/************************************************
+	 *			User Table 							* 
+	 ************************************************/
+
 	// create a user table - save to mySQL database
 	// @param dbconfig
 	// @throws SQLException
 	public static void createUserTable(DBConfig dbconfig) throws SQLException {		
+		
 		
 		
 		// 1. get connection from database config		
@@ -72,13 +106,13 @@ public class DBHelper {
 			tableStmt.executeUpdate();
 		}
 		
+
+		
 		
 		// close connection after each request 
 		con.close();
 		
-		/** DEBUG USE - DROP TABLE **/		
-//			PreparedStatement dropStatement = con.prepareStatement(dropTableStmt + userTable);
-//			dropStatement.executeUpdate();
+		
 		
 						
 	}
@@ -117,7 +151,7 @@ public class DBHelper {
 	
 	
 	
-//	/** userTable **/
+	/** userTable **/
 	// check if user exists in mySQL userTable database 
 	public static boolean userExist(DBConfig dbconfig, String username) throws SQLException {
 		
@@ -152,42 +186,6 @@ public class DBHelper {
 	}
 	
 	
-//	
-//	/** userTable **/
-//	// check if user password exists in mySQL database
-//	public static boolean passwordExist(DBConfig dbconfig, String password) throws SQLException {
-//		
-//		Connection con = getConnection(dbconfig);
-//				
-//		PreparedStatement retrieveStmt = con.prepareStatement(checkPasswordStmt);
-//		// set the ? in (SELECT * FROM user WHERE username=?) to the username that we want to check
-//		password = password.trim().toLowerCase();
-//		
-//		retrieveStmt.setString(1, password);
-//		
-//		ResultSet result = retrieveStmt.executeQuery();
-//		
-//		// we don't need a while loop here, username is PRIMARY key, and no duplicate is allowed + the mySQL syntax we use 
-//		// can find particular row record with the username provided
-//		
-//		// if found username exists - return true
-//		try {
-//			if(result.next()){
-//				return true;
-//			}
-//			else{
-//				// otherwise - false
-//				return false;
-//			}
-//		}
-//		finally {
-//			// need to close connection after return value (close connection every time a retrieve data execution from mySQL
-//			con.close();
-//		}
-//		
-//		
-//	}
-	
 	
 	/** userTable **/
 	// already implement lock mechanism in verifyuser servlet 
@@ -216,6 +214,10 @@ public class DBHelper {
 	}
 	
 	
+	
+	/************************************************
+	 *			Favorite List Table					* 
+	 ************************************************/
 	
 	
 	/** favTable **/
@@ -300,8 +302,8 @@ public class DBHelper {
 		}	
 	}
 	
-//	/** favTable **/
-//	// check if trackID exists in mySQL favTable database 
+	/** favTable **/
+	// check if trackID exists in mySQL favTable database 
 	public static boolean checkFavUsernameAndSongIDExist(DBConfig dbconfig, String username, String trackID) throws SQLException {
 		
 		Connection con = getConnection(dbconfig);
@@ -332,11 +334,130 @@ public class DBHelper {
 		}	
 	}
 	
+	
+	/************************************************
+	 *			LastFM ArtistInfo Table				* 
+	 ************************************************/
+	public static void createArtistTable(DBConfig dbconfig) throws SQLException {		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, "artist")){
+			PreparedStatement tableStmt = con.prepareStatement(createLastFMArtistInfoTableStmt);		
+			tableStmt.executeUpdate();
+		}
+		
+		
+		// close connection after each request 
+		con.close();
+		
+
+		
+				
+	}
+	
+	/** LASTFM artistsInfo table **/
+	// updateTable method - update/insert artist info to database
+	public static void addArtistInfoLastFM(DBConfig dbconfig, String name, Integer listeners, Integer playcount, String bio) throws SQLException{
+		
+		
+		
+		Connection con = getConnection(dbconfig);
+		// 3. creates a PreparedStatement object for sending parameterized SQL statements to the database
+		// insert artist info to table
+		PreparedStatement updateArtistInfoStmt = con.prepareStatement(insertLastFMArtistInfoStatement);
+		
+		
+		updateArtistInfoStmt.setString(1, name);		
+		updateArtistInfoStmt.setInt(2, listeners);
+		updateArtistInfoStmt.setInt(3, playcount);		
+		updateArtistInfoStmt.setString(4, bio);				
+		updateArtistInfoStmt.execute();	
+		
+		
+		// close each connection after a request
+		con.close();
+		
+	}
+	
+	
+	
+	/************************************************
+	 *			Artist Play-count Table				* 
+	 ************************************************/	
+	public static void createArtistPlayCountTable(DBConfig dbconfig) throws SQLException {		
+		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, "artistPlayCount")){
+			PreparedStatement tableStmt = con.prepareStatement(createArtistPlayCountTable);		
+			tableStmt.executeUpdate();
+		}
+		
+		con.close();
+		
+		// add the sorted artist play count based on pre-created ArtistInfoTable in mySQL
+		// start new connection
+		con = getConnection(dbconfig);
+	
+		PreparedStatement retrieveStmt = con.prepareStatement(checkArtistInfoOrderByPlayCount);
+	
+			
+		ResultSet result = retrieveStmt.executeQuery();
+			
+		while(result.next()){
+			
+			String artist = result.getString("name");
+			Integer playcount = result.getInt("playcount");
+			
+			addArtistPlayCount(dbconfig, artist, playcount);
+			
+		}
+	
+		
+		// close connection after each request 
+		con.close();
+		
+		
+	}
+	
+	public static void addArtistPlayCount(DBConfig dbconfig, String artist, Integer playcount) throws SQLException{
+		
+		Connection con = getConnection(dbconfig);
+		// 3. creates a PreparedStatement object for sending parameterized SQL statements to the database
+		// insert artist info to table
+		PreparedStatement updateArtistInfoStmt = con.prepareStatement(insertLastFMArtistPlayCount);
+	
+		updateArtistInfoStmt.setString(1, artist);				
+		updateArtistInfoStmt.setInt(2, playcount);		
+						
+		updateArtistInfoStmt.execute();	
+		
+		
+		// close each connection after a request
+		con.close();
+		
+	}
+	
+	
+	
+	
 
 	/** general use **/
 	// check if tableExists (helper method for clearTables method)
 	public static boolean tableExists(Connection con, String table) throws SQLException {
 
+		
+		
 		DatabaseMetaData metadata = con.getMetaData();
 		ResultSet resultSet;
 		resultSet = metadata.getTables(null, null, table, null);
@@ -430,38 +551,120 @@ public class DBHelper {
 //		
 //	}
 	
-	/** SHOW FAV TABLE **/
+	
+	
 	// show fav list table content
-	public static void generateFavTableContent(DBConfig dbconfig, StringBuffer buffer, String loginUsername) throws SQLException{
+	public static JSONArray retrieveFavTableContent(DBConfig dbconfig, String loginUsername) throws SQLException{
 			
-		
 			Connection con = getConnection(dbconfig);
 		
-			
 			PreparedStatement retrieveStmt = con.prepareStatement(showFavTableStmt);
-		
-			/** IMPORTANT ! This tiny bug!! **/			
-			//TODO: here
+			
 			loginUsername = loginUsername.trim().toLowerCase();
 			retrieveStmt.setString(1, loginUsername);
 					
 			ResultSet result = retrieveStmt.executeQuery();
-				
+			
+		
+			/** FIXED - CODE REVIEW POINT **/
+			// use a JSONArray to store data
+			// 3 data structure info for returning 
+			// JSONObject [artist, songTitle, songTrackID]
+			JSONArray jsonArray = new JSONArray();
 			while(result.next()){
 				
 				String artist = result.getString("artist");
 				String songTitle = result.getString("songTitle");
 				String songTrackID = result.getString("songTrackID");
-			
-				buffer.append(MusicLibraryBaseServlet.favListTableContent(artist, songTitle, songTrackID));
+				
+				// create new jsonObject each time we have a new artist + songTitle + songTrackID info
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("artist", artist);
+				jsonObj.put("songTitle", songTitle);
+				jsonObj.put("trackID", songTrackID);
+				
+				jsonArray.add(jsonObj);
 				
 			}
-		
+			
 			con.close();
+			
+			return jsonArray;
 	
 			
 	}
 	
+	// generate playcount table content
+	public static JSONArray retrieveArtistByPlayCountTableContent(DBConfig dbconfig, StringBuffer buffer) throws SQLException{
+	
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(showArtistNameByPlayCount);
+		
+		ResultSet result = retrieveStmt.executeQuery();
+			
+		JSONArray jsonArray = new JSONArray();
+		
+		while(result.next()){
+			
+			String artist = result.getString("name");
+			Integer playcount = result.getInt("playcount");
+			
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("artist", artist);
+			jsonObj.put("playcount", playcount.toString());
+			
+			jsonArray.add(jsonObj);
+			
+			
+		}
+		
+		// close connection after each request 
+		con.close();
+		
+		return jsonArray;
+		
+	}
+		
+	
+	// generate artist info table content
+	public static JSONArray retrieveArtistInfoTableContent(DBConfig dbconfig, String artist) throws SQLException{
+	
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(showArtistInfoTableStmt);
+		
+		retrieveStmt.setString(1, artist);
+		
+		ResultSet result = retrieveStmt.executeQuery();
+			
+		JSONArray jsonArray = new JSONArray();
+	
+		while(result.next()){
+			
+			String name = result.getString("name");
+			Integer listeners = result.getInt("listeners");
+			Integer playcount = result.getInt("playcount");
+			String bio = result.getString("bio");
+			
+		
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("name", name);
+			jsonObj.put("listeners", listeners.toString());
+			jsonObj.put("playcount", playcount.toString());		
+			jsonObj.put("bio", bio);
+			
+			jsonArray.add(jsonObj);
+			
+		
+			
+		}
+		
+		// close connection after each request 
+		con.close();
+		return jsonArray;
+		
+	}
 	
 	
 	

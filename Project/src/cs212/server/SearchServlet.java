@@ -132,8 +132,11 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		// form that has to be submit to SongServlet.class
 		buffer.append(searchBar());
 		
-		// show all artist button
-		buffer.append(showAllArtistsButton());
+		// show all artist alpha button
+		buffer.append(showAllArtistsAlphabeticallyButton());
+		
+		// add show all artist playcount
+		buffer.append(showAllArtistByPlayCountButton());
 		
 		// footer
 		buffer.append(footer());

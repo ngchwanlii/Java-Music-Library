@@ -23,7 +23,6 @@ public class SignUpServlet extends MusicLibraryBaseServlet {
 		// get session
 		HttpSession session = request.getSession();
 	
-		/** checking possible signup error **/
 		// check if username taken
 		String usernameError = (String)session.getAttribute(USERNAME_TAKEN_ERROR);
 		// check if password not match
@@ -76,8 +75,6 @@ public class SignUpServlet extends MusicLibraryBaseServlet {
 		
 		// get footer
 		buffer.append(footer());
-		
-		buffer.append("HELLO EHEHE");
 		
 		// write out the html page
 		writer.println(buffer);

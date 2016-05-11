@@ -100,12 +100,12 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		return "<style>" + 
 				".center {"
 				+ "margin: auto; "
-				+ "width: 80%; "				
+				+ "width: 100%; "				
 				+ "padding: 10px;}"
-				+ "form {display: inline; padding: 10px;}"
+				+ "form {display: inline;}"
 				
 				+ ".form {" 
-				+ "margin: 50px auto;"
+				+ "margin: auto;"				
 				+ "width:250px;"
 				+ "width:250px;"
 				+ "padding-top: 100px;}"
@@ -188,8 +188,8 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		
 		// pass method use "post" here - we have to hide the parameters (where user type in their user info: username, password etc)  
 		
-		String signUpForm = "<div class = \"form\">"  
-				+ "<form  action=\"verifyuser\" method=\"post\">"
+		String signUpForm = "<div class =\"form\">"  
+				+ "<form action=\"verifyuser\" method=\"post\">"
 				+ "<label>Username:</label></br>"
 				+ "<input type=\"text\" name=\"username\" style=\"width: 200px\"></br>"
 				+ "<label>Fullname:</label></br>"
@@ -336,7 +336,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				// TODO: modified this to clickable
 				+"<td><a href=\"/song?search_type=song_title" +  "&query=" + songTitle + "&songInfo=" + songTitle + "&songArtist=" + artist +  "\">" + songTitle + "</td>"
 				+"<td><center>"
-				+ "<a href=\"/favlist?favusername=" + username + "&artist=" + artist + "&songtitle=" + songTitle + "&trackid=" +   songTrackID  + "\">" 
+				+ "<a href=\"/check?favusername=" + username + "&artist=" + artist + "&songtitle=" + songTitle + "&trackid=" +   songTrackID  + "\">" 
 				+ "<img src=\"" + imgPath + "\">"
 				+ "</a>"
 				+ "</center>"
@@ -446,7 +446,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	 **************************************************************************************************************************************/
 	
 	// display all artist table format
-	protected String allArtistTableFormat(String col1){
+	protected String allArtistByAlphabetTableFormat(String col1){
 				
 		return "<body><table border=\"2px\" width=\"100%\">"				
 					+ "<tr>"
@@ -455,25 +455,92 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 								
 	} 
 	
-	// display all artist button
-	protected String showAllArtistsButton(){
+	// display all artist by play count table format
+	protected String allArtistByPlayCountTableFormat(String artist, String playcount){
 		
-		return "<form action=\"allartists\" method=\"get\"><input type=\"submit\" value=\"View all artist\"></form>"; 
+		return "<body><table border=\"2px\" width=\"100%\">"				
+					+ "<tr>"
+					+ "<td><strong><center>" + artist + "</center></strong></td>"									
+					+ "<td><strong><center>" + playcount + "</center></strong></td>"
+					+ "</tr>";
+								
+	}
+	
+	
+	
+	
+	// display all artist information table format
+	protected String artistInfoTableFormat(String name, String listeners, String playcount, String bio ){
+		
+		
+	
+		
+		return "<body><table border=\"2px\" width=\"100%\">"				
+					+ "<tr>"
+					+ "<td><strong><center>" + name + "</center></strong></td>"									
+					+ "<td><strong><center>" + listeners + "</center></strong></td>"
+					+ "<td><strong><center>" + playcount + "</center></strong></td>"
+					+ "<td><strong><center>" + bio + "</center></strong></td>"
+					+ "</tr>";
+								
+	} 
+	
+
+	
+	
+	// display all artist button
+	protected String showAllArtistsAlphabeticallyButton(){
+		
+		return " <form action=\"allartists\" method=\"get\"><input type=\"submit\" value=\"View all artist alphabetically\">"
+				+ "<input type=\"hidden\" name=\"showtype\" value=\"byAlphabet\">"
+				+ "</form>"; 
+	}
+	
+	protected String showAllArtistByPlayCountButton(){
+		
+		return " <form action=\"allartists\" method=\"get\"><input type=\"submit\" value=\"View all artist by playcount\">"
+				+ "<input type=\"hidden\" name=\"showtype\" value=\"byPlayCount\">"
+				+ "</form>"; 
 	}
 	
 	
 	// display all artist name table content
 	protected String  displayArtistNameEachRow(String artist){
 		
-		return "<tr><td>" + artist + "</td></tr>";
+	
+		return "<tr><td><a href=\"/artistinfo?artistInfo=" + artist +  "\">" + artist  + "</td></tr>";
+		
+	
 		
 	}
 	
+	// display artist name + playcount table content
+	public static String  displayArtistNameAndPlayCountEachRow(String artist, String playcount){
+		
+		return "<tr>"
+				+ "<td><a href=\"/artistinfo?artistInfo=" + artist +  "\">" + artist  + "</td>"
+				+ "<td>" + playcount + "</td>"
+				+ "</tr>";
+		
+	}
 	
-
-
-
-
+	// display artist info for each row [name, listeners, playcount, bio]
+	public static String  displayArtistInfoTable(String artist, String listeners, String playcount, String bio){
+		
+		return 
+				"<tr><td><strong>Name</strong></td><td>" + artist + "</td></tr>"
+				+ "<tr><td><strong>Listeners</strong></td><td>" + listeners + "</td></tr>"
+				+ "<tr><td><strong>Playcount</strong></td><td>" + playcount + "</td></tr>"
+				+ "<tr><td><strong>Bio</strong></td><td>" + bio + "</td></tr>";
+				
+		
+	}
+	
+	protected static String tableHeadWithBody(){
+		
+		return "<body><table border=\"2px\" width=\"100%\">";
+	}
+	
 
 	
 /**************************************************************************************************************************************
@@ -527,8 +594,8 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 		
 		 // remove session after use
-		 session.removeAttribute(SEARCH_TYPE);
-		 session.removeAttribute(QUERY);
+		session.removeAttribute(SEARCH_TYPE);
+		session.removeAttribute(QUERY);
 		 
 		 
 		// if user has clicked the link, add the favorite song and update to mySQL table
@@ -544,7 +611,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				boolean userHasSameSongRecorded  = DBHelper.checkFavUsernameAndSongIDExist(dbconfig, favUsername, songTrackID);
 				
 				// need to set this to determine a user has a favorite song list 
-				session.setAttribute(HAS_FAV_SONG_LIST_RECORD, favUsername);
+				session.setAttribute(USERNAME, favUsername);
 				
 				if(!userHasSameSongRecorded) {
 			
@@ -585,18 +652,6 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		
 		
 	}
-	
-	
-	
-	
-	
-	
-
-
-
-
-
-
 
 	
 }

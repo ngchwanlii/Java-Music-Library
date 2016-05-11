@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import cs212.util.concurrent.ReentrantLock;
 import database.DBConfig;
@@ -50,26 +52,24 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 		}
 		
 		
-		// 2. check if logged_in user has click on the display favorite song icon
-		// get searchType and query from session 
+		// 1. check if logged_in user has click on the display favorite song icon
+		 
 		
-		String searchType = (String)session.getAttribute(SEARCH_TYPE);
-		String query = (String)session.getAttribute(QUERY);
-		
-		
-		/** FavListServlet condition  - check whether loginUser has click on show Favorite List Icon **/
-		String showFavList = request.getParameter("showFavList");		
+		/** FavListServlet condition  - check whether loginUser has click on show Favorite List Icon **/				
 		// check if user already has fav list records on mySQL fav database table
-		String loginUserHasFavList = (String)session.getAttribute(HAS_FAV_SONG_LIST_RECORD);		
-		String loginUsername = (String) session.getAttribute(USERNAME);
 		
-		// check if user has Fav Song Records & CLICKED the show favorite song button
-		boolean userClickedShowFavIcon = checkUserClickOnShowFavListIcon(showFavList, loginUserHasFavList);
-
+		/*** FIXED CODE REVIEW POINT 
+		 * 
+		 * Removed showFavList, use session for the checking 
+		 *
+		 **/
+		String loginUsername = (String)session.getAttribute(USERNAME);		
+	
+		
 		// if user has click show fav icon
-		if(userClickedShowFavIcon){
+		if(loginUsername != null){
 			
-			/** Generate favorite list page html inside music ibrary base servlet **/
+			/** Generate favorite list page html inside music library base servlet **/
 			// generate a page that show all favorite added song
 			// get writer
 			PrintWriter writer = prepareResponse(response);
@@ -119,7 +119,10 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			buffer.append(searchBar());
 			
 			// show all artist button
-			buffer.append(showAllArtistsButton());
+			buffer.append(showAllArtistsAlphabeticallyButton());
+			
+			// add show all artist playcount
+			buffer.append(showAllArtistByPlayCountButton());
 			
 			// css style
 			buffer.append(divClass("table_result"));
@@ -131,11 +134,23 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			favLock.lockRead();
 			
 			try {
-			
-				// make up fav table content 
-				DBHelper.generateFavTableContent(dbconfig, buffer, loginUsername);
 				
 				
+				/** FIXED CODE REVIEW POINT -returned as an JSONArray, then use buffer to generate the html page content **/
+				// create up fav table content 
+				JSONArray favContentArray = DBHelper.retrieveFavTableContent(dbconfig, loginUsername);
+				
+				for(int i = 0; i < favContentArray.size(); i++){
+					
+					JSONObject obj = (JSONObject) favContentArray.get(i);
+					
+					String artist = (String)obj.get("artist");
+					String songTitle = (String)obj.get("songTitle");
+					String songTrackID = (String)obj.get("trackID"); 
+					
+					buffer.append(favListTableContent(artist, songTitle, songTrackID));
+					
+				}		
 			}
 			catch (SQLException e){
 				
@@ -160,22 +175,7 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			
 		}
 		
-		
-		// 3. check if user clicked add to Fav Song link 
-		boolean userClickedAddFavSong = checkAddFavSongAction(session, request, response, dbconfig, favLock);
-		
-		if(userClickedAddFavSong){
-			// redirect back to same page, just the star icon changed IMPORTANT STEP - [used searchType & query to identify this]!
-			// send the queried, and search_type back to song page ( this will verified and help display fullstar added favorite song icon)
-			response.sendRedirect(response.encodeRedirectURL("/song?search_type=" + searchType  +  "&query=" +  query));
-			return;
-		
-		}
-		else {
-			response.sendRedirect(response.encodeRedirectURL("/song"));
-			// return the response
-			return;
-		}
+	
 			
 	}
 	

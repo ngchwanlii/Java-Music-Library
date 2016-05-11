@@ -67,6 +67,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		String songArtist = getParameterValue(request, "songArtist");
 		
 		
+		
 		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
 	
 		// 2. check user clicked search button
@@ -157,7 +158,11 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		
 		// show all artist button
-		buffer.append(showAllArtistsButton());
+		buffer.append(showAllArtistsAlphabeticallyButton());
+		
+		
+		// add show all artist playcount
+		buffer.append(showAllArtistByPlayCountButton());
 		
 		// if user has click on song_info, display the clicked song artist + song title + returned similar song list
 		if(songInfo != null){
