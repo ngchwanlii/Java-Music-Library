@@ -556,10 +556,7 @@ public class DBHelper {
 	// show fav list table content
 	public static JSONArray retrieveFavTableContent(DBConfig dbconfig, String loginUsername) throws SQLException{
 			
-<<<<<<< HEAD
-=======
-//TODO: consider having this method return a data structure containing the relevant information rather than appending to a buffer.		
->>>>>>> origin/master
+
 			Connection con = getConnection(dbconfig);
 		
 			PreparedStatement retrieveStmt = con.prepareStatement(showFavTableStmt);

@@ -89,34 +89,27 @@ public class MusicLibraryServer {
 				
 					// create userTable					
 					DBHelper.createUserTable(dbconfig);
-//						
-//					// create favTable
+					
+					// create favTable
 					DBHelper.createFavTable(dbconfig);
-				
-					
-					
-////				//  create ArtistTable					
+
+					//  create ArtistTable					
 					DBHelper.createArtistTable(dbconfig);
-					
-//					/** DEBUG MSG **/
-//					System.out.println("created Usertable and Favtable and Artist");
-					
-//					// TODO: TEST getSortedArtistName()
-//					
-					// fetch and store artist information using lastFM API					
-					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
-					
+		
 					/** DEBUG MSG **/
-//					System.out.println("finish fetch and store artist in MusicLibraryServer");
-					
-					
-					/** DEBUG USE **/
-//					System.out.println("reach here");
-				
-//					// create ArtistPlayCountTable
-					DBHelper.createArtistPlayCountTable(dbconfig);					
-//					
+//					System.out.println("created Usertable and Favtable and Artist");
+										
+//					// fetch and store artist information using lastFM API					
+					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
+
 //					/** DEBUG MSG **/
+//					System.out.println("finish fetch and store artist in MusicLibraryServer");
+
+				
+					// create ArtistPlayCountTable
+					DBHelper.createArtistPlayCountTable(dbconfig);					
+				
+					/** DEBUG MSG **/
 //					System.out.println("finish createArtistPlayCountTable in MusicLibraryServer");
 					
 					
@@ -126,6 +119,7 @@ public class MusicLibraryServer {
 //					DBHelper.clearTables(dbconfig, "fav");
 //					DBHelper.clearTables(dbconfig, DBHelper.artistInfoTable);
 //					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
+//					DBHelper.clearTables(dbconfig, "artist");
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				

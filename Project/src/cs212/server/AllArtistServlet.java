@@ -85,7 +85,7 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			buffer.append(divClass("fav_icon"));
 			
 			// show favorite list icon
-			buffer.append(showFavListIcon(loginUsername));
+			buffer.append(showFavListIcon());
 			
 			// inner closing for icon
 			buffer.append(divClose());

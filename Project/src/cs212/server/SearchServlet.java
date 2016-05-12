@@ -115,7 +115,7 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		buffer.append(divClass("fav_icon"));
 		
 		// show favorite list icon
-		buffer.append(showFavListIcon(username));
+		buffer.append(showFavListIcon());
 		
 		// inner closing for icon
 		buffer.append(divClose());

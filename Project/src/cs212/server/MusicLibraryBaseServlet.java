@@ -265,11 +265,10 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	/** new added show fav list icon **/
 	
 	// need username + songTrackID parameters to show the favorite list from mySQL
-	protected String showFavListIcon(String username){
+	protected String showFavListIcon(){
 		
-		// key = showFavList
-		
-		return "<a href=\"/favlist?showFavList=" + username + "\">"
+				
+		return "<a href=\"/favlist\">"
 				+ "<img src=\"https://maxcdn.icons8.com/Color/PNG/48/Data/list-48.png\" title=\"Favorite List\" width=\"48\">"
 				+ "</a>";
 			
@@ -325,15 +324,9 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		/** DEBUG USE **/
 //		System.out.println("username: " + username + " artist: " + artist + " songTitle: " + songTitle + " songTrackID: " + songTrackID);
 		
-//		<select name=\"search_type\">"	// note search_type here
-//				+ "<option value=\"artist\">Artist</option>"
-//				+ "<option value=\"song_title\">Song Title</option>"
-//				+ "<option value=\"tag\">Tag</option>"    
-		
-	
+
 		return "<tr>"
-				+"<td>" + artist + "</td>"				
-				// TODO: modified this to clickable
+				+"<td>" + artist + "</td>"								
 				+"<td><a href=\"/song?search_type=song_title" +  "&query=" + songTitle + "&songInfo=" + songTitle + "&songArtist=" + artist +  "\">" + songTitle + "</td>"
 				+"<td><center>"
 				+ "<a href=\"/check?favusername=" + username + "&artist=" + artist + "&songtitle=" + songTitle + "&trackid=" +   songTrackID  + "\">" 
@@ -637,21 +630,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	}
 	
 	
-	/** FavListServlet condition  - check whether loginUser has click on show Favorite List Icon **/
-	protected boolean checkUserClickOnShowFavListIcon(String showFavList, String loginUserHasFavList) throws ServletException, IOException 
-														 
-	{
 	
-		// if user has clicked show fav table icon + user already has record favList records in mySQL favList database
-		if( showFavList != null && loginUserHasFavList != null ){
-			return true;
-		}
-			
-		// else
-		return false;
-		
-		
-	}
 
 	
 }
