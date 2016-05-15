@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.json.simple.JSONArray;
@@ -16,13 +17,18 @@ import cs212.util.comparator.*;
 public class MusicLibrary {
 	
 	// instance variable
+	private Path inputPath; 
+	private Path outputPath;
 	private TreeMap<String, TreeSet<Song>> artistMusicLibrary;
 	private TreeMap<String, TreeSet<Song>> titleMusicLibrary;
 	private TreeMap<String, ArrayList<Song>> tagMusicLibrary;	
-	private TreeMap<String, Song> trackIDMusicLibrary;
+	private TreeMap<String, Song> trackIDMusicLibrary;	
 	private TreeSet<String> sortedArtistNameSet;
-	private Path inputPath; 
-	private Path outputPath;
+	
+	/** for case insensitive search **/
+	private Map<String, String> artistMap;
+	private Map<String, String> titleMap;
+	private Map<String, String> tagMap;
 	
 	
 	// MusicLibrary constructor - for web search (multi-thread)
@@ -37,9 +43,15 @@ public class MusicLibrary {
 		this.tagMusicLibrary = new TreeMap<String, ArrayList<Song>>();
 		this.trackIDMusicLibrary = new TreeMap<String, Song>();
 		
+		
+		
 		/** Advance Feature **/ 
 		this.sortedArtistNameSet = new TreeSet<String>();
 		
+		/** Case insensitve search **/
+		artistMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+		titleMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+		tagMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
 		
 	} 
 	
@@ -58,12 +70,19 @@ public class MusicLibrary {
 		
 		/** Advance Feature **/ 
 		this.sortedArtistNameSet = new TreeSet<String>();
+		artistMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+		titleMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+		tagMap = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
 		
 			
 	}
 	
 	// searchByArtist method - return similarSongJSON based on query search in JSONArray
 	public JSONArray searchByArtist(String query) {
+		
+		
+		// ignore case and extract out the specific query
+		query = artistMap.get(query);
 		
 		
 		// thread-safe local variable
@@ -78,6 +97,8 @@ public class MusicLibrary {
 				
 		// list of songs by given artist
 		TreeSet<Song> songs = artistMusicLibrary.get(query);
+		
+		
 		
 		// for each song in songs
 		for(Song s : songs){
@@ -108,6 +129,10 @@ public class MusicLibrary {
 	// searchByArtist method - return similarSongJSON based on query search in JSONArray
 	public JSONArray searchByTitle(String query) {
 	
+		// case insensitve search
+		query = titleMap.get(query);
+		
+		
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
 		
@@ -152,6 +177,9 @@ public class MusicLibrary {
 	
 	// searchByArtist method - return similarSongJSON based on query search in JSONArray
 	public JSONArray searchByTag(String query) {
+		
+		// case insensitve search
+		query = tagMap.get(query);
 		
 		// initialize resultList
 		JSONArray resultList = new JSONArray();
@@ -219,7 +247,6 @@ public class MusicLibrary {
 		
 		/** Advance Feature [Display artist name alpbaetically] **/
 		this.sortedArtistNameSet.add(artistName);
-		 
 		
 		this.trackIDMusicLibrary.put(trackID, song);
 		
@@ -228,6 +255,10 @@ public class MusicLibrary {
 		// if this is a new artist, create TreeSet to store these song
 		if(!artistMusicLibrary.containsKey(artistName)){
 			this.artistMusicLibrary.put(artistName, new TreeSet<Song>(new ArtistComparator()));
+			
+			// TODO: case insensitive search
+			artistMap.put(artistName, artistName);
+			
 		}
 		
 		// else add to the created artistName data structure
@@ -235,7 +266,11 @@ public class MusicLibrary {
 		
 		// if this is a new title, create TreeSet to store these song
 		if(!titleMusicLibrary.containsKey(title)){
+			
 			this.titleMusicLibrary.put(title, new TreeSet<Song>(new TitleComparator()));
+			
+			// TODO: case insensitive search
+			titleMap.put(title, title);
 		}
 		
 		// else add to the created title data structure
@@ -251,6 +286,11 @@ public class MusicLibrary {
 			if(!tagMusicLibrary.containsKey(tag)){
 				// natural ordering, don't have to create Tag Comparator
 				this.tagMusicLibrary.put(tag, new ArrayList<Song>());
+				
+				// TODO: case insensitive search
+				tagMap.put(tag, tag);
+				
+				
 			}
 			
 			// no duplicate song can be added in orderType tag

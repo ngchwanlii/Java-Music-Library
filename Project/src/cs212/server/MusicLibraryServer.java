@@ -89,35 +89,49 @@ public class MusicLibraryServer {
 				
 					// create userTable					
 					DBHelper.createUserTable(dbconfig);
-					
-					// create favTable
+//					
+//					// create favTable
 					DBHelper.createFavTable(dbconfig);
 
-					//  create ArtistTable					
+//					//  create ArtistTable					
 					DBHelper.createArtistTable(dbconfig);
-		
-					/** DEBUG MSG **/
-//					System.out.println("created Usertable and Favtable and Artist");
-										
-//					// fetch and store artist information using lastFM API					
-					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
-
+//			
+					
+					// create SearchHistoryTable
+					DBHelper.createSearchHistoryTable(dbconfig);
+					
 //					/** DEBUG MSG **/
-//					System.out.println("finish fetch and store artist in MusicLibraryServer");
-
-				
-					// create ArtistPlayCountTable
-					DBHelper.createArtistPlayCountTable(dbconfig);					
+////					System.out.println("created Usertable and Favtable and Artist");
+//										
+////					// fetch and store artist information using lastFM API					
+					
+					/** DEBUG USE FOR quickly setup server **/
+//					LastFMClient.fetchSingleArtist("50 Cent", dbconfig);
+					
+					
+					/** MAIN USE **/
+//					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
+//
+////					/** DEBUG MSG **/
+////					System.out.println("finish fetch and store artist in MusicLibraryServer");
+//
+//				
+//					// create ArtistPlayCountTable
+//					DBHelper.createArtistPlayCountTable(dbconfig);					
 				
 					/** DEBUG MSG **/
 //					System.out.println("finish createArtistPlayCountTable in MusicLibraryServer");
 					
 					
 					
+					
 					/** DEBUG dropUserTable **/
-//					DBHelper.clearTables(dbconfig, "user");					
-//					DBHelper.clearTables(dbconfig, "fav");
+					
+					// TODO: TESTING ARTIST IMAGE NOW!!
 //					DBHelper.clearTables(dbconfig, DBHelper.artistInfoTable);
+//					
+//					DBHelper.clearTables(dbconfig, "user");					
+//					DBHelper.clearTables(dbconfig, "fav");				
 //					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
 //					DBHelper.clearTables(dbconfig, "artist");
 					/** DEBUG dropFavTable **/
@@ -158,8 +172,11 @@ public class MusicLibraryServer {
 		// signup-servlet - go to sign up page
 		servhandler.addServlet(SignUpServlet.class, "/signup");
 		
-		// login-server - if user has been logged-in, display same song finder and a "add Fav Song" features
+		// login-servlet - if user has been logged-in, display same song finder and a "add Fav Song" features
 		servhandler.addServlet(LoginServlet.class, "/login");
+		
+		// change new password servlet - let user to change new password
+		servhandler.addServlet(ChangePasswordServlet.class, "/changepassword");
 		
 		// logout-server 
 		servhandler.addServlet(LogoutServlet.class, "/logout");
@@ -180,6 +197,12 @@ public class MusicLibraryServer {
 		servhandler.addServlet(AllArtistServlet.class, "/allartists");
 		
 		servhandler.addServlet(ArtistInfoServlet.class, "/artistinfo");
+		
+		
+		
+		/** NEW UPDATE **/
+		servhandler.addServlet(SearchHistoryServlet.class, "/searchhistory");
+		
 		
 		
 		

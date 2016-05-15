@@ -36,6 +36,9 @@ public class DBHelper {
 	private static final String checkPasswordStmt = "SELECT * FROM user WHERE password=?";
 	private static final String loginAuthentication = "SELECT * FROM user WHERE username=? AND password=?";
 	
+	// TODO: new added change password statement
+	private static final String changeNewPasswordStmt = "UPDATE user SET password=? WHERE username=?";
+	
 	
 	/** favTable **/
 	public static final String createFavTable = "CREATE TABLE IF NOT EXISTS fav"
@@ -63,10 +66,11 @@ public class DBHelper {
 												   + "name LONGTEXT NOT NULL, " 
 												   + "listeners INTEGER, " 
 												   + "playcount INTEGER, "  
-												   + "bio LONGTEXT "  
+												   + "bio LONGTEXT, "
+												   + "image LONGTEXT"
 												   + ")";
 			
-	private static final String insertLastFMArtistInfoStatement = "INSERT INTO artist (name, listeners, playcount, bio) VALUES (?, ?, ?, ?)";	
+	private static final String insertLastFMArtistInfoStatement = "INSERT INTO artist (name, listeners, playcount, bio, image) VALUES (?, ?, ?, ?, ?)";	
 	public static final String artistInfoTable = "artist";
 	private static final String showArtistInfoTableStmt = "SELECT * from artist WHERE name=?";
 	
@@ -77,17 +81,167 @@ public class DBHelper {
 															+ "name LONGTEXT NOT NULL, "
 															+ "playcount INTEGER"
 															+ ")";
+	
 	private static final String insertLastFMArtistPlayCount = "INSERT INTO artistPlayCount (name, playcount) VALUES (?, ?)";
 	public static final String artistPlayCountTable = "artistPlayCount";
 	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artist ORDER BY playcount";
 	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount";
 	
 	
+	/*** Search History Table ***/
+	private static final String createSearchHistoryTable = 	"CREATE TABLE IF NOT EXISTS searchHistory"
+															+ "("
+															+ "username VARCHAR(100) NOT NULL, "
+															+ "searchType TEXT NOT NULL, "
+															+ "searchQuery TEXT NOT NULL"
+															+ ")";
+	private static final String searchHistoryTable = "searchHistory";
+	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery) VALUES (?, ?, ?)";
+	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=?";
+	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
+	
+	
+	
+	
 	
 	/************************************************
 	 *			User Table 							* 
 	 ************************************************/
+	
+	// TODO: create searchHistory mySQL database
+	public static void createSearchHistoryTable(DBConfig dbconfig) throws SQLException {
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, searchHistoryTable)){
+			PreparedStatement tableStmt = con.prepareStatement(createSearchHistoryTable);		
+			tableStmt.executeUpdate();
+		}
+		
+	
+		// close connection after each request 
+		con.close();
+		
+	}
+	
+	
+	
+	// TODO: added saveSearchHistory to database
+	public static void saveSearchHistory(DBConfig dbconfig, String username, String search_type, String  query) throws SQLException {
+	
+		Connection con = getConnection(dbconfig);
+		
+		// insert search History stmt
+		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
+		
+		// trim all white space and make it to lower case (because mySQL SELECT is case and space sensitive)
+		// easier for retrieving data when user at login page
+		username = username.trim().toLowerCase();
+		
+		updateStmt.setString(1, username);		
+		updateStmt.setString(2, search_type);
+		updateStmt.setString(3, query);		
+						
+		updateStmt.execute();	
+	
+		con.close();
+		
+		
+	}
+	
+	
+	
+	
+	// TODO: retrieve searchedHistory table content 
+	// retrieve searchedHistory table content
+	public static JSONArray retrieveSearchHistoryTableContent(DBConfig dbconfig, String username) throws SQLException{
+	
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(showSearchHistoryByUsername);
+		
+		retrieveStmt.setString(1, username);
+		
+		ResultSet result = retrieveStmt.executeQuery();
+			
+		JSONArray jsonArray = new JSONArray();
+		
+		while(result.next()){
+			
+		
+			String searchType = result.getString("searchType");
+			String searchQuery = result.getString("searchQuery");
+			
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("searchType", searchType);
+			jsonObj.put("searchQuery", searchQuery);
+			
+			jsonArray.add(jsonObj);
+			
+		}
+		
+		// close connection after each request 
+		con.close();
+		
+		return jsonArray;
+		
+	}
 
+	
+	// TODO: clear search history button
+	public static void clearSearchedHistory(DBConfig dbconfig, String username) throws SQLException{
+		
+	
+		
+		Connection con = getConnection(dbconfig);
+		
+		//create a statement object
+		PreparedStatement clearStmt = con.prepareStatement(clearSearchHistoryStmt);
+		
+		clearStmt.setString(1, username);
+		
+		if(tableExists(con, searchHistoryTable)) {				
+			clearStmt.executeUpdate();
+		}
+		
+		con.close();
+		
+	}
+	
+
+		
+	// TODO: new added changeNewPassword method - allow user to change new password 
+	// OK SUCCESS
+	public static void changeNewPassword(DBConfig dbconfig, String newPassword, String username ) throws SQLException {
+		
+		Connection con = getConnection(dbconfig);
+		// 3. creates a PreparedStatement object for sending parameterized SQL statements to the database
+		// insert artist info to table
+		PreparedStatement updateStmt = con.prepareStatement(changeNewPasswordStmt);
+		
+	
+		// trim all white space and make it to lower case (because mySQL SELECT is case and space sensitive)
+		// easier for retrieving data when user at login page
+		username = username.trim().toLowerCase();		
+		newPassword = newPassword.trim().toLowerCase();
+		
+		updateStmt.setString(1, newPassword);		
+		updateStmt.setString(2, username);
+		
+		updateStmt.execute();	
+	
+		con.close();
+		
+	}
+	
+	
+	
+	
+	
 	// create a user table - save to mySQL database
 	// @param dbconfig
 	// @throws SQLException
@@ -105,9 +259,7 @@ public class DBHelper {
 			PreparedStatement tableStmt = con.prepareStatement(createUserTable);		
 			tableStmt.executeUpdate();
 		}
-		
-
-		
+	
 		
 		// close connection after each request 
 		con.close();
@@ -117,12 +269,13 @@ public class DBHelper {
 						
 	}
 	
-	public static boolean loginAuthentication(DBConfig dbconfig, String username, String password) throws SQLException{
+	// check if user inside mySQL [user] database
+	public static boolean userAuthentication(DBConfig dbconfig, String username, String password) throws SQLException{
 			
 		Connection con = getConnection(dbconfig);
 		PreparedStatement retrieveStmt = con.prepareStatement(loginAuthentication);
 	
-		// the way to varified, trim username and password and conver to lower-case
+		// the way to verified, trim username and password and convert to lower-case
 		username = username.trim().toLowerCase();
 		password = password.trim().toLowerCase();
 		
@@ -362,7 +515,7 @@ public class DBHelper {
 	
 	/** LASTFM artistsInfo table **/
 	// updateTable method - update/insert artist info to database
-	public static void addArtistInfoLastFM(DBConfig dbconfig, String name, Integer listeners, Integer playcount, String bio) throws SQLException{
+	public static void addArtistInfoLastFM(DBConfig dbconfig, String name, Integer listeners, Integer playcount, String bio, String artistImage) throws SQLException{
 		
 		
 		
@@ -376,6 +529,7 @@ public class DBHelper {
 		updateArtistInfoStmt.setInt(2, listeners);
 		updateArtistInfoStmt.setInt(3, playcount);		
 		updateArtistInfoStmt.setString(4, bio);				
+		updateArtistInfoStmt.setString(5, artistImage);
 		updateArtistInfoStmt.execute();	
 		
 		
@@ -515,43 +669,7 @@ public class DBHelper {
 
 		return con;
 	}
-	
-	
-	
-	/** DEBUG TABLE **/
-	// show table method - this is just extra method that use for debugging
-	// copy paste this code -> [DBHelper.showTableContent(dbconfig)] into TestlastFMClient 
-	// after invoking [LastFMClient.fetchAndStoreArtists(artists, dbconfig)] to DISPLAY TABLE content	
-//	public static void showTableContent(DBConfig dbconfig, String tableType) throws SQLException {
-//		
-//		/** DEBUG USE - display the table content - SUCCESS OKAY!!!! **/
-//		//reuse the statement to insert a new value into the table
-//		Connection con = getConnection(dbconfig);
-//		
-//		PreparedStatement retrieveStmt = con.prepareStatement(selectAllStmt + tableType);
-//		ResultSet result = retrieveStmt.executeQuery();
-//		
-//		int rowCounter = 0;
-//		//iterate over the ResultSet
-//		while (result.next()) {
-//			//for each result, get the value of the columns name and id
-//			String username = result.getString("username");
-//			String fullname = result.getString("fullname");
-//			String password = result.getString("password");
-//			
-//			System.out.printf("\n*** ROW %d ***\n", rowCounter++);
-//			System.out.printf("username: %s\n"
-//							+ "fullname: %s\n"
-//							+ "password: %s\n", username, fullname, password);
-//		}
-//		
-//		
-//		// close each connection after a request
-//		con.close();
-//		
-//	}
-	
-	
+		
 	
 	// show fav list table content
 	public static JSONArray retrieveFavTableContent(DBConfig dbconfig, String loginUsername) throws SQLException{
@@ -596,7 +714,7 @@ public class DBHelper {
 	}
 	
 	// generate playcount table content
-	public static JSONArray retrieveArtistByPlayCountTableContent(DBConfig dbconfig, StringBuffer buffer) throws SQLException{
+	public static JSONArray retrieveArtistByPlayCountTableContent(DBConfig dbconfig) throws SQLException{
 	
 		Connection con = getConnection(dbconfig);
 		
@@ -647,6 +765,7 @@ public class DBHelper {
 			Integer listeners = result.getInt("listeners");
 			Integer playcount = result.getInt("playcount");
 			String bio = result.getString("bio");
+			String artistImage = result.getString("image");
 			
 		
 			JSONObject jsonObj = new JSONObject();
@@ -654,6 +773,7 @@ public class DBHelper {
 			jsonObj.put("listeners", listeners.toString());
 			jsonObj.put("playcount", playcount.toString());		
 			jsonObj.put("bio", bio);
+			jsonObj.put("image", artistImage);
 			
 			jsonArray.add(jsonObj);
 			

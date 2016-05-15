@@ -29,12 +29,14 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	public static final String FULLNAME = "fullname";		
 	public static final String PASSWORD = "password";
 	public static final String CONFIRMPASSWORD = "confirmpassword";
+	public static final String NEWPASSWORD = "new_password";
 	public static final String STATUS = "status";
 	
 	// few type of error
 	public static final String ERROR = "error";
 	public static final String USERNAME_TAKEN_ERROR = "username_taken_error";
 	public static final String PASSWORD_NOT_MATCH_ERROR = "password_not_match_error";
+	public static final String USERNAME_OR_PASSWORD_NOT_EXIST = "username_or_password_does_not_exist_in_user_database";
 	
 	// check login status
 	public static final String LOGGED_IN = "logged_in";
@@ -53,6 +55,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	public static final String PAGENAME =  "pagename";
 	public static final String LOGINPAGE =  "loginpage";
 	public static final String SIGNUPPAGE =  "signuppage";
+	public static final String CHANGEPASSWORDPAGE =  "changepasswordpage";
 	
 	
 	// favList page status track
@@ -74,6 +77,15 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	public static final String USERTABLE_LOCK = "user_table_reentrant_lock";
 	// favLock
 	public static final String FAVTABLE_LOCK = "fav_table_reentrant_lock";
+	
+	
+	/** NEW UPDATE **/
+	// change password
+	public static final String CHG_PASSWORD = "chg_password";
+	// base color for artist image
+	public static final String BLUE_COLOR = "#55ACEE";
+	// clear search button
+	public static final String CLEAR_SEARCH_HISTORY_BUTTON = "clear_search_history";
 	
 	
 	
@@ -118,6 +130,19 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "padding-top: 20px;"
 				+ "}"
 				
+				+ ".img-circle {"
+				+ "border-radius: 50%;"
+				+ "}"
+				
+				+ ".button_style {"
+				+ "display: inline;"
+				+ " padding: 0px 2px 0px 2px;"
+				+ "}"
+				
+				+ ".clear_button_style {"
+				+ " padding-bottom: 2px;"
+				+ "}"
+				
 				+ "a {"
 				+ "text-decoration: none;"
 				+ "}"
@@ -157,7 +182,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	// return a search type with drop downlist + query input text field
 	protected String searchBar(){
 	
-		String search_form = "<label>Search Type:</label>"
+		String search_form = "<label>Search Type:</label>"				
 				+ "<form action=\"song\" method=\"get\">"
 				+ "<select name=\"search_type\">"	// note search_type here
 				+ "<option value=\"artist\">Artist</option>"
@@ -167,7 +192,9 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 
 		String query_form = "<label> Query:</label>"				
 				+ "<input type=\"text\" name=\"query\">" // note query here
-				+ "<input type=\"submit\" value=\"Submit\">"
+				+ "<div class=\"button_style\">"				
+				+ "<input type=\"submit\" value=\"Search\">"
+				+ "</div>"
 				+ "</form>";
 		
 		
@@ -231,7 +258,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "</br>"
 				+ "<input type=\"submit\" value=\"Login\" style=\"width: 200px\">"
 				+ "<input type=\"hidden\" name=\"pagename\" value=\"loginpage\">"				
-				+ "</form></div>";
+				+ "</form>";
 				
 		return loginForm;
 	}
@@ -280,6 +307,38 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	/********************************************END OF Login Logic *********************************************************/
 	
+	/****************************************************************************************************************
+	 * 																												*
+	 *  										Change new Password logic														*											*
+	 * 																												*
+	 *****************************************************************************************************************/
+	
+	
+	// return a signup form
+		protected String changePasswordForm(){
+			
+			// pass method use "post" here - we have to hide the parameters (where user type in their user info: username, password etc)  
+			
+			String changePasswordForm = "<div class =\"form\">"  
+					+ "<form action=\"verifyuser\" method=\"post\">"
+					+ "<label>Username:</label></br>"
+					+ "<input type=\"text\" name=\"username\" style=\"width: 200px\"></br>"										
+					+ "<label>Current Password:</label></br>"
+					+ "<input type=\"password\" name=\"password\" style=\"width: 200px\"></br>"
+					+ "<label>New password:</label></br>"
+					+ "<input type=\"password\" name=\"new_password\" style=\"width: 200px\"></br>"
+					+ "</br>"
+					+ "<input type=\"submit\" value=\"Submit\" style=\"width: 200px\">"
+					+ "<input type=\"hidden\" name=\"pagename\" value=\"changepasswordpage\">"				
+					+ "</form></div>";
+					
+			return changePasswordForm;
+		}
+	
+	
+	
+	
+	
 	// return welcome msg
 	protected String welcomeMsg(String msg){
 		// welcome message
@@ -321,8 +380,6 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	protected String tableContent(String username, String artist, String songTitle, String songTrackID,  String imgPath){
 		
 		
-		/** DEBUG USE **/
-//		System.out.println("username: " + username + " artist: " + artist + " songTitle: " + songTitle + " songTrackID: " + songTrackID);
 		
 
 		return "<tr>"
@@ -419,8 +476,13 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	// option searchButton that let user navigate back to search page
 	protected String goToSearchButton(){
-		return "<form action=\"search\" method=\"get\"><input type=\"submit\" value=\"Search Again\"></form>";
-	}
+		return "<form action=\"search\" method=\"get\">"
+				+ "<div class=\"button_style\">"
+				+ "<input type=\"submit\" value=\"Search Again\">"
+				+ "</div>"
+				+ "</form>";
+				
+	}	
 	
 	// option signUpButton that let user navigate back to signup page
 	protected String goToSignUpButton(){
@@ -431,6 +493,59 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	protected String goToLoginButton(){
 		return "<form action=\"login\" method=\"get\"><input type=\"submit\" value=\"Go to Login Page\"></form>";
 	}
+
+	
+	// option to go to change password button
+	protected String goToChangePasswordButton(){
+		
+		return "<form action=\"changepassword\" method=\"get\">"
+				+ "<input type=\"submit\" style=\"width: 200px\" value=\"Change New Password?\">"
+				+ "</form>";
+	}
+	
+	// TODO: go to searchHistory Button
+	protected String goToViewSearchHistoryButton(){
+		return "<form action=\"searchhistory\" method=\"get\">"
+				+ "<div class=\"button_style\">" 
+				+ "<input type=\"submit\" value=\"View search history\">"
+				+ "</div>" 
+				+ "</form>";
+		
+	}
+	
+	// TODO: clear history button
+	// allow user to clear searched history
+	protected String clearSearchHistoryButton(){
+		
+		
+//		+ "style=\"margin: 20px auto 80px auto;display:block; border-style: solid; border-width: 5px; border-color:" + BLUE_COLOR +  "\">"
+		
+		return "<form action=\"searchhistory\" method=\"get\">"
+				+ "<div class=\"clear_button_style\">"
+				+ "<input type=\"hidden\" name=\"clear_search_history\" value=\"clearSearch\">"
+				+ "<input type=\"submit\" value=\"Clear search history\">"
+				+ "</div>"
+				+ "</form>";
+	}
+	
+	
+	
+	
+	
+	
+	// TODO: search history format
+	protected String setSearchHistoryTableFormat(String searchType, String query){
+		
+		return "<body><table border=\"2px\" width=\"100%\">"				
+					+ "<tr>"
+					+ "<td><strong><center>" + searchType + "</center></strong></td>"									
+					+ "<td><strong><center>" + query + "</center></strong></td>"
+					+ "</tr>";
+								
+	}
+	
+	
+	
 	
 	
 	
@@ -462,21 +577,21 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	
 	
-	// display all artist information table format
-	protected String artistInfoTableFormat(String name, String listeners, String playcount, String bio ){
-		
-		
-	
-		
-		return "<body><table border=\"2px\" width=\"100%\">"				
-					+ "<tr>"
-					+ "<td><strong><center>" + name + "</center></strong></td>"									
-					+ "<td><strong><center>" + listeners + "</center></strong></td>"
-					+ "<td><strong><center>" + playcount + "</center></strong></td>"
-					+ "<td><strong><center>" + bio + "</center></strong></td>"
-					+ "</tr>";
-								
-	} 
+//	// display all artist information table format
+//	protected String artistInfTableFormat(String name, String listeners, String playcount, String bio ){
+//		
+//		
+//	
+//		
+//		return "<body><table border=\"2px\" width=\"100%\">"				
+//					+ "<tr>"
+//					+ "<td><strong><center>" + name + "</center></strong></td>"									
+//					+ "<td><strong><center>" + listeners + "</center></strong></td>"
+//					+ "<td><strong><center>" + playcount + "</center></strong></td>"
+//					+ "<td><strong><center>" + bio + "</center></strong></td>"
+//					+ "</tr>";
+//								
+//	} 
 	
 
 	
@@ -484,15 +599,21 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	// display all artist button
 	protected String showAllArtistsAlphabeticallyButton(){
 		
-		return " <form action=\"allartists\" method=\"get\"><input type=\"submit\" value=\"View all artist alphabetically\">"
+			return " <form action=\"allartists\" method=\"get\">"
+				+ "<div class=\"button_style\">"
+				+ "<input type=\"submit\" value=\"View all artist alphabetically\">"
 				+ "<input type=\"hidden\" name=\"showtype\" value=\"byAlphabet\">"
+				+ "</div>"
 				+ "</form>"; 
 	}
 	
 	protected String showAllArtistByPlayCountButton(){
 		
-		return " <form action=\"allartists\" method=\"get\"><input type=\"submit\" value=\"View all artist by playcount\">"
+		return " <form action=\"allartists\" method=\"get\">"
+				+ "<div class=\"button_style\">"
+				+ "<input type=\"submit\" value=\"View all artist by playcount\">"
 				+ "<input type=\"hidden\" name=\"showtype\" value=\"byPlayCount\">"
+				+ "</div>"
 				+ "</form>"; 
 	}
 	
@@ -528,6 +649,36 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				
 		
 	}
+	
+	// for displaying artist Image
+	public static String displayArtistImage(String artistImageURL, String artist, String imageStyle){
+		
+		
+		
+		return "<img class=\"" + imageStyle + "\"" + "src=\"" + artistImageURL + "\"" + "alt=\"" + artist + "\"" 
+				+ "style=\"margin: 20px auto 80px auto;display:block; border-style: solid; border-width: 5px; border-color:" + BLUE_COLOR +  "\">";
+		
+		
+
+		
+//return "<body><div class=\"center\"><center><h1>" + boldTitle + "</h1></center><br/></div>";
+//"<img src=\"https://maxcdn.icons8.com/Color/PNG/48/Data/list-48.png\" title=\"Favorite List\" width=\"48\">"
+				
+		
+		
+	}
+	
+	// display searched type and searched query
+	public static String  displaySearchedHistoryEachRow(String searchType, String searchQuery){
+		
+		return "<tr>"
+				+ "<td>" + searchType + "</td>"
+				+ "<td>" + searchQuery + "</td>"
+				+ "</tr>";
+		
+	}
+	
+	
 	
 	protected static String tableHeadWithBody(){
 		

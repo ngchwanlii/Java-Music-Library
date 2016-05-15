@@ -89,6 +89,17 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// get username from session
 		String username = (String) session.getAttribute(USERNAME);
 	
+		//TODO: added advance feature 5 - save search history
+		try {
+			
+			DBHelper.saveSearchHistory(dbconfig, username, search_type, query);
+		
+			
+		} catch (SQLException e1) {
+			
+			e1.printStackTrace();
+		}
+		
 		
 		// perform search task on musiclibrary		
 		// 2. load song_data_processor content
@@ -156,6 +167,8 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// searchBar remain at song result page
 		buffer.append(searchBar());
 		
+		// added view search history
+		buffer.append(goToViewSearchHistoryButton());
 		
 		// show all artist button
 		buffer.append(showAllArtistsAlphabeticallyButton());

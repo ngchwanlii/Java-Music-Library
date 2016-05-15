@@ -107,6 +107,9 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			
+			// TODO: added view search history button
+			buffer.append(goToViewSearchHistoryButton());
+			
 			// show all artist by ALPHABETICALLY button
 			buffer.append(showAllArtistsAlphabeticallyButton());
 			
@@ -143,7 +146,7 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 				try {
 					
 					// generate artist play count table
-					JSONArray artistPlayCountContentArray = DBHelper.retrieveArtistByPlayCountTableContent(dbconfig, buffer);
+					JSONArray artistPlayCountContentArray = DBHelper.retrieveArtistByPlayCountTableContent(dbconfig);
 					
 					for(int i = 0; i < artistPlayCountContentArray.size(); i++){
 						

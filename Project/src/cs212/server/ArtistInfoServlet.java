@@ -100,6 +100,10 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 		// searchBar remain at song result page
 		buffer.append(searchBar());
 		
+		// TODO: added view search history bar 
+		buffer.append(goToViewSearchHistoryButton());
+		
+		
 		// show all artist by ALPHABETICALLY button
 		buffer.append(showAllArtistsAlphabeticallyButton());
 		
@@ -118,6 +122,8 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 				
 				JSONArray artistInfoArray = DBHelper.retrieveArtistInfoTableContent(dbconfig, artistInfo);
 				
+				boolean displayedImage = false; 
+				
 				for(int i = 0; i < artistInfoArray.size(); i++){
 					
 					JSONObject obj = (JSONObject) artistInfoArray.get(i);
@@ -125,8 +131,20 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 					String name = (String)obj.get("name");
 					String listeners = (String)obj.get("listeners");
 					String playcount = (String)obj.get("playcount");
-					String bio = (String)obj.get("bio"); 
+					String bio = (String)obj.get("bio");				
+					String artistImage = (String)obj.get("image");
 					
+					
+					if(!displayedImage){
+						
+						// set image style - to circle
+						buffer.append(displayArtistImage(artistImage, name, "img-circle"));
+						
+						displayedImage = true;
+					}
+					
+					
+					// then display artist info
 					buffer.append(displayArtistInfoTable(name,listeners, playcount, bio));
 					
 				}

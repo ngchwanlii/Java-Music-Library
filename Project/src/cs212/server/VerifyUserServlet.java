@@ -55,11 +55,42 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 		// 1. signup page
 		// 2. login page	
 		String formType = request.getParameter(PAGENAME);
-		 
+		String changePassword = request.getParameter(CHG_PASSWORD);
 		
 		try {
+			
+			// 0. if user need to change password			
+			if(formType.equals(CHANGEPASSWORDPAGE)){
+				
+				String username = request.getParameter(USERNAME);
+				String oldPassword = request.getParameter(PASSWORD);
+				String newPassword = request.getParameter(NEWPASSWORD);
+				
+				// authentication
+				boolean userExists = DBHelper.userAuthentication(dbconfig, username, oldPassword);
+				
+				// if user does not exists in database record, print out error message
+				if(!userExists){
+					
+					// set user login error
+					session.setAttribute(USERNAME_OR_PASSWORD_NOT_EXIST, username);
+					
+					response.sendRedirect("/changepassword?" + STATUS + "=" + USERNAME_OR_PASSWORD_NOT_EXIST );
+					return;
+				}
+				
+				// else, user exists, user can now change new password
+				DBHelper.changeNewPassword(dbconfig, newPassword, username);
+				
+				// then redirect user to login page
+				response.sendRedirect("/login");
+				return;
+				
+				
+			}
+					
 			// 1. signup page logic here
-			if(formType.equals(SIGNUPPAGE)){
+			else if(formType.equals(SIGNUPPAGE)){
 				
 				// get the parameters value from user signed-up form
 				String username = request.getParameter(USERNAME);
@@ -112,9 +143,11 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 				// reach this line mean signup check passed - ready to save this user info to mySQL database
 				// ready to addUser to mySQL table
 				// need to acquire writeLock 1st before addUser (write operation)
-								
+			
 				// add user to mySQL
-				userLock.lockWrite();
+				userLock.lockWrite();				
+				// set username = logged in username
+				session.setAttribute(USERNAME, username);
 				DBHelper.addUser(dbconfig, username, fullname, password);
 				// release lock
 				userLock.unlockWrite();	
@@ -149,7 +182,7 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 				userLock.lockRead();
 				
 				// login authentication
-				boolean loginStatusOK = DBHelper.loginAuthentication(dbconfig, username, password);			
+				boolean loginStatusOK = DBHelper.userAuthentication(dbconfig, username, password);			
 				
 				userLock.unlockRead();
 				
