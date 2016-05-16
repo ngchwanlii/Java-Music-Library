@@ -52,7 +52,9 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 		/** Condition check - check user click on which artist info **/
 		String artistInfo =  getParameterValue(request, "artistInfo");
 		
-		
+		// get login user last time stamp
+		String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
+				
 		// generate html page
 		// get writer
 		PrintWriter writer = prepareResponse(response);
@@ -69,8 +71,17 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 		// header of search page - Song Finder
 		buffer.append(header("Artist Information"));
 		
-		// styling to right for welcome user messag
-		buffer.append(alignDivDirection("right"));
+		// css style float left
+		buffer.append(divClass("alignleft"));
+		
+		// display last login time
+		buffer.append("Last Login Time: " + loginUserTimeStamp);
+		
+		// css close
+		buffer.append(divClose());
+		
+		// css style float right
+		buffer.append(divClass("alignright"));
 		
 		// login welcome message
 		buffer.append(loginWelcomeMsg(loginUsername));		
@@ -91,6 +102,9 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 		// outer div close
 		buffer.append(divClose());
 		
+		// css style
+		buffer.append(divClass("welcome_msg_style"));
+		
 		// fav welcome message
 		buffer.append(welcomeMsg("Welcome to artist information page!"));
 		
@@ -99,6 +113,10 @@ public class ArtistInfoServlet extends MusicLibraryBaseServlet {
 
 		// searchBar remain at song result page
 		buffer.append(searchBar());
+		
+		
+		// TOOD: added suggest search 
+		buffer.append(goToSearchSuggestionButton());
 		
 		// TODO: added view search history bar 
 		buffer.append(goToViewSearchHistoryButton());

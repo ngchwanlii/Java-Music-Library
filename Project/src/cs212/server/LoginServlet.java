@@ -54,6 +54,9 @@ public class LoginServlet extends MusicLibraryBaseServlet {
 		// html page for login page		
 		buffer.append(initHtmlAndTitle("Login Page"));
 		
+		/*** REMEMBER ADD JAVA SCRIPT **/
+		buffer.append(javaScript());
+		
 		// css style
 		buffer.append(style());
 		
@@ -81,10 +84,30 @@ public class LoginServlet extends MusicLibraryBaseServlet {
 		
 		// display login form
 		buffer.append(loginForm());
-		
+	
 		// new breakline
 		buffer.append(breakLine());
 		buffer.append(breakLine());
+		
+		
+		// TODO: TESTING WITH FACEBOOK INTEGRATION
+		// testing with facebook like button
+//		buffer.append("<div class=\"fb-like\""
+//					 + "data-share=\"true\""
+//					 + "data-width=\"450\""
+//					 + "data-show-faces=\"true\">"
+//					 + "</div>");
+		
+		buffer.append("<div class=\"or_style\"><center><strong> or </strong></center><br></div>");
+		
+		buffer.append(divClass("facebook"));
+		
+		buffer.append(faceBookLoginButton());
+		
+		buffer.append(divClose());
+		
+		buffer.append(breakLine());
+		
 		
 		// option change password button
 		buffer.append(goToChangePasswordButton());

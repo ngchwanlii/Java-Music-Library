@@ -89,13 +89,23 @@ public class DBHelper {
 															+ "("
 															+ "username VARCHAR(100) NOT NULL, "
 															+ "searchType TEXT NOT NULL, "
-															+ "searchQuery TEXT NOT NULL"
+															+ "searchQuery TEXT NOT NULL, "
+															+ "searchCount LONG NOT NULL"
 															+ ")";
 	private static final String searchHistoryTable = "searchHistory";
-	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery) VALUES (?, ?, ?)";
+	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery, searchCount) VALUES (?, ?, ?, ?)";
 	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=?";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
+	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE searchType=? AND searchQuery=?";
 	
+	
+	/** Search Suggestion Table **/	
+	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchHistory WHERE searchType=? GROUP BY searchQuery ORDER BY searchCount DESC";
+	
+	/** work version **/
+//	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchHistory GROUP BY searchQuery";
+	
+//	private static final String showSearchSuggestion = "(SELECT DISTINCT searchQuery from searchHistory ORDER BY searchCount DESC) GROUP BY searchQuery";
 	
 	
 	
@@ -271,8 +281,27 @@ public class DBHelper {
 	
 		Connection con = getConnection(dbconfig);
 		
+		// prepare statment for check search counter
+		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
+		
+		// set retrieveStmt for checking
+		retrieveStmt.setString(1, search_type);
+		
+		retrieveStmt.setString(2, query);
+		
 		// insert search History stmt
 		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
+		
+		ResultSet result = retrieveStmt.executeQuery();
+		
+		// means there is a record on this search
+		if(result.next()){
+			updateStmt.setLong(4, result.getLong("searchCount") + 1);
+		}
+		else {
+			updateStmt.setLong(4, 1);
+		}
+		
 		
 		// trim all white space and make it to lower case (because mySQL SELECT is case and space sensitive)
 		// easier for retrieving data when user at login page
@@ -280,8 +309,8 @@ public class DBHelper {
 		
 		updateStmt.setString(1, username);		
 		updateStmt.setString(2, search_type);
-		updateStmt.setString(3, query);		
-						
+		updateStmt.setString(3, query);	
+		
 		updateStmt.execute();	
 	
 		con.close();
@@ -315,6 +344,48 @@ public class DBHelper {
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("searchType", searchType);
 			jsonObj.put("searchQuery", searchQuery);
+		
+			jsonArray.add(jsonObj);
+			
+		}
+		
+		// close connection after each request 
+		con.close();
+		
+		return jsonArray;
+		
+	}
+	
+	
+	public static JSONArray retrieveSearchSuggestionTableContent(DBConfig dbconfig, String clickedSearchType) throws SQLException{
+		
+		Connection con = getConnection(dbconfig);
+		
+		// retrieve in descending order
+		PreparedStatement retrieveStmt = con.prepareStatement(showSearchSuggestion);
+		
+		
+		// set retrieveStmt !!!!!
+		retrieveStmt.setString(1, clickedSearchType);
+		
+		ResultSet result = retrieveStmt.executeQuery();
+			
+		JSONArray jsonArray = new JSONArray();
+		
+		while(result.next()){
+			
+		
+			String searchType = result.getString("searchType");
+			String searchQuery = result.getString("searchQuery");
+			Long searchCounter = result.getLong("searchCount");
+			
+			// convert search counter to string - for print out
+			String strSearchCounter = searchCounter.toString();
+			
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("searchType", searchType);
+			jsonObj.put("searchQuery", searchQuery);
+			jsonObj.put("searchCount", strSearchCounter);
 			
 			jsonArray.add(jsonObj);
 			
@@ -326,6 +397,7 @@ public class DBHelper {
 		return jsonArray;
 		
 	}
+	
 
 	
 	// TODO: clear search history button

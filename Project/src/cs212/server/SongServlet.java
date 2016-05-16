@@ -181,6 +181,9 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// searchBar remain at song result page
 		buffer.append(searchBar());
 		
+		// TOOD: added suggest search 
+		buffer.append(goToSearchSuggestionButton());
+		
 		// added view search history
 		buffer.append(goToViewSearchHistoryButton());
 		
@@ -249,7 +252,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 						
 					}
 				}
-				catch (SQLException e) {
+				catch (SQLException | NullPointerException e) {
 					
 					e.printStackTrace();
 				}

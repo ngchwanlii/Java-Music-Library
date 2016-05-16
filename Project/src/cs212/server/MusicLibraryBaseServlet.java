@@ -86,7 +86,8 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	public static final String BLUE_COLOR = "#55ACEE";
 	// clear search button
 	public static final String CLEAR_SEARCH_HISTORY_BUTTON = "clear_search_history";
-	
+	// search suggestion
+	public static final String SEARCH_SUGGESTION_BUTTON = "searchSuggestion";
 	
 	// login user time stamp
 	public static final String LOGIN_TIMESTAMP = "time";
@@ -112,8 +113,14 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	// css/js styling
 	protected String style(){
 		
-		return "<style>" + 
-				".center {"
+		return "<style>" 
+				 
+				+ "select {"
+				+ "padding: auto;"
+				+ "margin-right: 5px"
+				+ "}"
+				
+				+ ".center {"
 				+ "margin: auto; "
 				+ "width: 100%; "				
 				+ "padding: 10px;}"
@@ -163,6 +170,20 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "text-decoration: none;"
 				+ "}"
 				
+				
+				+ ".or_style{"
+				+ "width: 200px;"
+				+ "}"
+				
+				+ ".view_search_history_padding{"
+				+ "padding-left: 5px;"				
+				+ "}"
+				
+				+ ".facebook{"
+				+ "width: 300px;"
+//				+ "margin-left: 20px"
+				+ "}"
+				
 				+ "</style>";
 					
 	}
@@ -182,10 +203,101 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		
 	}
 	
+	// java script for facebook
+	protected String javaScript(){
+		
+		return "  <body>"
+				+ "<script>"
+				+ "function statusChangeCallback(response) {"
+				+ "console.log('statusChangeCallback');"
+				+ "console.log(response);"
+				+ "if (response.status === 'connected') {"
+				+ "testAPI();}" 
+				+ "else if (response.status === 'not_authorized') {"
+				+ "document.getElementById('status').innerHTML = 'Please log ' + 'into this app.';}"
+				+ " else {"
+				+ "document.getElementById('status').innerHTML = 'Please log ' + 'into Facebook.';}"
+				+ "}"
+//				+ "function checkLoginState() {"
+//				+ "FB.getLoginStatus(function(response) {"
+//				+ "statusChangeCallback(response);"
+//				+ "});"
+//				+ "}"
+				
+				+ "function checkLoginState() {"
+				+ "FB.getLoginStatus(function(response) {"
+				+ "statusChangeCallback(response);"
+				+ "});"
+				+ "}"
+				
+				
+				+ "window.fbAsyncInit = function() {"
+				+ "FB.init({"
+				+ "appId      : '228334240883505',"
+				+ "xfbml      : true,"
+				+ "version    : 'v2.6'});"
+				+ "};"
+				
+				
+//				+ "FB.getLoginStatus(function(response) {"
+//				+ "statusChangeCallback(response);"
+//				+ "});"
+				
+				
+				+ "(function(d, s, id){"
+				+ "var js, fjs = d.getElementsByTagName(s)[0];"
+				+ "if (d.getElementById(id)) {return;}"
+				+ "js = d.createElement(s); js.id = id;"
+				+ "js.src = \"//connect.facebook.net/en_US/sdk.js\";"
+				+ "fjs.parentNode.insertBefore(js, fjs);"
+				+ "}(document, 'script', 'facebook-jssdk'));"
+				
+				+ "function testAPI() {"
+				+ "console.log('Welcome!  Fetching your information.... ');"
+				+ "FB.api('/me', function(response) {"
+				+ "console.log('Successful login for: ' + response.name);"
+				+ "document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';"
+				+ "});"
+				+ "}"
+				
+				
+				
+				
+				+ "</script>";
+	}
+	
+	// TODO: added new facebook plugin button
+	protected String faceBookLoginButton(){
+		
+//		return "<center><div class=\"fb-login-button\"" 
+//				+ "width=\"300px\""
+//				+ "data-max-rows=\"1\"" 
+//				+ "data-size=\"large\"" 
+//				+ "data-show-faces=\"false\"" 
+//				+ "data-auto-logout-link=\"false\""
+//				+ "onlogin=\"checkLoginState();\">"
+//				+ "Login with Facebook"
+//				+ "</div></center>";
+		
+		return "<fb:login-button size=\"large\" scope=\"public_profile,email\"  onlogin=\"checkLoginState();\"  style=\"margin-left: 15px\">"
+				+ "Login with Facebook"
+				+ "</fb:login-button><br>";
+
+//		<fb:login-button size="xlarge"
+//                onlogin="Log.info.bind('onlogin callback')">
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	// return boldHeader
 	protected String header(String boldTitle){
-		
-		return "<body><div class=\"center\"><center><h1>" + boldTitle + "</h1></center><br/></div>";
+	
+		return "<div class=\"center\"><center><h1>" + boldTitle + "</h1></center><br/></div>";
 		
 	}
 	
@@ -489,6 +601,40 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		return "<font color=\"red\"><p><b>No similar songs to " + searchType + " \"" + query + "\" found in this music-library. Try search again." + "</b></p></font>";
 	}
 	
+	// TODO: search suggestion button
+	protected String goToSearchSuggestionButton(){
+
+		return "<form action=\"searchhistory\" method=\"get\">"				
+				+ "<div class=\"button_style\">"
+				+ "<input type=\"submit\" style=\"font-weight: bold;  color: blue; \" value=\"Search Suggestion\">"
+				+ "<select name=\"searchSuggestion\">"	// note searchSuggestion name here
+				+ "<option value=\"artist\">Artist</option>"
+				+ "<option value=\"song_title\">Song Title</option>"								
+				+ "</div>" 				
+				+ "</form>";
+		
+		
+			
+//			String search_form = "<label>Search Type:</label>"				
+//					+ "<form action=\"song\" method=\"get\">"
+//					+ "<select name=\"search_type\">"	// note search_type here
+//					+ "<option value=\"artist\">Artist</option>"
+//					+ "<option value=\"song_title\">Song Title</option>"
+//					+ "<option value=\"tag\">Tag</option>"    				
+//					+ "</select>";
+		
+			
+			/** ORIGINAL ONE **/
+//			return "<form action=\"searchhistory\" method=\"get\">"
+//			+ "<div class=\"button_style\">"			
+//			+ "<input type=\"hidden\" name=\"searchSuggestion\" value=\"clickedSearchSuggestion\">"
+//			+ "<input type=\"submit\" value=\"Search Suggestion\">"
+//			+ "</div>" 
+//			+ "</form>";	
+			
+		
+	}
+	
 	
 	// option searchButton that let user navigate back to search page
 	protected String goToSearchButton(){
@@ -524,7 +670,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 		return "<form action=\"searchhistory\" method=\"get\">"
 				+ "<div class=\"button_style\">" 
 				+ "<input type=\"submit\" value=\"View search history\">"
-				+ "</div>" 
+				+ "</div></div>" 
 				+ "</form>";
 		
 	}
@@ -556,6 +702,19 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 					+ "<tr>"
 					+ "<td><strong><center>" + searchType + "</center></strong></td>"									
 					+ "<td><strong><center>" + query + "</center></strong></td>"
+					+ "</tr>";
+								
+	}
+	
+	
+	// TODO: set search suggestion table format
+	protected String setSearchSuggestionTableFormat(String searchType, String query, String searchCount){
+		
+		return "<body><table border=\"2px\" width=\"100%\">"				
+					+ "<tr>"
+					+ "<td><strong><center>" + searchType + "</center></strong></td>"									
+					+ "<td><strong><center>" + query + "</center></strong></td>"
+					+ "<td><strong><center>" + searchCount + "</center></strong></td>"
 					+ "</tr>";
 								
 	}
@@ -681,6 +840,17 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 //"<img src=\"https://maxcdn.icons8.com/Color/PNG/48/Data/list-48.png\" title=\"Favorite List\" width=\"48\">"
 				
 		
+		
+	}
+	
+	// display searched type, searched query and searchCount
+	public static String  displaySearchSuggestionEachRow(String searchType, String searchQuery, String searchCount){
+		
+		return "<tr>"
+				+ "<td>" + searchType + "</td>"
+				+ "<td>" + searchQuery + "</td>"
+				+ "<td>" + searchCount + "</td>"
+				+ "</tr>";
 		
 	}
 	

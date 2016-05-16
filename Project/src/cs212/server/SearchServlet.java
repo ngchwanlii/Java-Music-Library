@@ -148,6 +148,9 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		// form that has to be submit to SongServlet.class
 		buffer.append(searchBar());
 		
+		// TOOD: added suggest search 
+		buffer.append(goToSearchSuggestionButton());
+		
 		// TODO: added view search history button
 		buffer.append(goToViewSearchHistoryButton());
 		

@@ -134,6 +134,12 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			
+			// TOOD: added suggest search 
+			buffer.append(goToSearchSuggestionButton());
+			
+			// TODO: added view search history button
+			buffer.append(goToViewSearchHistoryButton());
+			
 			// show all artist button
 			buffer.append(showAllArtistsAlphabeticallyButton());
 			

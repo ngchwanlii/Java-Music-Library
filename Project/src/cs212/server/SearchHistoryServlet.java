@@ -51,6 +51,9 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 		
 		String clickedClearSearchButton = (String) request.getParameter(CLEAR_SEARCH_HISTORY_BUTTON);
 		
+		
+		String clickedSearchSuggestionButton = (String) request.getParameter(SEARCH_SUGGESTION_BUTTON);
+		
 		// generate html page
 		// get writer
 		PrintWriter writer = prepareResponse(response);
@@ -73,14 +76,25 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 			
 	
 			// set header
-			buffer.append(initHtmlAndTitle("Search History Page"));
+			if(clickedSearchSuggestionButton != null){
+				buffer.append(initHtmlAndTitle("Search Suggestion Page"));
+			}
+			else  {
+				buffer.append(initHtmlAndTitle("Search History Page"));
+			}
+			
 			
 			// set style (css)
 			buffer.append(style());
 					
-			// header of search page - Song Finder
-			buffer.append(header("Search History Page"));
-			
+			if(clickedSearchSuggestionButton != null){
+				
+				buffer.append(header("Popular Search Suggestion Page"));
+			}
+			else {
+				// header of search page - Song Finder
+				buffer.append(header("Search History Page"));
+			}
 			
 			// css style float left
 			buffer.append(divClass("alignleft"));
@@ -125,8 +139,16 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			
+			// TOOD: added suggest search 
+			buffer.append(goToSearchSuggestionButton());
+			
 			// TODO: added view search history button
+			
+//			buffer.append(divClass("view_search_history_padding"));
+			
 			buffer.append(goToViewSearchHistoryButton());
+			
+//			buffer.append(divClose());
 			
 			// show all artist by ALPHABETICALLY button
 			buffer.append(showAllArtistsAlphabeticallyButton());
@@ -151,25 +173,43 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 			
 			buffer.append(divClose());
 			
-			// view search history table format
-			buffer.append(setSearchHistoryTableFormat("Searched Type", "Searched Queries"));
+			if(clickedSearchSuggestionButton != null){
+				buffer.append(setSearchSuggestionTableFormat("Searched Type", "Searched Queries", "Search Counts"));
+			}
+			else {// view search history table format			
+				buffer.append(setSearchHistoryTableFormat("Searched Type", "Searched Queries"));
+			}
+			
 			
 			// building searched history table content
+			JSONArray searchedArray;
 			
-			// generate artist play count table
-			JSONArray searchedHistoryArray = DBHelper.retrieveSearchHistoryTableContent(dbconfig, loginUsername);
+			if(clickedSearchSuggestionButton != null){
+				
+				// retrieve search suggestion
+				// clickedSearchSuggestionButton has value of searchType
+				searchedArray = DBHelper.retrieveSearchSuggestionTableContent(dbconfig, clickedSearchSuggestionButton);
+			}
+			else {
+				// generate artist play count table
+				searchedArray = DBHelper.retrieveSearchHistoryTableContent(dbconfig, loginUsername);
+			}
 			
 			
-			
-			for(int i = 0; i < searchedHistoryArray.size(); i++){
+			for(int i = 0; i < searchedArray.size(); i++){
 				
 				
-				JSONObject obj = (JSONObject) searchedHistoryArray.get(i);
+				JSONObject obj = (JSONObject) searchedArray.get(i);
 				String searchType = (String)obj.get("searchType");
 				String searchQuery = (String)obj.get("searchQuery");
+				String searchCount = (String)obj.get("searchCount");
 				
-				buffer.append(displaySearchedHistoryEachRow(searchType, searchQuery));
-				
+				if(clickedSearchSuggestionButton != null){
+					buffer.append(displaySearchSuggestionEachRow(searchType, searchQuery, searchCount));
+				}
+				else {
+					buffer.append(displaySearchedHistoryEachRow(searchType, searchQuery));
+				}
 				
 			}
 		

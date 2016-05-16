@@ -141,6 +141,7 @@ public class MusicLibraryServer {
 //					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
 //					DBHelper.clearTables(dbconfig, "artist");
 //					DBHelper.clearTables(dbconfig, "time");
+//					DBHelper.clearTables(dbconfig, "searchHistory");
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				
