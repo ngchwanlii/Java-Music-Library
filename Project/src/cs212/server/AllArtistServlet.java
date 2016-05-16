@@ -106,6 +106,9 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// outer div close
 			buffer.append(divClose());
 			
+			// css style
+			buffer.append(divClass("welcome_msg_style"));
+			
 			// fav welcome message
 			if(showType.equals("byAlphabet")){
 				buffer.append(welcomeMsg("All Artists' name displayed alphabetically!"));
@@ -113,6 +116,8 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			else if(showType.equals("byPlayCount")) {
 				buffer.append(welcomeMsg("All Artists' name displayed based on playcount in ascending order!"));
 			}
+			
+			buffer.append(divClose());
 			
 			// horizontal line
 			buffer.append(horizontalLine());

@@ -65,6 +65,9 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 		 **/
 		String loginUsername = (String)session.getAttribute(USERNAME);		
 	
+		// get login user last time stamp
+		String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
+		
 		
 		// if user has click show fav icon
 		if(loginUsername != null){
@@ -86,9 +89,17 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			// header of search page - Song Finder
 			buffer.append(header("Favorite Song List"));
 			
-		 
-			// styling to right
-			buffer.append(alignDivDirection("right"));
+			// css style float left
+			buffer.append(divClass("alignleft"));
+			
+			// display last login time
+			buffer.append("Last Login Time: " + loginUserTimeStamp);
+			
+			// css close
+			buffer.append(divClose());
+			
+			// css style float right
+			buffer.append(divClass("alignright"));
 					
 			// login welcome message
 			buffer.append(loginWelcomeMsg(loginUsername));		
@@ -109,8 +120,13 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			// outer div close
 			buffer.append(divClose());
 
+			// css style
+			buffer.append(divClass("welcome_msg_style"));
+			
 			// fav welcome message
 			buffer.append(welcomeMsg("Here your favorite song list!"));
+			
+			buffer.append(divClose());
 			
 			// horizontal line
 			buffer.append(horizontalLine());

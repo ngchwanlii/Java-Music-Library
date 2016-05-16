@@ -167,9 +167,13 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// outer closing for right container
 		buffer.append(divClose());
 		
+		// css style
+		buffer.append(divClass("welcome_msg_style"));
+		
 		// welcome message
 		buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
 		
+		buffer.append(divClose());
 		
 		// horizontal line
 		buffer.append(horizontalLine());

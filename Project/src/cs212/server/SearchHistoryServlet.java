@@ -68,6 +68,8 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 				
 			}
 			
+			// get login user last time stamp
+			String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
 			
 	
 			// set header
@@ -79,8 +81,19 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 			// header of search page - Song Finder
 			buffer.append(header("Search History Page"));
 			
-			// styling to right for welcome user messag
-			buffer.append(alignDivDirection("right"));
+			
+			// css style float left
+			buffer.append(divClass("alignleft"));
+			
+			// display last login time
+			buffer.append("Last Login Time: " + loginUserTimeStamp);
+			
+			// css close
+			buffer.append(divClose());
+			
+		
+			// css style float right
+			buffer.append(divClass("alignright"));
 			
 			// login welcome message
 			buffer.append(loginWelcomeMsg(loginUsername));		
@@ -101,9 +114,14 @@ public class SearchHistoryServlet extends MusicLibraryBaseServlet  {
 			// outer div close
 			buffer.append(divClose());
 			
+			// css style
+			buffer.append(divClass("welcome_msg_style"));
+			
 			// horizontal line
 			buffer.append(horizontalLine());
 
+			buffer.append(divClose());
+			
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			

@@ -151,6 +151,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "}"
 				
 				+ ".welcome_msg_style {"
+//				+ "margin-top: 50px;"
 				+ "padding-top: 100px;"
 				+ "}"
 				
