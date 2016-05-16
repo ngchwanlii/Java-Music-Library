@@ -51,10 +51,14 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// check if user already has fav list records on mySQL fav database table				
 			String loginUsername = (String) session.getAttribute(USERNAME);
 			
+			
+			// get login user last time stamp
+			String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
+			
 			// check the clicked SHOW ALL BUTTON TYPE
 			String showType = getParameterValue(request, "showtype");
 			
-			
+		
 			// generate html page
 			// get writer
 			PrintWriter writer = prepareResponse(response);
@@ -71,8 +75,17 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// header of search page - Song Finder
 			buffer.append(header("All Artist Page"));
 			
-			// styling to right for welcome user messag
-			buffer.append(alignDivDirection("right"));
+			// css style float left
+			buffer.append(divClass("alignleft"));
+			
+			// display last login time
+			buffer.append("Last Login Time: " + loginUserTimeStamp);
+			
+			// css close
+			buffer.append(divClose());
+			
+			// css style float right
+			buffer.append(divClass("alignright"));
 			
 			// login welcome message
 			buffer.append(loginWelcomeMsg(loginUsername));		

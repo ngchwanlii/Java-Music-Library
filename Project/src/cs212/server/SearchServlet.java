@@ -90,7 +90,10 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 			favLock.unlockRead();
 		}
 		
-	
+		// get login user last time stamp
+		String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
+		
+
 		// set header of html page
 		buffer.append(initHtmlAndTitle("Search Page"));
 		
@@ -101,13 +104,21 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		buffer.append(header("Song Finder"));
 			
 	
-		// styling to right
-		buffer.append(alignDivDirection("right"));
+		// css style float left
+		buffer.append(divClass("alignleft"));
 		
+		// display last login time
+		buffer.append("Last Login Time: " + loginUserTimeStamp);
+		
+		// css close
+		buffer.append(divClose());
+		
+		// css style float right
+		buffer.append(divClass("alignright"));
 		
 		// login welcome message
-		buffer.append(loginWelcomeMsg(username));		
-	
+		buffer.append(loginWelcomeMsg(username));	
+		
 		// logout link
 		buffer.append(logoutLink());
 		
@@ -123,8 +134,13 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		// close div
 		buffer.append(divClose());
 		
+		// css style
+		buffer.append(divClass("welcome_msg_style"));
+		
 		// welcome message
 		buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
+		
+		buffer.append(divClose());
 		
 		// horizontal line
 		buffer.append(horizontalLine());

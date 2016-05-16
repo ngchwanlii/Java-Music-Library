@@ -5,15 +5,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-import cs212.data.Song;
-import cs212.server.MusicLibraryBaseServlet;
-
+import java.sql.Timestamp;
 
 public class DBHelper {
 		
@@ -99,6 +95,146 @@ public class DBHelper {
 	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery) VALUES (?, ?, ?)";
 	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=?";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
+	
+	
+	
+	
+	/** Last login Time **/
+	private static final String createLoginTimeTable = 	"CREATE TABLE IF NOT EXISTS time "
+															+ "("
+															+ "username VARCHAR(100) NOT NULL, "															
+															+ "lastLoginTime TIMESTAMP"
+															+ ")";
+	
+	private static final String insertLoginUserTimeStmt = "INSERT INTO time (username, lastLoginTime) VALUES (?, ?)";
+	
+	private static final String showUserLastLoginTimeStmt = "SELECT lastLoginTime FROM time WHERE username=? ORDER BY lastLoginTime DESC";
+	
+	private static final String checkUserTimeStampExist = "SELECT lastLoginTime FROM time WHERE username=?";
+	
+	
+	
+	
+	
+	/************************************************
+	 *			Login User Time Table 				* 
+	 ************************************************/
+	
+	public static void createUserLoginTimeTable(DBConfig dbconfig) throws SQLException { 
+	
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, "time")){
+			PreparedStatement tableStmt = con.prepareStatement(createLoginTimeTable);		
+			tableStmt.executeUpdate();
+		}
+		
+	
+		// close connection after each request 
+		con.close();
+	
+	}
+	
+	
+	// keep track user latest login time
+	public static void insertLoginUserTimeStamp(DBConfig dbconfig, String username) throws SQLException {
+		
+		Connection con = getConnection(dbconfig);
+		// 3. creates a PreparedStatement object for sending parameterized SQL statements to the database
+		// insert artist info to table
+		PreparedStatement updateStmt = con.prepareStatement(insertLoginUserTimeStmt);
+		
+		
+		// get current time stamp from java
+		java.util.Date currentDate = new java.util.Date();
+		
+		Timestamp currentTimeStamp = new java.sql.Timestamp(currentDate.getTime());
+		
+
+		// trim all white space and make it to lower case (because mySQL SELECT is case and space sensitive)
+		// easier for retrieving data when user at login page
+		username = username.trim().toLowerCase();
+		
+		updateStmt.setString(1, username);
+		updateStmt.setTimestamp(2, currentTimeStamp);
+	
+		updateStmt.execute();	
+	
+		con.close();
+		
+		
+	}
+	
+	// show user last login time - retrieve from mySQL database
+	public static String retrieveUserLastLoginTime(DBConfig dbconfig, String username) throws SQLException {
+				
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(showUserLastLoginTimeStmt);
+		
+		
+		retrieveStmt.setString(1, username);
+		
+		ResultSet result = retrieveStmt.executeQuery();
+		
+		String timeStamp = null;
+		
+		try {
+			// get last login time stamp of this user
+			if(result.next()){
+				
+				timeStamp = result.getTimestamp("lastLoginTime").toString();
+			}
+			return timeStamp; 
+		
+		}
+		finally {
+			con.close();
+		}
+		
+	}
+	
+	
+	public static boolean checkUserTimeStampExists(DBConfig dbconfig, String username) throws SQLException {
+		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement checkStmt = con.prepareStatement(checkUserTimeStampExist);
+		
+		
+		username = username.trim().toLowerCase();
+		
+		checkStmt.setString(1, username);
+		
+		
+		
+		ResultSet result = checkStmt.executeQuery();
+		
+		
+		
+		try {
+			// means user has recorded a time stamp
+			if(result.next()){
+				
+				return true;
+			}
+			else {
+				// else user has no record on time stamp
+				return false;
+			}
+			
+		}
+		finally {
+			con.close();
+		}
+		
+			
+		
+	}
 	
 	
 	

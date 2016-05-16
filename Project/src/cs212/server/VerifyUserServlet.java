@@ -208,7 +208,8 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 				}
 			
 				
-				// reach this line mean login check passed											
+				/**** REACH THIS LINE MEAN LOGIN AUTHENTICATION OK ***/
+				
 				
 				// set login status equal to LOGGED in
 				session.setAttribute(LOGGED_IN, username);
@@ -216,6 +217,34 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 				// set username = logged in username
 				session.setAttribute(USERNAME, username);
 				
+				// user time stamp test condition
+				String userTimeStamp;
+				
+				
+				
+				// checking condition if this is new user or not, if this is new user, they still don't have time stamp record on database
+				boolean userTimeStampExist = DBHelper.checkUserTimeStampExists(dbconfig, username);
+				
+	
+				if(!userTimeStampExist){
+					// means this is the new user that login 1st time - set this current time as last login time
+					DBHelper.insertLoginUserTimeStamp(dbconfig, username);
+					// then retrieve from database
+					userTimeStamp = DBHelper.retrieveUserLastLoginTime(dbconfig, username);
+					/** DEBUG **/
+					System.out.println("reach here" );
+					
+				}
+				else {
+					// else, this user has login record last time, retrieve last login time
+					userTimeStamp = DBHelper.retrieveUserLastLoginTime(dbconfig, username);
+					
+					
+					// then only set a new current time for this user
+					DBHelper.insertLoginUserTimeStamp(dbconfig, username);
+				}
+				
+				session.setAttribute(LOGIN_TIMESTAMP, userTimeStamp);
 				
 				
 			
@@ -226,7 +255,7 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 			
 			
 		}	
-		catch (SQLException e) {				
+		catch (SQLException e) {
 			e.printStackTrace();
 		} 
 		

@@ -88,6 +88,9 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	public static final String CLEAR_SEARCH_HISTORY_BUTTON = "clear_search_history";
 	
 	
+	// login user time stamp
+	public static final String LOGIN_TIMESTAMP = "time";
+	
 	
 	// HTML 200 - OK
 	// set content type and status
@@ -137,6 +140,18 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ ".button_style {"
 				+ "display: inline;"
 				+ " padding: 0px 2px 0px 2px;"
+				+ "}"
+				
+				+ ".alignleft {"
+				+ "float: left;"
+				+ "}"
+				
+				+ ".alignright {"
+				+ "float: right;"
+				+ "}"
+				
+				+ ".welcome_msg_style {"
+				+ "padding-top: 100px;"
 				+ "}"
 				
 				+ ".clear_button_style {"
@@ -781,7 +796,6 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	}
 	
 	
-	
 
-	
+
 }

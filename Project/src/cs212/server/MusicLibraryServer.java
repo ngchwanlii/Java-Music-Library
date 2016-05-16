@@ -100,6 +100,12 @@ public class MusicLibraryServer {
 					// create SearchHistoryTable
 					DBHelper.createSearchHistoryTable(dbconfig);
 					
+					
+					// create loginUserTimeTable
+					DBHelper.createUserLoginTimeTable(dbconfig);
+					
+					
+					
 //					/** DEBUG MSG **/
 ////					System.out.println("created Usertable and Favtable and Artist");
 //										
@@ -134,6 +140,7 @@ public class MusicLibraryServer {
 //					DBHelper.clearTables(dbconfig, "fav");				
 //					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
 //					DBHelper.clearTables(dbconfig, "artist");
+//					DBHelper.clearTables(dbconfig, "time");
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				

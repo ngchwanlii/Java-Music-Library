@@ -66,6 +66,8 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// get songArtist (this is the songArtist where the user clicked on the song title previously)
 		String songArtist = getParameterValue(request, "songArtist");
 		
+		// get login user last time stamp
+		String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
 		
 		
 		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
@@ -132,10 +134,18 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		buffer.append(header("Song Finder"));
 		
 		
-		/** added welcome logged in user login msg "Hello Jay", and a optional logout link **/ 
-		// styling to right
-		buffer.append(alignDivDirection("right"));
-				
+		// css style float left
+		buffer.append(divClass("alignleft"));
+		
+		// display last login time
+		buffer.append("Last Login Time: " + loginUserTimeStamp);
+		
+		// css close
+		buffer.append(divClose());
+		
+		// css style float right
+		buffer.append(divClass("alignright"));	
+		
 		// login welcome message
 		buffer.append(loginWelcomeMsg(username));		
 	
