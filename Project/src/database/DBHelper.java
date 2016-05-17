@@ -15,6 +15,21 @@ public class DBHelper {
 		
 	// class variable 	
 	
+
+	/** create admin table **/
+	private static final String createAdminTable = "CREATE TABLE IF NOT EXISTS admin"
+													+ "("
+													+ "adminName VARCHAR(100) NOT NULL, "
+													+ "password TEXT NOT NULL"
+													+ ")";
+	private static final String insertAdminInfo = "INSERT INTO admin (adminName, password) VALUES (?, ?)";
+	
+	public static final String adminTable = "admin";	
+	
+	private static final String adminAuthenticationStmt = "SELECT * FROM admin WHERE adminName=? AND password=?";
+	
+	
+	
 	/** userTable **/
 	private static final String createUserTable = "CREATE TABLE IF NOT EXISTS user" +
 													"(" + 
@@ -185,7 +200,88 @@ public class DBHelper {
 	private static final String getTop100RankImageArtistName = "SELECT top100ArtistChart.rank, top100ArtistChart.artist, "
 																+ " artist.image FROM top100ArtistChart JOIN artist WHERE top100ArtistChart.artist=artist.name";
 	
-
+	
+	
+	/************************************************
+	 *			Admin Table 						* 
+	 ************************************************/
+	
+	public static void createAdminTable(DBConfig dbconfig) throws SQLException { 
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, adminTable)){
+			PreparedStatement adminTableStmt = con.prepareStatement(createAdminTable);		
+			adminTableStmt.executeUpdate();
+		}
+		
+	
+		// close connection after each request 
+		con.close();
+	
+	}
+	
+	// set adminName and password
+	public static void setAdmin(DBConfig dbconfig, String adminName, String password) throws SQLException{
+		
+	
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement updateAdminStmt = con.prepareStatement(insertAdminInfo);
+		
+		adminName = adminName.trim().toLowerCase();
+		password = password.trim().toLowerCase();
+	
+		updateAdminStmt.setString(1, adminName);		
+		updateAdminStmt.setString(2, password);
+				
+						
+		updateAdminStmt.execute();	
+	
+		con.close();
+	}
+	
+	
+	
+	// admin authentication
+	public static boolean adminLoginAuthentication(DBConfig dbconfig, String adminName, String password) throws SQLException{
+	
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(adminAuthenticationStmt);
+		
+		// the way to verified, trim username and password and convert to lower-case
+		adminName = adminName.trim().toLowerCase();
+		password = password.trim().toLowerCase();
+		
+		retrieveStmt.setString(1, adminName);
+		retrieveStmt.setString(2, password);
+		
+		// execute
+		ResultSet result = retrieveStmt.executeQuery();
+		
+		try {
+			if(result.next()){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		finally {
+			con.close();
+		}
+	
+		
+	}
+	
+	
+	
+	
 	
 	
 	

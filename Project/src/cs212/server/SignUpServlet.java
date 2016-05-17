@@ -14,8 +14,6 @@ import database.DBHelper;
 public class SignUpServlet extends MusicLibraryBaseServlet {
 	
 	
-	
-	// post method should use for sign-up (hide user sign up info, without display them in URL)
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{		
 		

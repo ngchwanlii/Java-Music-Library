@@ -10,7 +10,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -27,6 +26,9 @@ public class MusicLibraryServer {
 	public static final int DEFAULT_PORT = 9051;
 	public static final int MAX_THREADS = 10;
 	public static final String MUSIC_DATAPATH = "input/lastfm_subset";
+	private static final String ADMIN_NAME = "Jay";
+	private static final String SECRET_KEY = "jay890703vivfam";
+	public static String JETTY_SERVER = "server";
 	public static DBConfig dbconfig;
 	
 	public static void main(String[] args) throws Exception {
@@ -34,18 +36,28 @@ public class MusicLibraryServer {
 		// set new server by default_port
 		Server server = new Server(DEFAULT_PORT);
 		
+		
 		// web-container 
 		// create ServletHander for attaching servlets
 		ServletContextHandler servhandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		
+		
 		server.setHandler(servhandler);
+		
+		
 		
 		// add Event Listener
 		servhandler.addEventListener(new ServletContextListener() {
 
 			@Override
 			public void contextDestroyed(ServletContextEvent arg0) {
+				
 				// when server shut down - do nothing
-				// option - put some task here if you want server do something after shutdown
+			
+				// check if server is shutdown!
+				System.out.println("Server is shutdown");
+				
+				
 			}
 
 			
@@ -188,6 +200,12 @@ public class MusicLibraryServer {
 				
 				
 				
+				// create adminTable
+				DBHelper.createAdminTable(dbconfig);
+				
+				// insert admin info = preset by admin only
+				DBHelper.setAdmin(dbconfig, ADMIN_NAME, SECRET_KEY);
+				
 				
 				
 				
@@ -238,10 +256,9 @@ public class MusicLibraryServer {
 				**/
 				
 				
-				// create ArtistPlayCountTable
-//				DBHelper.createArtistPlayCountTable(dbconfig);
 				
-				
+				// set jetty server into web container - use for shut down later on
+				sce.getServletContext().setAttribute(JETTY_SERVER, server);
 				
 				// set attribute music_lib
 				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.MUSIC_LIB,  threadSafe_musicLibrary);
@@ -280,7 +297,8 @@ public class MusicLibraryServer {
 //					DBHelper.clearTables(dbconfig, "artist");
 //					DBHelper.clearTables(dbconfig, "time");
 //					DBHelper.clearTables(dbconfig, "searchHistory");					
-//					DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);
+//					DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);			
+//					DBHelper.clearTables(dbconfig, DBHelper.adminTable);
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				
@@ -338,10 +356,22 @@ public class MusicLibraryServer {
 		// Top 100 Artist Chart
 		servhandler.addServlet(Top100ArtistChartServlet.class, "/chart");
 		
+		// Admin page
+		servhandler.addServlet(AdminServlet.class, "/admin");
+		
+		// Gracefully shutdown servlet
+		servhandler.addServlet(ShutdownServlet.class, "/shutdown");
 		
 		
 		//set the list of handlers for the server
 		server.setHandler(servhandler);
+		
+		
+		
+		
+		
+		
+		
 		
 		// server start
 		server.start();

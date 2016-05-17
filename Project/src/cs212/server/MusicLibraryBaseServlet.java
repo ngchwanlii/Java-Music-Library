@@ -93,6 +93,12 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	public static final String LOGIN_TIMESTAMP = "time";
 	
 	
+	
+	/** SHUTDOWN on admin control **/
+	public static final String ADMINNAME = "Jay";
+	public static final String READY_TO_SHUT_DOWN = "ready_toshutdown";
+	
+	
 	// HTML 200 - OK
 	// set content type and status
 	// return a print writer
@@ -501,9 +507,43 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	
 	
+	
 	/****************************************************************************************************************
 	 * 																												*
-	 *  										LOGIN logic														*											*
+	 *  										ADMIN logic															*											*
+	 * 																												*
+	 *****************************************************************************************************************/
+	
+	
+	
+	// return a signup form
+	protected String adminLoginForm(){
+		
+	
+		String adminLoginForm = "<div class = \"form\">"  
+				+ "<form  action=\"verifyuser\" method=\"post\">"
+				+ "<label>Admin Name:</label></br>"
+				+ "<input type=\"text\" name=\"adminName\" style=\"width: 200px\"></br>"
+				+ "<label>Password:</label></br>"
+				+ "<input type=\"password\" name=\"adminPassword\" style=\"width: 200px\"></br>"				
+				+ "</br>"
+				+ "<div class='submit'>"
+				+ "<input type=\"submit\" value=\"Login\" id='button-green' style=\"width: 200px\">"
+				+ "<input type=\"hidden\" name=\"pagename\" value=\"adminpage\">"
+				+ "</div>"
+				+ "</form></div>";
+				
+		return adminLoginForm;
+	}
+	
+	
+	
+	
+	
+	
+	/****************************************************************************************************************
+	 * 																												*
+	 *  										LOGIN logic															*											*
 	 * 																												*
 	 *****************************************************************************************************************/
 	
@@ -763,6 +803,17 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				
 	}	
 	
+	// go to admin button
+	protected String goToAdminButton(){
+		return "<form action=\"admin\" method=\"get\">"
+				+ "<div class='submit_grey'>"
+				+ "<input type=\"submit\" value=\"Go to Admin Page\" id='button-grey'>"
+				+ "</div>"
+				+ "</form>";
+	}
+	
+	
+	
 	// option signUpButton that let user navigate back to signup page
 	protected String goToSignUpButton(){
 		return "<form action=\"signup\" method=\"get\">"
@@ -794,8 +845,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "</form></div>";
 	}
 	
-	// TODO: go to searchHistory Button
-	
+	// go to searchHistory Button	
 	protected String goToViewSearchHistoryButton(){
 		
 		return "<form action='searchHistory' method='get'>"
@@ -806,6 +856,19 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "</form>";
 		
 	}
+	
+	// go to gracefully shutdown button
+	protected String goToShutDownButton(){
+		
+		return "<div class =\"form\">"
+				+ "<form action=\"shutdown\" method=\"get\">"
+				+ "<div class='submit_grey'>" 
+				+ "<input type=\"submit\" style=\"width: 200px\" value=\"Shutdown Server\" id='button-grey'>"
+				+ "</div>"
+				+ "</form></div>";
+	}
+	
+	
 	
 	// TODO: clear history button
 	// allow user to clear searched history

@@ -30,6 +30,7 @@ public class CheckServlet extends MusicLibraryBaseServlet {
 		// get session
 		HttpSession session = request.getSession();
 		
+		
 		// setting
 		// get dbconfig from web-container
 		DBConfig dbconfig = (DBConfig) request.getServletContext().getAttribute(DBConfig.DBCONFIG);

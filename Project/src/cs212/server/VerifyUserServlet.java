@@ -59,8 +59,40 @@ public class VerifyUserServlet extends MusicLibraryBaseServlet {
 		
 		try {
 			
-			// 0. if user need to change password			
-			if(formType.equals(CHANGEPASSWORDPAGE)){
+			if(formType.equals("adminpage")){
+				
+				String adminName = request.getParameter("adminName");
+				String adminPassword = request.getParameter("adminPassword");
+				
+				boolean adminExists = DBHelper.adminLoginAuthentication(dbconfig, adminName, adminPassword);
+				
+				// if admin does not exits
+				if(!adminExists){
+					
+					// send erro message
+					// set admin login error
+					// set user login error
+					session.setAttribute(USERNAME_OR_PASSWORD_NOT_EXIST, adminName);
+					
+					response.sendRedirect("/admin?" + STATUS + "=" + USERNAME_OR_PASSWORD_NOT_EXIST );
+					
+					return;
+					
+				}
+				else {
+					
+					session.setAttribute(ADMINNAME, adminName);
+					
+					response.sendRedirect("/admin?" + STATUS + "=" + READY_TO_SHUT_DOWN );
+					return;
+					
+				}
+				
+			}
+			
+			
+			// if user need to change password			
+			else if(formType.equals(CHANGEPASSWORDPAGE)){
 				
 				String username = request.getParameter(USERNAME);
 				String oldPassword = request.getParameter(PASSWORD);

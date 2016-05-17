@@ -53,6 +53,14 @@ public class LoginServlet extends MusicLibraryBaseServlet {
 		// LOGO
 		buffer.append(logo());
 		
+		
+		// styling
+		buffer.append(alignDivDirection("right"));
+		
+		buffer.append(goToAdminButton());
+		
+		buffer.append(divClose());
+		
 		buffer.append(horizontalLine());
 		
 		// if not_logged_in
