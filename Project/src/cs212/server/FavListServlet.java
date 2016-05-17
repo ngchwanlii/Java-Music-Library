@@ -160,7 +160,7 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			buffer.append(divClass("table_result"));
 			
 			// set fav table foramt
-			buffer.append(favTableFormat("Artist", "Song Title", "Song Track ID"));
+			buffer.append(favTableFormat("Artist", "Song Title", "Song Track ID", "Delete Favorites?"));
 			
 			// need to acquire write lock
 			favLock.lockRead();
@@ -180,7 +180,10 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 					String songTitle = (String)obj.get("songTitle");
 					String songTrackID = (String)obj.get("trackID"); 
 					
-					buffer.append(favListTableContent(artist, songTitle, songTrackID));
+					 
+					String deleteImgAndParameter = generateDeleteIconAndParameters(loginUsername, songTrackID);
+							
+					buffer.append(favListTableContent(artist, songTitle, songTrackID, deleteImgAndParameter));
 					
 				}		
 			}
@@ -207,9 +210,27 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			
 		}
 		
-	
-			
 	}
+	
+	// generateDeleteIconAndParameters method
+	// with a identify clickedDeleteFav to detect if user want to delete particular fav song on their list
+	// after delete redirect back to this fav list page
+	// go to check servlet for deleting the chosen list from fav list
+	public String generateDeleteIconAndParameters(String username, String songTrackID){
+		
+		return "<a href=\"/check?delete=clicked" + "&favusername=" + username + "&trackid=" + songTrackID  + "\">" 
+				+ "<img src='https://maxcdn.icons8.com/windows8/PNG/26/User_Interface/delete_sign-26.png' title='Delete' width='26'>"
+				+ "</a>";
+				
+		
+//		+ "<a href=\"/check?favusername=" + username + "&artist=" + artist + "&songtitle=" + songTitle + "&trackid=" +   songTrackID  + "\">" 
+//		+ "<img src=\"" + imgPath + "\">"
+//		+ "</a>"
+				
+		
+	}
+	
+	
 	
 	
 	

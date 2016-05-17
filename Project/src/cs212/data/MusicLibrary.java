@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import cs212.util.comparator.*;
+import database.DBHelper;
 
 
 public class MusicLibrary {
@@ -256,8 +257,9 @@ public class MusicLibrary {
 		if(!artistMusicLibrary.containsKey(artistName)){
 			this.artistMusicLibrary.put(artistName, new TreeSet<Song>(new ArtistComparator()));
 			
-			// TODO: case insensitive search
+			// case insensitive search
 			artistMap.put(artistName, artistName);
+				
 			
 		}
 		
@@ -302,6 +304,22 @@ public class MusicLibrary {
 		
 		
 		
+		
+	}
+	
+	// getTreeSet a list of sorted artistname alphabetically
+	// make this thread safe, TreeSet is not thread safe but the element inside is a String type, string element inside is thread-safe 
+	// caller who invoke this method need to ACQUIRE READ LOCK 	
+	public TreeSet<String> getSortedArtistName(){
+		
+		// create a new TreeSet object for returning
+		TreeSet<String> result = new TreeSet<String>();
+		
+		for(String str : this.sortedArtistNameSet){
+			result.add(str);
+		}
+		
+		return result;
 		
 	}
 	
@@ -370,24 +388,145 @@ public class MusicLibrary {
 		}
 	}
 	
-	// getTreeSet a list of sorted artistname alphabetically
-	// make this thread safe, TreeSet is not thread safe but the element inside is a String type, string element inside is thread-safe 
-	// caller who invoke this method need to ACQUIRE READ LOCK 	
-	public TreeSet<String> getSortedArtistName(){
+	
+	
+	// return a new JSONArray which contain artistMusicLibrary Info
+	public JSONObject getArtistMusicLibrary(){
 		
-		// create a new TreeSet object for returning
-		TreeSet<String> result = new TreeSet<String>();
+		JSONObject artistMusicLibObj = new JSONObject();
+		
+		JSONArray artistArray = new JSONArray();
 		
 		for(String str : this.sortedArtistNameSet){
-			result.add(str);
+			artistArray.add(str);
 		}
+	
 		
-		return result;
+		artistMusicLibObj.put("artistMusicLibrary", artistArray);
+		
+		return artistMusicLibObj;
 		
 	}
+	
+	// return a new JSONArray which contain titleMusicLibrary Info
+	public JSONObject getSongTitleMusicLibrary(){
+		
+		
+		JSONObject titleMusicLibObj = new JSONObject();
+		
+		JSONArray songsArray = new JSONArray();
+		
+		for(Map.Entry<String, TreeSet<Song>> entry: this.titleMusicLibrary.entrySet()){
+			
+			String songTitle = entry.getKey();
+			
+			TreeSet<Song> songs = entry.getValue();
+			
+	
+			for(Song song : songs){
+				
+				JSONObject innerObj = new JSONObject();
+			
+				String artistName = song.getArtistName();
+				String songTrackID = song.getTrackID();
+				
+				// forming most inner jsonObj
+				innerObj.put("songTitle", songTitle);	// # this is the song title we want - at key set
+				innerObj.put("artistName", artistName);
+				innerObj.put("trackID", songTrackID);
+				
+				// add to songsJSONArray
+				songsArray.add(innerObj);
+				
+			}
+		
+			
+		}
+		
+		// forming top level titleMusicLibObj
+		titleMusicLibObj.put("artistMusicLibrary", songsArray);
+		
+		return titleMusicLibObj;
+	
+	}
+	
+	// get tag music libarry for DBHelper to add into mySQL
+	public JSONObject getTagMusicLibrary(){
+		
+		
+		JSONObject tagMusicLibObj = new JSONObject();
+		
+		JSONArray songsArray = new JSONArray();
+		
+		for(Map.Entry<String, ArrayList<Song>> entry: this.tagMusicLibrary.entrySet()){
+			
+			String tag = entry.getKey();
+			
+			ArrayList<Song> songs = entry.getValue();
 
 
+			for(Song song : songs){
+				
+				JSONObject innerObj = new JSONObject();
+			
+				String songTrackID = song.getTrackID();
+				
+				// forming most inner jsonObj
+				innerObj.put("tag", tag);	// # this is the song title we want - at key set				
+				innerObj.put("trackID", songTrackID);
+				
+				// add to songsJSONArray
+				songsArray.add(innerObj);
+				
+			}		
+		}
+		
+		
+		// forming top level titleMusicLibObj
+		tagMusicLibObj.put("tagMusicLibrary", songsArray);
+		
+		return tagMusicLibObj;
+	
+	}
+	
+	
+	// get trackID music library for DBHelper to add into mySQL
+	public JSONObject getTrackIDMusicLibrary(){
+		
+		
+		JSONObject trackIDMusicLibObj = new JSONObject();
+		
+		JSONArray songsArray = new JSONArray();
+		
+		for(Map.Entry<String, Song> entry: this.trackIDMusicLibrary.entrySet()){
+			
+			String tag = entry.getKey();
+			
+			Song song = entry.getValue();
 
+			JSONObject innerObj = new JSONObject();
+		
+			String songTrackID = song.getTrackID();
+			
+			// forming most inner jsonObj
+			innerObj.put("trackID", songTrackID);
+			innerObj.put("tag", tag);	// # this is the song title we want - at key set				
+			
+			
+			// add to songsJSONArray
+			songsArray.add(innerObj);
+		
+		}
+		
+		
+		// forming top level titleMusicLibObj
+		trackIDMusicLibObj.put("trackIDMusicLibrary", songsArray);
+		
+		return trackIDMusicLibObj;
+	
+	}
+	
+	
 	
 	
 }	

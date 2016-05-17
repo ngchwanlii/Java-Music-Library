@@ -10,6 +10,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -52,30 +53,24 @@ public class MusicLibraryServer {
 			// set the intialized context  
 			public void contextInitialized(ServletContextEvent sce) {
 				
-				
+			try{
+
 				// number of threads for the thread pool
 				int nThreads = MAX_THREADS;
 				
-										
+									
 				// create musiclibrary (thread version)		  - [task: set content of musiclibrary and ready for build up]
 				ThreadSafeMusicLibrary threadSafe_musicLibrary = new ThreadSafeMusicLibrary(MUSIC_DATAPATH);
 				
+				
+				
 				// create song_data_processor (thread version) - [task: addSong and build up musiclibrary]
 				SongDataProcessor processSongData = new SongDataProcessor(threadSafe_musicLibrary, MUSIC_DATAPATH, nThreads);
-				
-				// create new dbconfig
-				DBConfig dbconfig = setupDBConfig();
+			
 				
 				LastFMClient lastFMClient = new LastFMClient();
 				
-		
-				
-				// create 2 types of reentrant lock (lock logic for addUser to mySQL + retrieve data from mySQL table (for login authentication)
-				
-				// why 2 types? both userLock and favLock has similar features -  (retrieve / update userTable)
-				// but they update to their own table, so we use 2 reentrant lock, where other thread can simultaneously 
-				// update to 2 different table 
-				
+			
 				// this lock is for userLock (retrieve / update userTable) 
 				ReentrantLock userLock = new ReentrantLock();
 				
@@ -86,57 +81,184 @@ public class MusicLibraryServer {
 				ReentrantLock searchHistoryLock = new ReentrantLock();
 		
 				
-				// must create user table 1st
-				try {
-					
+				/*********************
+				 *  Database zone	 *
+				 *********************/
 				
-					// create userTable					
-					DBHelper.createUserTable(dbconfig);
+				/****** artistTable in mySQL ******/
+				// create new dbconfig
+				DBConfig dbconfig = setupDBConfig();
+				
+				
+				// Storing MusicLibrary persistently
+				//  create ArtistTable - Artist name is key			
+//				DBHelper.createArtistTable(dbconfig);
+//				
+//				
+//				JSONObject artistMusicLib = threadSafe_musicLibrary.getArtistMusicLibrary();
+//				
+//				JSONArray artistArray = (JSONArray) artistMusicLib.get("artistMusicLibrary");
+//				
+//				for(int i = 0; i < artistArray.size(); i++){
 //					
-//					// create favTable
-					DBHelper.createFavTable(dbconfig);
-
-//					//  create ArtistTable					
-					DBHelper.createArtistTable(dbconfig);
+//					String artist = (String) artistArray.get(i);
+//					
+//					DBHelper.addArtistTable(dbconfig, artist);
+//					
+//				}
+				
+				/****** END of artistTable ******/
+				
+				
+				
+				/****** songTitle in mySQL ******/				
+				//  create TitleTable - [songtitle, artistname, trackID]
+//				DBHelper.createSongTitleTable(dbconfig);
+//				
+//				JSONObject titleMusicLibObj = threadSafe_musicLibrary.getSongTitleMusicLibrary();
+//				
+//				JSONArray songsArray = (JSONArray) titleMusicLibObj.get("artistMusicLibrary");
+//				
+//				for(int i = 0; i < songsArray.size(); i++){
+//					
+//					JSONObject songInfo = (JSONObject) songsArray.get(i);
+//				
+//					String artistName = (String)songInfo.get("artistName");
+//					String songTitle = (String)songInfo.get("songTitle");
+//					String trackID = (String)songInfo.get("trackID");
+//					
+//					// ready to add to database
+//					DBHelper.addSongTitleTable(dbconfig, artistName, songTitle, trackID);
+//					
+//				
+//				}
+				
+				/****** END of songTitle ******/
+				
+				
+			
+				/****** Tag in mySQL ******/					
+				// create TagTable - [tag, trackID]
+//				DBHelper.createTagTable(dbconfig);
+//				
+//				
+//				JSONObject tagMusicLibObj = threadSafe_musicLibrary.getTagMusicLibrary();
+//				
+//				JSONArray tagsArray = (JSONArray) tagMusicLibObj.get("tagMusicLibrary");
+//				
+//				for(int i = 0; i < tagsArray.size(); i++){
+//					
+//					JSONObject tagInfo = (JSONObject) tagsArray.get(i);
 //			
-					
-					// create SearchHistoryTable
-					DBHelper.createSearchHistoryTable(dbconfig);
-					
-					
-					// create loginUserTimeTable
-					DBHelper.createUserLoginTimeTable(dbconfig);
-					
-					// create Top 100 Artist Chart 
-					DBHelper.createTop100ArtistChart(dbconfig);
+//					String tag = (String)tagInfo.get("tag");
+//					String trackID = (String)tagInfo.get("trackID");
+//					
+//					// ready to add to database
+//					DBHelper.addTagTable(dbconfig, tag, trackID);
+//					
+//				
+//				}
+				
+				/****** END of tag ******/
+				
+				
+				
+				/****** TrackID in mySQL ******/
+				// create TrackIDTable [trackID, songTitle]
+//				DBHelper.createTrackIDTable(dbconfig);
+//				
+//				JSONObject trackIDMusicLibObj = threadSafe_musicLibrary.getTrackIDMusicLibrary();
+//				
+//				JSONArray trackIDArray = (JSONArray) tagMusicLibObj.get("trackIDMusicLibrary");
+//				
+//				for(int i = 0; i < trackIDArray.size(); i++){
+//					
+//					JSONObject trackIDInfo = (JSONObject) trackIDArray.get(i);
+//			
+//					String trackID = (String)trackIDInfo.get("trackID");
+//					String tag = (String)trackIDInfo.get("tag");
+//				
+//					// ready to add to database
+//					DBHelper.addTrackIDTable(dbconfig, trackID, tag);
+//					
+//				}
+				
+				/****** END of trackID ******/
+				
+				
+				
+				
+				
+				
+				
+				// create userTable					
+				DBHelper.createUserTable(dbconfig);
+				
+				// create favTable
+				
+				/** RESUME LATER **/
+				DBHelper.createFavTable(dbconfig);
+
+			
+
+				// create SearchHistoryTable
+				DBHelper.createSearchHistoryTable(dbconfig);
+				
+				
+				// create loginUserTimeTable
+				DBHelper.createUserLoginTimeTable(dbconfig);
+				
+				// create Top 100 Artist Chart 
+				DBHelper.createTop100ArtistChart(dbconfig);
+				
+				// create artistDetailsInfoTable
+				DBHelper.createArtistInfoDetailsTable(dbconfig);
 					
 					
 					
 					/** DEBUG MSG **/
-//					System.out.println("created Usertable and Favtable and Artist");
+//					System.out.println("created Usertable and Favtable, SearchHistoryTable, LoginTimeTable, top100Chart");
 //											
-					// fetch and store artist information using lastFM API					
-					
+					// fetch and store artist information using lastFM API										
 					/** DEBUG USE FOR quickly setup server **/
 //					LastFMClient.fetchSingleArtist("Radiohead", dbconfig);
-//					
-//					LastFMClient.fetchTopArtistsChart(dbconfig);
 					
-					
-					
-					
-					
-					
-					
-					
-					/** MAIN USE - RESUME THESE AFTER
-					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
-					
-					// create ArtistPlayCountTable
-					DBHelper.createArtistPlayCountTable(dbconfig);	
-					
-					
-					**/
+			
+				
+				/** MAIN USE - RESUME THESE AFTER
+				
+				 LastFMClient.fetchTopArtistsChart(dbconfig); 
+				  
+				LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
+				
+				// create ArtistPlayCountTable
+				DBHelper.createArtistPlayCountTable(dbconfig);	
+				
+				
+				**/
+				
+				
+				// create ArtistPlayCountTable
+//				DBHelper.createArtistPlayCountTable(dbconfig);
+				
+				
+				
+				// set attribute music_lib
+				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.MUSIC_LIB,  threadSafe_musicLibrary);
+				
+				// set dbconfig data
+				sce.getServletContext().setAttribute(DBConfig.DBCONFIG,  dbconfig);
+				
+				// set attribute userLock into web container
+				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.USERTABLE_LOCK,  userLock);
+				
+				// set attribute favLock into web container
+				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.FAVTABLE_LOCK,  favLock);
+				
+				
+				sce.getServletContext().setAttribute("searchHistoryLock",  searchHistoryLock);
+				
+				
 
 					/** DEBUG MSG **/
 //					System.out.println("finish fetch and store artist in MusicLibraryServer");
@@ -157,34 +279,14 @@ public class MusicLibraryServer {
 //					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
 //					DBHelper.clearTables(dbconfig, "artist");
 //					DBHelper.clearTables(dbconfig, "time");
-//					DBHelper.clearTables(dbconfig, "searchHistory");
-//					DBHelper.clearTables(dbconfig, "searchHistory");
+//					DBHelper.clearTables(dbconfig, "searchHistory");					
 //					DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				
 					e.printStackTrace();
 				}
-				
-				
-			
-				// set attribute music_lib
-				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.MUSIC_LIB,  threadSafe_musicLibrary);
-				
-				// set dbconfig data
-				sce.getServletContext().setAttribute(DBConfig.DBCONFIG,  dbconfig);
-				
-				// set attribute userLock into web container
-				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.USERTABLE_LOCK,  userLock);
-				
-				// set attribute favLock into web container
-				sce.getServletContext().setAttribute(MusicLibraryBaseServlet.FAVTABLE_LOCK,  favLock);
-				
-				
-				sce.getServletContext().setAttribute("searchHistoryLock",  searchHistoryLock);
-				
-				
-							
+						
 			}
 						
 		});

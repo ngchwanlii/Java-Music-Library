@@ -631,12 +631,13 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	}
 	
 	// return table format style
-	protected String favTableFormat(String artistCol, String songTitleCol, String songTrackIDCol){
+	protected String favTableFormat(String artistCol, String songTitleCol, String songTrackIDCol, String deleteFavs){
 		return "<body><table border=\"2px\" width=\"100%\">"				
 				+ "<tr>"
 				+ "<th><strong><center>" + artistCol + "</center></strong></th>"
 				+ "<th><strong><center>" + songTitleCol + "</center></strong></th>"				
 				+ "<th><strong><center>" + songTrackIDCol + "</center></strong></th>"
+				+ "<th><strong><center>" + deleteFavs + "</center></strong></th>"
 				+ "</tr>";
 	
 	}
@@ -657,14 +658,8 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "</center>"
 				+"</td>"
 				+"</tr>";
-				
 		
-		/** correct format this 1 **/
-//		"<a href=\"/favlist?favusername=" + username + "&artist=" + artist + "&songtitle=" + songTitle + "&trackid=" +   songTrackID  + "\">"
-		
-
-				
-		
+	
 	}
 	
 	// show the songInfo "artist + songTitle" when user click on a particular song 
@@ -676,13 +671,14 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	
 	
 	// return favorite list table content 
-	public static String favListTableContent(String artist, String songTitle, String songTrackID){
+	public static String favListTableContent(String artist, String songTitle, String songTrackID, String deleteIconAndParameter){
 		
 	
 		return "<tr>"
 				+"<td>" + artist + "</td>"
 				+"<td>" + songTitle + "</td>"
 				+"<td>" + songTrackID + "</td>"
+				+"<td>" + deleteIconAndParameter + "</td>"			
 				+"</tr>";
 		
 	}

@@ -47,6 +47,11 @@ public class DBHelper {
 	
 	
 	private static final String insertFavSongListStatement = "INSERT INTO fav (username, artist, songTitle, songTrackID) VALUES (?, ?, ?, ?)";
+	
+	
+	private static final String deleteFavSongStatement = "DELETE FROM fav WHERE username=? AND songTrackID=?";
+
+	
 	public static final String favTable = "fav";
 	
 	// check songID has been inserted into mySQL table (useful for switching status of favorite song (added or not added)
@@ -56,8 +61,9 @@ public class DBHelper {
 	
 	
 	
-	/** ArtistInfoTable - from lastFMAPI **/
-	private static final String createLastFMArtistInfoTableStmt = "CREATE TABLE IF NOT EXISTS artist" 
+	// Persistent MusicLibrary Storage
+	/** ArtistInfoTable - from lastFMAPI - different than artist from persistent music library**/
+	private static final String createLastFMArtistInfoTableStmt = "CREATE TABLE IF NOT EXISTS artistInfo" 
 												   + "(" 
 												   + "name LONGTEXT NOT NULL, " 
 												   + "listeners INTEGER, " 
@@ -66,10 +72,54 @@ public class DBHelper {
 												   + "image LONGTEXT"
 												   + ")";
 			
-	private static final String insertLastFMArtistInfoStatement = "INSERT INTO artist (name, listeners, playcount, bio, image) VALUES (?, ?, ?, ?, ?)";	
-	public static final String artistInfoTable = "artist";
-	private static final String showArtistInfoTableStmt = "SELECT * from artist WHERE name=?";
+	private static final String insertLastFMArtistInfoStatement = "INSERT INTO artistInfo (name, listeners, playcount, bio, image) VALUES (?, ?, ?, ?, ?)";	
+	public static final String artistInfoTable = "artistInfo";
+	private static final String showArtistInfoTableStmt = "SELECT * from artistInfo WHERE name=?";
 	
+	
+	
+	// Artist table - from artistMusicLibrary to persistent database
+	private static final String createArtistTable = "CREATE TABLE IF NOT EXISTS artist" 
+													   + "(" 
+													   + "name LONGTEXT NOT NULL PRIMARY KEY " 			  			     			   													 
+													   + ")";
+	private static final String insertArtistStatement = "INSERT INTO artist (name) VALUES (?)";
+	public static final String artistTable = "artist";
+	
+	
+	
+	
+	// Song Title table
+	private static final String createSongTitleTable = "CREATE TABLE IF NOT EXISTS songTitle" 
+													   + "(" 
+													   + "name LONGTEXT NOT NULL, " 			  			     			   
+													   + "songtitle LONGTEXT NOT NULL, "
+													   + "trackID LONGTEXT NOT NULL"
+													   + ")";
+	private static final String insertSongTitleStatement = "INSERT INTO songTitle (name, songtitle, trackID) VALUES (?, ?, ?)";
+	public static final String songTitleInfoTable = "songTitle";
+	
+	
+	
+	// Tag table
+	private static final String createTagTable = "CREATE TABLE IF NOT EXISTS tag" 
+												   + "(" 
+												   + "tag LONGTEXT NOT NULL, " 			  			     			   			   
+												   + "trackID LONGTEXT NOT NULL"
+												   + ")";
+	private static final String insertTagStatement = "INSERT INTO tag (tag, trackID) VALUES (?, ?)";
+	public static final String tagInfoTable = "tag";
+	
+	
+	// TrackID table
+	private static final String createTrackIDTable = "CREATE TABLE IF NOT EXISTS trackID" 
+												   + "("
+												   + "songTrackID LONGTEXT NOT NULL"
+												   + "songtitle LONGTEXT NOT NULL, " 			  			     			   			   			   
+												   + ")";
+	private static final String insertTrackIDStatement = "INSERT INTO trackID (songTrackID, tag) VALUES (?, ?)";
+	public static final String trackIDInfoTable = "trackID";
+		
 	
 	/** ArtistPlayCount table **/
 	private static final String createArtistPlayCountTable = "CREATE TABLE IF NOT EXISTS artistPlayCount"
@@ -97,19 +147,12 @@ public class DBHelper {
 	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=?";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
 	
-//	/** NEED PUT USER NAME **/ DOG
 	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE username=? AND searchQuery=?";
 	
 	
 	/** Search Suggestion Table **/	
 	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchHistory WHERE searchType=? GROUP BY searchQuery ORDER BY searchCount DESC";
-	
-	/** work version **/
-//	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchHistory GROUP BY searchQuery";
-	
-//	private static final String showSearchSuggestion = "(SELECT DISTINCT searchQuery from searchHistory ORDER BY searchCount DESC) GROUP BY searchQuery";
-	
-	
+		
 	
 	/** Last login Time **/
 	private static final String createLoginTimeTable = 	"CREATE TABLE IF NOT EXISTS time "
@@ -142,12 +185,7 @@ public class DBHelper {
 	private static final String getTop100RankImageArtistName = "SELECT top100ArtistChart.rank, top100ArtistChart.artist, "
 																+ " artist.image FROM top100ArtistChart JOIN artist WHERE top100ArtistChart.artist=artist.name";
 	
-	/** CORRECT ONE **/
-//	SELECT user.username, user.password, history.search FROM user JOIN history WHERE user.username=history.username	
-	
-//	private static final String getTop100RankImageArtistName = "SELECT top100ArtistChart.rank, top100ArtistChart.artist, artist.image FROM top100ArtistChart INNERJOIN artist ON top100ArtistChart.artist=artist.name";
-	
-	
+
 	
 	
 	
@@ -659,6 +697,25 @@ public class DBHelper {
 		
 	}
 	
+	// delete favorite song list
+	public static void deleteFavorite(DBConfig dbconfig, String favusername, String songTrackID) throws SQLException {
+		
+		Connection con = getConnection(dbconfig);
+		
+		favusername = favusername.trim().toLowerCase();
+		
+	
+		PreparedStatement deleteStmt = con.prepareStatement(deleteFavSongStatement);
+		
+		deleteStmt.setString(1, favusername);
+		deleteStmt.setString(2, songTrackID);
+		
+		deleteStmt.execute();
+		
+		con.close();
+		
+	}
+	
 	
 	/** favTable **/
 	// check if username exists in mySQL favTable database 
@@ -724,18 +781,20 @@ public class DBHelper {
 	}
 	
 	
+	
 	/************************************************
 	 *			LastFM ArtistInfo Table				* 
 	 ************************************************/
-	public static void createArtistTable(DBConfig dbconfig) throws SQLException {		
+	public static void createArtistInfoDetailsTable(DBConfig dbconfig) throws SQLException {		
 		
+	
 		// 1. get connection from database config		
 		Connection con = getConnection(dbconfig);
 		
 		// 2. check if table exits or not
 		// if table exits - we won't create this table
 		// else - create artist table 		
-		if(!tableExists(con, "artist")){
+		if(!tableExists(con, artistInfoTable)){
 			PreparedStatement tableStmt = con.prepareStatement(createLastFMArtistInfoTableStmt);		
 			tableStmt.executeUpdate();
 		}
@@ -744,6 +803,96 @@ public class DBHelper {
 		// close connection after each request 
 		con.close();
 		
+	}
+	
+	
+	/************************************************
+	 *			Persistent MusicLibrary storage		* 
+	 ************************************************/
+	
+	
+	// create Artist Table
+	
+	public static void createArtistTable(DBConfig dbconfig) throws SQLException {		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, artistTable)){
+			PreparedStatement tableStmt = con.prepareStatement(createArtistTable);		
+			tableStmt.executeUpdate();
+		}
+		
+		
+		// close connection after each request 
+		con.close();
+		
+	}
+	
+	
+	
+	// Create Song Title Table
+	public static void createSongTitleTable(DBConfig dbconfig) throws SQLException {		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, songTitleInfoTable)){
+			PreparedStatement tableStmt = con.prepareStatement(createSongTitleTable);		
+			tableStmt.executeUpdate();
+		}
+		
+		
+		// close connection after each request 
+		con.close();
+		
+	}
+	
+	// Create Tag Table
+	public static void createTagTable(DBConfig dbconfig) throws SQLException {		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 		
+		if(!tableExists(con, tagInfoTable)){
+			PreparedStatement tableStmt = con.prepareStatement(createTagTable);		
+			tableStmt.executeUpdate();
+		}
+		
+		
+		// close connection after each request 
+		con.close();
+		
+	}
+	
+	// Create TrackID Table
+	public static void createTrackIDTable(DBConfig dbconfig) throws SQLException {		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		// 2. check if table exits or not
+		// if table exits - we won't create this table
+		// else - create artist table 	
+	
+		if(!tableExists(con, trackIDInfoTable)){
+		
+			PreparedStatement tableStmt = con.prepareStatement(createTrackIDTable);		
+			tableStmt.executeUpdate();
+		}
+		
+		
+		// close connection after each request 
+		con.close();
 		
 	}
 	
@@ -768,8 +917,85 @@ public class DBHelper {
 	}
 	
 	
+	/************************************************
+	 *			Add to mySQL database				* 
+	 ************************************************/
 	
-	/** LASTFM artistsInfo table **/
+	// addArtist - from artistMusicLibrary to database
+	public static void addArtistTable(DBConfig dbconfig, String artist) throws SQLException{
+		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement updateArtistInfoStmt = con.prepareStatement(insertArtistStatement);
+
+		updateArtistInfoStmt.setString(1, artist);
+		
+		// remember execute!
+		updateArtistInfoStmt.execute();
+		
+		con.close();
+
+	}
+	
+	
+	// 2. addSongTitle - from titleMusicLibrary to database
+	public static void addSongTitleTable(DBConfig dbconfig, String artistName, String songTitle, String trackID) throws SQLException{
+		
+	
+		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement updateSongTitleStmt = con.prepareStatement(insertSongTitleStatement);
+
+		updateSongTitleStmt.setString(1, artistName);
+		updateSongTitleStmt.setString(2, songTitle);
+		updateSongTitleStmt.setString(3, trackID);
+		
+		// remember execute!
+		updateSongTitleStmt.execute();
+		
+		con.close();
+
+	}
+	
+	
+	
+	// 3. addTag - from tagMusicLibrary to database	
+	public static void addTagTable(DBConfig dbconfig, String tag, String trackID) throws SQLException{
+		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement updateTagStmt = con.prepareStatement(insertTagStatement);
+
+		updateTagStmt.setString(1, tag);
+		updateTagStmt.setString(2, trackID);
+	
+		// remember execute!
+		updateTagStmt.execute();
+		
+		con.close();
+
+	}
+
+	// 4. addTrackID - from trackIDMusicLibrary to database
+	public static void addTrackIDTable(DBConfig dbconfig, String trackID, String tag) throws SQLException{
+
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement updateTrackIDStmt = con.prepareStatement(insertTrackIDStatement);
+		
+		updateTrackIDStmt.setString(1, trackID);
+		updateTrackIDStmt.setString(2, tag);
+	
+		updateTrackIDStmt.execute();
+		
+		con.close();
+
+	}
+	
+	
+	
+	/** LASTFM TopArtistChart **/
 	public static void addTopArtistChartInfoLastFM(DBConfig dbconfig, String artist) throws SQLException{
 		
 		Connection con = getConnection(dbconfig);
@@ -785,7 +1011,7 @@ public class DBHelper {
 		
 		
 	}
-	
+	/** LASTFM artistsInfo table **/
 	// updateTable method - update/insert artist info to database
 	public static void addArtistInfoLastFM(DBConfig dbconfig, String name, Integer listeners, Integer playcount, String bio, String artistImage) throws SQLException{
 		

@@ -1,6 +1,7 @@
 package cs212.server;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import cs212.util.concurrent.ReentrantLock;
 import database.DBConfig;
+import database.DBHelper;
 
 public class CheckServlet extends MusicLibraryBaseServlet {
 	
@@ -35,10 +37,37 @@ public class CheckServlet extends MusicLibraryBaseServlet {
 		// get favLock - this SongServlet (involve retrieve / update to favListTable)
 		ReentrantLock favLock = (ReentrantLock) request.getServletContext().getAttribute(MusicLibraryBaseServlet.FAVTABLE_LOCK);
 		
+		// check delete icon
+		String deleteClicked = request.getParameter("delete");
+		
+		if(deleteClicked != null){
+			
+			String favusername = request.getParameter("favusername");
+			String trackID = request.getParameter("trackid");
+			
+			try {
+				
+				DBHelper.deleteFavorite(dbconfig, favusername, trackID);
+				
+				// after delete, redirect back to favList
+				response.sendRedirect(response.encodeRedirectURL("/favlist"));
+				return;
+				
+			} catch (SQLException e) {
+				
+				e.printStackTrace();
+			}
+			
+			
+			
+			
+		}
+		
+		
 		
 		String searchType = (String)session.getAttribute(SEARCH_TYPE);
 		String query = (String)session.getAttribute(QUERY);
-		
+	
 		
 		// 3. check if user clicked add to Fav Song link 
 		boolean userClickedAddFavSong = checkAddFavSongAction(session, request, response, dbconfig, favLock);
@@ -55,6 +84,11 @@ public class CheckServlet extends MusicLibraryBaseServlet {
 			// return the response
 			return;
 		}
+		
+		
+		
+		
+		
 	}
 	
 }
