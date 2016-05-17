@@ -12,11 +12,10 @@ import javax.servlet.http.HttpSession;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import cs212.util.concurrent.ReentrantLock;
 import database.DBConfig;
 import database.DBHelper;
 
-public class FavListServlet extends MusicLibraryBaseServlet {
+public class SearchSuggestionServlet extends MusicLibraryBaseServlet  {
 	
 	// both GET and POST is acceptable
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,19 +27,15 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 	}
 	
 	
-	
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		
 		
 		// get session
 		HttpSession session = request.getSession();
 		
-		// setting
 		// get dbconfig from web-container
 		DBConfig dbconfig = (DBConfig) request.getServletContext().getAttribute(DBConfig.DBCONFIG);
-	
-		// get favLock - this SongServlet (involve retrieve / update to favListTable)
-		ReentrantLock favLock = (ReentrantLock) request.getServletContext().getAttribute(MusicLibraryBaseServlet.FAVTABLE_LOCK);
-		
 		
 		// 1. base case - check user login
 		boolean userLogin = checkUserLogin(session, response);
@@ -52,43 +47,40 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 		}
 		
 		
-		// 1. check if logged_in user has click on the display favorite song icon
-		 
+		// check if user already has fav list records on mySQL fav database table				
+		String loginUsername = (String) session.getAttribute(USERNAME);
 		
-		/** FavListServlet condition  - check whether loginUser has click on show Favorite List Icon **/				
-		// check if user already has fav list records on mySQL fav database table
-		
-		/*** FIXED CODE REVIEW POINT 
-		 * 
-		 * Removed showFavList, use session for the checking 
-		 *
-		 **/
-		String loginUsername = (String)session.getAttribute(USERNAME);		
 	
-		// get login user last time stamp
-		String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
+		// check if user clicked SEARCH SUGGESTIOn
+		String clickedSearchSuggestionButton = (String) request.getParameter(SEARCH_SUGGESTION_BUTTON);
 		
+		// generate html page
+		// get writer
+		PrintWriter writer = prepareResponse(response);
 		
-		// if user has click show fav icon
-		if(loginUsername != null){
+		// String buffer		
+		StringBuffer buffer = new StringBuffer();
+		
+		try {
 			
-			/** Generate favorite list page html inside music library base servlet **/
-			// generate a page that show all favorite added song
-			// get writer
-			PrintWriter writer = prepareResponse(response);
+		
+			// get login user last time stamp
+			String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
 			
-			// String buffer		
-			StringBuffer buffer = new StringBuffer();
+			// LOGO
+			buffer.append(logo());
+			
+			buffer.append(horizontalLine());
 			
 			// set header
-			buffer.append(initHtmlAndTitle("Favorite Song List Page"));
+			buffer.append(initHtmlAndTitle("Search Suggestion Page"));
+			
 			
 			// set style (css)
 			buffer.append(style());
-					
-			// header of search page - Song Finder
-			buffer.append(header("Favorite Song List"));
 			
+			buffer.append(header("Popular Search Suggestion Page"));
+		
 			// css style float left
 			buffer.append(divClass("alignleft"));
 			
@@ -98,9 +90,10 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			// css close
 			buffer.append(divClose());
 			
+		
 			// css style float right
 			buffer.append(divClass("alignright"));
-					
+			
 			// login welcome message
 			buffer.append(loginWelcomeMsg(loginUsername));		
 		
@@ -119,68 +112,78 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			
 			// outer div close
 			buffer.append(divClose());
-
+			
 			// css style
 			buffer.append(divClass("welcome_msg_style"));
 			
-			// fav welcome message
-			buffer.append(welcomeMsg("Here your favorite song list!"));
-			
-			buffer.append(divClose());
-			
 			// horizontal line
 			buffer.append(horizontalLine());
+
+			buffer.append(divClose());
 			
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			
-			// TOOD: added suggest search 
+			// added suggest search 
 			buffer.append(goToSearchSuggestionButton());
 			
-			// TODO: added view search history button
+			// add view search histroy
 			buffer.append(goToViewSearchHistoryButton());
 			
-			// show all artist button
+			// show all artist by ALPHABETICALLY button
 			buffer.append(showAllArtistsAlphabeticallyButton());
 			
-			// add show all artist playcount
+			// show all artist by PLAY COUNT button
 			buffer.append(showAllArtistByPlayCountButton());
+
+			buffer.append(divClose());
+			
+			// css style
+			buffer.append(divClass("alignright"));
+			
+			// Top 100 Artist Chart
+			buffer.append(goToViewTop100ArtistChartButton());
+			
+			buffer.append(divClose());
+			
 			
 			// css style
 			buffer.append(divClass("table_result"));
 			
-			// set fav table foramt
-			buffer.append(favTableFormat("Artist", "Song Title", "Song Track ID"));
+			// align clear history button on right
+			buffer.append(alignDivDirection("right"));
 			
-			// need to acquire write lock
-			favLock.lockRead();
+			buffer.append(divClass("button_style"));
 			
-			try {
-				
-				
-				/** FIXED CODE REVIEW POINT -returned as an JSONArray, then use buffer to generate the html page content **/
-				// create up fav table content 
-				JSONArray favContentArray = DBHelper.retrieveFavTableContent(dbconfig, loginUsername);
-				
-				for(int i = 0; i < favContentArray.size(); i++){
-					
-					JSONObject obj = (JSONObject) favContentArray.get(i);
-					
-					String artist = (String)obj.get("artist");
-					String songTitle = (String)obj.get("songTitle");
-					String songTrackID = (String)obj.get("trackID"); 
-					
-					buffer.append(favListTableContent(artist, songTitle, songTrackID));
-					
-				}		
-			}
-			catch (SQLException e){
-				
-			}
-			finally {
-				favLock.unlockRead();
-			}
+			// don't need to have clearSearchHistory button in SearchSuggestion
 			
+			buffer.append(divClose());
+			
+			buffer.append(divClose());
+			
+			
+			buffer.append(setSearchSuggestionTableFormat("Searched Type", "Searched Queries", "Search Counts"));
+			
+			
+			// building searched history table content
+			JSONArray searchedArray;
+			
+			// retrieve search suggestion
+			// clickedSearchSuggestionButton has value of searchType
+			searchedArray = DBHelper.retrieveSearchSuggestionTableContent(dbconfig, clickedSearchSuggestionButton);
+			
+			for(int i = 0; i < searchedArray.size(); i++){
+				
+				
+				JSONObject obj = (JSONObject) searchedArray.get(i);
+				String searchType = (String)obj.get("searchType");
+				String searchQuery = (String)obj.get("searchQuery");
+				String searchCount = (String)obj.get("searchCount");
+			
+				buffer.append(displaySearchSuggestionEachRow(searchType, searchQuery, searchCount));
+			
+			}
+		
 			// closing table </table> <-- NOTE
 			buffer.append("</table>");
 			
@@ -190,17 +193,20 @@ public class FavListServlet extends MusicLibraryBaseServlet {
 			buffer.append(footer());
 			
 			
-			// print out html page
-			writer.println(buffer);
-						
-			return;
 			
 		}
+		catch (SQLException e) {
+
+			e.printStackTrace();
+		}
 		
+		
+		// print out html page
+		writer.println(buffer); 
+
+		return;
 	
-			
 	}
-	
 	
 	
 }

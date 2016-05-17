@@ -3,7 +3,6 @@ package cs212.server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,25 +12,24 @@ import javax.servlet.http.HttpSession;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import cs212.data.ThreadSafeMusicLibrary;
 import database.DBConfig;
 import database.DBHelper;
 
-public class AllArtistServlet extends MusicLibraryBaseServlet {
+public class Top100ArtistChartServlet extends MusicLibraryBaseServlet { 
 	
-		// both GET and POST is acceptable
-		protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-			processRequest(request, response);
-		}
+	// both GET and POST is acceptable
+			protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+				processRequest(request, response);
+			}
 
-		protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-			processRequest(request, response);
-		}
+			protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+				processRequest(request, response);
+			}
 		
 		
 		private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 			
-			
+		
 			// get session
 			HttpSession session = request.getSession();
 			
@@ -55,10 +53,7 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// get login user last time stamp
 			String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
 			
-			// check the clicked SHOW ALL BUTTON TYPE
-			String showType = getParameterValue(request, "showtype");
 			
-		
 			// generate html page
 			// get writer
 			PrintWriter writer = prepareResponse(response);
@@ -66,14 +61,19 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// String buffer		
 			StringBuffer buffer = new StringBuffer();
 			
+			// LOGO
+			buffer.append(logo());
+			
+			buffer.append(horizontalLine());
+			
 			// set header
-			buffer.append(initHtmlAndTitle("All Artist Page"));
+			buffer.append(initHtmlAndTitle("Top 100 Artists Chart"));
 			
 			// set style (css)
 			buffer.append(style());
 					
 			// header of search page - Song Finder
-			buffer.append(header("All Artist Page"));
+			buffer.append(header("Top 100 Artists Chart"));
 			
 			// css style float left
 			buffer.append(divClass("alignleft"));
@@ -109,19 +109,18 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// css style
 			buffer.append(divClass("welcome_msg_style"));
 			
-			// fav welcome message
-			if(showType.equals("byAlphabet")){
-				buffer.append(welcomeMsg("All Artists' name displayed alphabetically!"));
-			}
-			else if(showType.equals("byPlayCount")) {
-				buffer.append(welcomeMsg("All Artists' name displayed based on playcount in ascending order!"));
-			}
+			// welcome msg
+			buffer.append(welcomeMsg("Welcome, here's Top 100 Artists!"));
 			
 			buffer.append(divClose());
 			
 			// horizontal line
 			buffer.append(horizontalLine());
 
+			// css style float left
+			
+			buffer.append(divClass("alignleft"));
+			
 			// searchBar remain at song result page
 			buffer.append(searchBar());
 			
@@ -137,57 +136,46 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			// show all artist by PLAY COUNT button
 			buffer.append(showAllArtistByPlayCountButton());
 			
+			buffer.append(divClose());
+			
+			// css style
+			buffer.append(divClass("alignright"));
+			
+			// Top 100 Artist Chart
+			buffer.append(goToViewTop100ArtistChartButton());
+			
+			buffer.append(divClose());
+			
+			
 			// css style
 			buffer.append(divClass("table_result"));
+
+			// table format
+			buffer.append(tableFormat("Rank", "Artist Image", "Artist Name"));
 			
-			if(showType.equals("byAlphabet")){
-				// display all artist table format
-				buffer.append(allArtistByAlphabetTableFormat("Artists"));
-			}
-			else if(showType.equals("byPlayCount")){
-				buffer.append(allArtistByPlayCountTableFormat("Artists", "Playcount"));
-			}
-			
-			
-			
-			if(showType.equals("byAlphabet")){
-				// load musicLibrary content
-				ThreadSafeMusicLibrary threadSafeML = (ThreadSafeMusicLibrary) request.getServletContext().getAttribute(MUSIC_LIB);
+			// Code logic here
+			try {
+				JSONArray top100ArtistsArray = DBHelper.retrieveTop100ArtistsChartContent(dbconfig);
 				
-				TreeSet<String> sortedArtists = threadSafeML.getSortedArtistName();
-				
-				for(String str : sortedArtists){
+				for(int i = 0; i < top100ArtistsArray.size(); i++){
+						
+					JSONObject obj = (JSONObject) top100ArtistsArray.get(i);
+					String rank = (String)obj.get("rank");
+					String image = (String)obj.get("image");
+					String artist = (String)obj.get("artist"); 
 					
-					buffer.append(displayArtistNameEachRow(str));
+					/** DEBUG USE **/
+					System.out.println("rank: " +  rank + " image: " + image + " artist: " + artist);
+					
+					buffer.append(displaytop100ArtistChartContent(rank, image, artist));
 					
 				}
-			}
-			else if(showType.equals("byPlayCount")) {
 				
-				try {
-					
-					// generate artist play count table
-					JSONArray artistPlayCountContentArray = DBHelper.retrieveArtistByPlayCountTableContent(dbconfig);
-					
-					for(int i = 0; i < artistPlayCountContentArray.size(); i++){
-						
-						
-						JSONObject obj = (JSONObject) artistPlayCountContentArray.get(i);
-						String artist = (String)obj.get("artist");
-						String playcount = (String)obj.get("playcount");
-						
-						buffer.append(displayArtistNameAndPlayCountEachRow(artist, playcount));
-						
-						
-					}
-					
-					
-				} catch (SQLException e) {
-					
-					e.printStackTrace();
-				}
-				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
 			
 			// closing table </table> <-- NOTE
 			buffer.append("</table>");
@@ -198,14 +186,12 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 			buffer.append(footer());
 			
 			
-			// print out html page
 			writer.println(buffer);
-						
+			
 			return;
-			
-			
-			
 		}
 		
 		
+		
+	
 }
