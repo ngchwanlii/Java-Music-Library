@@ -13,7 +13,13 @@ import java.sql.Timestamp;
 
 public class DBHelper {
 		
-	// class variable 	
+	
+	
+	/** for partial search **/
+	private static final String artistPartialSearchStmt = "SELECT name FROM artist WHERE name LIKE ?"; 
+	private static final String titlePartialSearchStmt = "SELECT songtitle FROM songTitle WHERE songtitle LIKE ?";
+	private static final String tagPartialSearchStmt = "SELECT tag FROM tag WHERE tag LIKE ?";
+	
 	
 
 	/** create admin table **/
@@ -108,7 +114,7 @@ public class DBHelper {
 	private static final String createSongTitleTable = "CREATE TABLE IF NOT EXISTS songTitle" 
 													   + "(" 
 													   + "name LONGTEXT NOT NULL, " 			  			     			   
-													   + "songtitle LONGTEXT NOT NULL, "
+													   + "songtitle LONGTEXT, "
 													   + "trackID LONGTEXT NOT NULL"
 													   + ")";
 	private static final String insertSongTitleStatement = "INSERT INTO songTitle (name, songtitle, trackID) VALUES (?, ?, ?)";
@@ -145,7 +151,7 @@ public class DBHelper {
 	
 	private static final String insertLastFMArtistPlayCount = "INSERT INTO artistPlayCount (name, playcount) VALUES (?, ?)";
 	public static final String artistPlayCountTable = "artistPlayCount";
-	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artist ORDER BY playcount";
+	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artistInfo ORDER BY playcount";
 	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount";
 	
 	
@@ -199,6 +205,110 @@ public class DBHelper {
 	
 	private static final String getTop100RankImageArtistName = "SELECT top100ArtistChart.rank, top100ArtistChart.artist, "
 																+ " artist.image FROM top100ArtistChart JOIN artist WHERE top100ArtistChart.artist=artist.name";
+	
+	
+	
+	
+	
+	/**** partial search ***/
+	public static String artistPartialSearchResult(DBConfig dbconfig, String artist) throws SQLException {
+	
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(artistPartialSearchStmt); 
+	
+	
+		retrieveStmt.setString(1, "%" + artist + "%");				
+		
+		
+		ResultSet result = retrieveStmt.executeQuery();
+		String completeName = null;
+		try {
+			if(result.next()){
+				
+				/** DEBUG **/
+				System.out.println(result.next());
+				
+				completeName = result.getString("name");
+				
+				/** DEBUG **/
+				System.out.println(completeName);
+			
+			}
+			
+		}
+		finally {
+			con.close();
+		}
+		
+		return completeName; 
+		
+	}
+	
+	
+	public static String titlePartialSearchResult(DBConfig dbconfig, String title) throws SQLException{
+		
+
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(titlePartialSearchStmt); 
+	
+		retrieveStmt.setString(1, title);				
+		
+		
+		ResultSet result = retrieveStmt.executeQuery();
+		String completeTitle = null;
+		try {
+			if(result.next()){
+				
+				completeTitle = result.getString("songtitle");
+				
+				
+			}
+			
+		}
+		finally {
+			con.close();
+		} 
+		
+		return completeTitle;
+		
+	}
+	
+	
+	public static String tagPartialSearchResult(DBConfig dbconfig, String tag) throws SQLException{
+		
+		
+		
+		// 1. get connection from database config		
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(tagPartialSearchStmt); 
+	
+		retrieveStmt.setString(1, tag);				
+		
+		
+		ResultSet result = retrieveStmt.executeQuery();
+		String completeTag = null;
+		
+		try {
+			if(result.next()){
+				
+				completeTag = result.getString("tag");
+			
+			}
+			
+		}
+		finally {
+			con.close();
+		} 
+		
+		return completeTag;
+		
+	}
+	
 	
 	
 	

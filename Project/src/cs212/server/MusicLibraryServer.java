@@ -176,15 +176,15 @@ public class MusicLibraryServer {
 //					
 //				
 //				}
-				
-				System.out.println("END of tagTable");
-				
-				/****** END of tag ******/
-				
-				
-				
-				/****** TrackID in mySQL ******/
-				// create TrackIDTable [trackID, songTitle]
+//				
+//				System.out.println("END of tagTable");
+//				
+//				/****** END of tag ******/
+//				
+//				
+//				
+//				/****** TrackID in mySQL ******/
+//				// create TrackIDTable [trackID, songTitle]
 //				DBHelper.createTrackIDTable(dbconfig);
 //				
 //				JSONObject trackIDMusicLibObj = threadSafe_musicLibrary.getTrackIDMusicLibrary();
@@ -203,7 +203,7 @@ public class MusicLibraryServer {
 //					
 //				}
 				
-				System.out.println("END of trackIDTable");
+//				System.out.println("END of trackIDTable");
 				
 //				/****** END of trackID ******/
 //				
@@ -241,9 +241,8 @@ public class MusicLibraryServer {
 				
 				// create artistDetailsInfoTable
 				DBHelper.createArtistInfoDetailsTable(dbconfig);
-//					
-//					
-//					
+
+				
 //					/** DEBUG MSG **/
 //					System.out.println("created Usertable and Favtable, SearchHistoryTable, LoginTimeTable, top100Chart");
 ////											
@@ -261,8 +260,10 @@ public class MusicLibraryServer {
 //					
 //					DBHelper.createArtistPlayCountTable(dbconfig);
 					
+					
+					
 					/** DEBUG MSG **/
-//					System.out.println("created artistPlayCountTable  - the END");
+					System.out.println("created artistPlayCountTable  - the END");
 					
 					
 				/** MAIN USE - RESUME THESE AFTER

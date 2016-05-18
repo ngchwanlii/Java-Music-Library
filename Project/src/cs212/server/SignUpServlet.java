@@ -17,7 +17,7 @@ public class SignUpServlet extends MusicLibraryBaseServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{		
 		
-
+		
 		// get session
 		HttpSession session = request.getSession();
 	

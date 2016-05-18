@@ -74,8 +74,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		String privateMode = getParameterValue(request, "private");
 		
-		
-		
+
 		
 		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
 	
@@ -128,21 +127,53 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// load musicLibrary content
 		ThreadSafeMusicLibrary threadSafeML = (ThreadSafeMusicLibrary) request.getServletContext().getAttribute(MUSIC_LIB);
 		
+		// TODO: 
+		// 1. for Partial Search, implement logic with mySQL syntax here 
+		// 2. then set get resulting query
+		// 3. pass into threadSafeML for search
+		
+	
 		// create a JSONArray
 		JSONArray searchResultsArray = null;
 		// check searchType
-		if(search_type.equals(ARTIST)){
-			searchResultsArray = threadSafeML.searchByArtist(query);
+		
+		try {
+			if(search_type.equals(ARTIST)){
+			
+				query = DBHelper.artistPartialSearchResult(dbconfig, query);
+			
+				session.setAttribute("DISPLAYQUERY", query);
+				
+				searchResultsArray = threadSafeML.searchByArtist(query);
+			}
+			else if(search_type.equals(SONG_TITLE)){
+					
+					
+				query = DBHelper.titlePartialSearchResult(dbconfig, query);
+				
+				session.setAttribute("DISPLAYQUERY", query);
+				
+				searchResultsArray = threadSafeML.searchByTitle(query);
+			}
+			else if(search_type.equals(TAG)){
+				
+				
+				query = DBHelper.tagPartialSearchResult(dbconfig, query);
+				session.setAttribute("DISPLAYQUERY", query);
+				
+				searchResultsArray = threadSafeML.searchByTag(query);
+			}
 		}
-		else if(search_type.equals(SONG_TITLE)){
-			searchResultsArray = threadSafeML.searchByTitle(query);
-		}
-		else if(search_type.equals(TAG)){
-			searchResultsArray = threadSafeML.searchByTag(query);
+		catch (SQLException e) {
+			
+			e.printStackTrace();
 		}
 		
 		// prepare to build html page
 	
+		String displaySearchedQuery = (String) session.getAttribute("DISPLAYQUERY");
+		session.removeAttribute("DISPLAYQUERY");
+		
 		// LOGO
 		buffer.append(logo());
 		
@@ -194,9 +225,18 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// css style
 		buffer.append(divClass("welcome_msg_style"));
 		
-		// welcome message
-		buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
 		
+		if(displaySearchedQuery != null){
+			
+			buffer.append(divClass("center"));
+			buffer.append("<center>Searched Query: "  + displaySearchedQuery + "</center>" );
+			buffer.append(divClose());
+			
+		}
+		else {
+			// welcome message
+			buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
+		}
 		buffer.append(divClose());
 		
 		// horizontal line
@@ -219,11 +259,11 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		// add show all artist playcount
 		buffer.append(showAllArtistByPlayCountButton());
-		
-		
-		
-		
+	
 		buffer.append(divClose());
+		
+		
+		
 		
 		// css style
 		buffer.append(divClass("alignright"));
@@ -240,6 +280,8 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			buffer.append(songInfoBar(songArtist, query));
 			
 		}
+		
+		
 		
 		// css style
 		buffer.append(divClass("table_result"));
