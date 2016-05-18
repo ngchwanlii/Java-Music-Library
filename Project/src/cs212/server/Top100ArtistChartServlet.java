@@ -163,10 +163,7 @@ public class Top100ArtistChartServlet extends MusicLibraryBaseServlet {
 					String rank = (String)obj.get("rank");
 					String image = (String)obj.get("image");
 					String artist = (String)obj.get("artist"); 
-					
-					/** DEBUG USE **/
-					System.out.println("rank: " +  rank + " image: " + image + " artist: " + artist);
-					
+								
 					buffer.append(displaytop100ArtistChartContent(rank, image, artist));
 					
 				}

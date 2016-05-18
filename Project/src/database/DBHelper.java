@@ -194,17 +194,18 @@ public class DBHelper {
 	/** Add TopArtistChart **/
 	private static final String createTop100ArtistChart = 	"CREATE TABLE IF NOT EXISTS top100ArtistChart "
 															+ "("
-															+ "rank int NOT NULL AUTO_INCREMENT, "
-															+ "artist LONGTEXT NOT NULL, "	
-															+ "PRIMARY KEY(rank)"
+															+ "rank int NOT NULL PRIMARY KEY AUTO_INCREMENT, "
+															+ "image LONGTEXT,"
+															+ "artist LONGTEXT NOT NULL"																
 															+ ")";
 	public static final String top100ArtistChartTable = "top100ArtistChart";
 	
-	private static final String insertTop100Artist = "INSERT INTO top100ArtistChart (artist) VALUES (?)";
+	
+	private static final String insertTop100Artist = "INSERT INTO top100ArtistChart (image, artist) VALUES (?, ?)";
 	
 	
-	private static final String getTop100RankImageArtistName = "SELECT top100ArtistChart.rank, top100ArtistChart.artist, "
-																+ " artist.image FROM top100ArtistChart JOIN artist WHERE top100ArtistChart.artist=artist.name";
+	
+	private static final String getTop100ArtistChart = "SELECT * FROM top100ArtistChart";
 	
 	
 	
@@ -1204,13 +1205,14 @@ public class DBHelper {
 	
 	
 	/** LASTFM TopArtistChart **/
-	public static void addTopArtistChartInfoLastFM(DBConfig dbconfig, String artist) throws SQLException{
-		
+	public static void addTopArtistChartInfoLastFM(DBConfig dbconfig, String image, String artist) throws SQLException{
+	
 		Connection con = getConnection(dbconfig);
 		
 		PreparedStatement updateArtistInfoStmt = con.prepareStatement(insertTop100Artist);
-
-		updateArtistInfoStmt.setString(1, artist);
+		
+		updateArtistInfoStmt.setString(1, image);
+		updateArtistInfoStmt.setString(2, artist);
 		
 		// remember execute!
 		updateArtistInfoStmt.execute();
@@ -1501,14 +1503,14 @@ public class DBHelper {
 		
 		Connection con = getConnection(dbconfig);
 		
-		PreparedStatement retrieveStmt = con.prepareStatement(getTop100RankImageArtistName);
+		
+		PreparedStatement retrieveStmt = con.prepareStatement(getTop100ArtistChart);
 		
 	
 		ResultSet result = retrieveStmt.executeQuery();
 			
 		JSONArray jsonArray = new JSONArray();
 	
-		System.out.println("Before while loop DBHelper");
 		
 		while(result.next()){
 			
@@ -1519,14 +1521,7 @@ public class DBHelper {
 			String artist = result.getString("artist");
 			
 			String artistImage = result.getString("image");
-			
-			System.out.println("Inside while loop DBHelper");
-			
-			/** DEBUG **/
-			System.out.println("strRank: " + strRank + " artist: " + artist + " artistImage: " + artistImage);
-			
-			
-			
+	
 		
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("rank", strRank);

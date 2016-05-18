@@ -1156,6 +1156,8 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	protected String displaytop100ArtistChartContent(String rank, String artistImagePath, String artistName) {
 		
 		
+//		System.out.println("inside displaytop100ArtistChartContent MusicLibraryBaseServlet");
+		
 		return "<tr>"
 				+"<td>" + rank + "</td>"
 				+"<td><center>"				 
@@ -1166,7 +1168,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+"<td><center><a href=\"/artistinfo?artistInfo=" + artistName +  "\">" + artistName  + "</td>"				
 				+"</tr>";
 
-				
+
 		
 	}
 	

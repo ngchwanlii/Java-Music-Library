@@ -36,12 +36,12 @@ public class LastFMClient {
 	// TODO: new added features - implement addition LASTFM API
 	public static void fetchTopArtistsChart(DBConfig dbconfig) throws SQLException {
 		
-		// per page = 50
-		// page="2" - 2 pages = Top 100 Artists
+		
+		// limit on 100 
 
-		for(int i = 1; i <= 2; i++){
-			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0?"
-												+ "page=" + i
+		String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0?"
+												+ "page=1"
+												+ "&limit=100"
 												+ "&api_key=" + API_KEY 
 												+ "&method=" + GET_TOP_ARTIST_CHART_METHOD 
 												+ "&format=" + FORMAT);
@@ -88,10 +88,27 @@ public class LastFMClient {
 							JSONObject obj = (JSONObject) artistArray.get(j);
 							
 							String artist = (String) obj.get("name");
+				
+							// get artist image
+							JSONArray artistImageArray = (JSONArray) obj.get("image");
 							
-					
+							// ready to pickup the right image with correct size
+							String image = null;
 							
-							DBHelper.addTopArtistChartInfoLastFM(dbconfig, artist);
+							for(int k = 0; k < artistImageArray.size(); k++){
+								
+								JSONObject imgObj = (JSONObject) artistImageArray.get(k);
+								
+								// pick large image
+								if(imgObj.get("size").equals("medium")){
+									
+									image = (String) imgObj.get("#text");
+									
+								}
+								
+							}
+						
+							DBHelper.addTopArtistChartInfoLastFM(dbconfig, image, artist);
 							
 						}
 					
@@ -103,7 +120,7 @@ public class LastFMClient {
 				}				
 			}
 		}		
-	}
+	
 	
 	
 	

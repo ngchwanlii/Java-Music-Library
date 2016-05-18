@@ -236,12 +236,21 @@ public class MusicLibraryServer {
 				// create loginUserTimeTable
 				DBHelper.createUserLoginTimeTable(dbconfig);
 				
+		
+				// create artistDetailsInfoTable
+				DBHelper.createArtistInfoDetailsTable(dbconfig);
+				
+
+				
 				// create Top 100 Artist Chart 
 				DBHelper.createTop100ArtistChart(dbconfig);
 				
-				// create artistDetailsInfoTable
-				DBHelper.createArtistInfoDetailsTable(dbconfig);
-
+				/** RESUME LATER **/
+				LastFMClient.fetchTopArtistsChart(dbconfig); 
+				
+				
+//				DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);
+				
 				
 //					/** DEBUG MSG **/
 //					System.out.println("created Usertable and Favtable, SearchHistoryTable, LoginTimeTable, top100Chart");
@@ -251,7 +260,7 @@ public class MusicLibraryServer {
 ////					LastFMClient.fetchSingleArtist("Radiohead", dbconfig);
 //					
 //			
-//					LastFMClient.fetchTopArtistsChart(dbconfig); 
+					
 //					
 //					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
 //					
