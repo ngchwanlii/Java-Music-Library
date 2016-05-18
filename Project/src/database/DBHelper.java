@@ -96,7 +96,7 @@ public class DBHelper {
 	// Artist table - from artistMusicLibrary to persistent database
 	private static final String createArtistTable = "CREATE TABLE IF NOT EXISTS artist" 
 													   + "(" 
-													   + "name LONGTEXT NOT NULL PRIMARY KEY " 			  			     			   													 
+													   + "name LONGTEXT NOT NULL" 			  			     			   													 
 													   + ")";
 	private static final String insertArtistStatement = "INSERT INTO artist (name) VALUES (?)";
 	public static final String artistTable = "artist";
@@ -910,6 +910,8 @@ public class DBHelper {
 	// create Artist Table
 	
 	public static void createArtistTable(DBConfig dbconfig) throws SQLException {		
+		
+		
 		
 		// 1. get connection from database config		
 		Connection con = getConnection(dbconfig);

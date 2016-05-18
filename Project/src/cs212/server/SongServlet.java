@@ -72,6 +72,11 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		String loginUserTimeStamp = (String) session.getAttribute(LOGIN_TIMESTAMP);
 		
 		
+		String privateMode = getParameterValue(request, "private");
+		
+		
+		
+		
 		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
 	
 		
@@ -95,19 +100,27 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 	
 		// get username from session
 		String username = (String) session.getAttribute(USERNAME);
-	
-		//TODO: added advance feature 5 - save search history
-		try {
-			
-			searchHistoryLock.lockWrite();
-			DBHelper.saveSearchHistory(dbconfig, username, search_type, query);
-			searchHistoryLock.unlockWrite();
-			
-		} catch (SQLException e1) {
-			
-			e1.printStackTrace();
-		}
 		
+		// user search using private mode - don't save search to history
+		if(privateMode != null){
+			
+			// do nothing - private mode switch on
+		}
+		else { 
+			try {
+				
+				// added advance feature 5 - save search history
+				searchHistoryLock.lockWrite();
+				
+				DBHelper.saveSearchHistory(dbconfig, username, search_type, query);
+				
+				searchHistoryLock.unlockWrite();
+				
+			} catch (SQLException e1) {
+				
+				e1.printStackTrace();
+			}
+		}
 		
 		// perform search task on musiclibrary		
 		// 2. load song_data_processor content

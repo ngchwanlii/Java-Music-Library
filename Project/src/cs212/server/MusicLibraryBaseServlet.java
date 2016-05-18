@@ -462,6 +462,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "<input type=\"text\" name=\"query\">" // note query here
 				+ "<div class=\"button_style\">"					
 				+ "<input type=\"submit\" value=\"Search\">"
+				+ "<input type=\"submit\" name='private' value=\"Private Search\">"
 				+ "</div>"
 				+ "</form>";
 		

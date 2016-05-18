@@ -32,6 +32,7 @@ public class LoginServlet extends MusicLibraryBaseServlet {
 		// 1. logged_in		
 		String loggedIn = (String) session.getAttribute(LOGGED_IN);
 		
+		String signUp = (String) session.getAttribute(USERNAME);
 	
 		// 2. not_logged_in		
 		String loginUsernameError = (String) session.getAttribute(LOGIN_USERNAME_NOT_MATCH_ERROR);
@@ -42,7 +43,7 @@ public class LoginServlet extends MusicLibraryBaseServlet {
 		session.removeAttribute(LOGIN_PASSWORD_NOT_MATCH_ERROR);
 		
 		
-		
+	
 		//if user already logged in, redirect to "favorite-list song finder class"
 		if(loggedIn != null) {
 			

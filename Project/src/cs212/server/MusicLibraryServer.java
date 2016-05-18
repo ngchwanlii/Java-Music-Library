@@ -10,6 +10,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -93,20 +94,20 @@ public class MusicLibraryServer {
 				ReentrantLock searchHistoryLock = new ReentrantLock();
 		
 				
+				// create new dbconfig
+				DBConfig dbconfig = setupDBConfig();
+				
 				/*********************
 				 *  Database zone	 *
 				 *********************/
 				
 				/****** artistTable in mySQL ******/
-				// create new dbconfig
-				DBConfig dbconfig = setupDBConfig();
-				
 				
 				// Storing MusicLibrary persistently
 				//  create ArtistTable - Artist name is key			
 //				DBHelper.createArtistTable(dbconfig);
 //				
-//				
+//			
 //				JSONObject artistMusicLib = threadSafe_musicLibrary.getArtistMusicLibrary();
 //				
 //				JSONArray artistArray = (JSONArray) artistMusicLib.get("artistMusicLibrary");
@@ -118,13 +119,16 @@ public class MusicLibraryServer {
 //					DBHelper.addArtistTable(dbconfig, artist);
 //					
 //				}
-				
-				/****** END of artistTable ******/
-				
-				
-				
-				/****** songTitle in mySQL ******/				
-				//  create TitleTable - [songtitle, artistname, trackID]
+//				
+//				
+//				System.out.println("END of artistTable");
+//				
+//				/****** END of artistTable ******/
+//				
+//				
+//				
+//				/****** songTitle in mySQL ******/				
+//				//  create TitleTable - [songtitle, artistname, trackID]
 //				DBHelper.createSongTitleTable(dbconfig);
 //				
 //				JSONObject titleMusicLibObj = threadSafe_musicLibrary.getSongTitleMusicLibrary();
@@ -144,13 +148,15 @@ public class MusicLibraryServer {
 //					
 //				
 //				}
-				
-				/****** END of songTitle ******/
-				
-				
-			
-				/****** Tag in mySQL ******/					
-				// create TagTable - [tag, trackID]
+//				
+//				System.out.println("END of songTitleTable");
+//				
+//				/****** END of songTitle ******/
+//				
+//				
+//			
+//				/****** Tag in mySQL ******/					
+//				// create TagTable - [tag, trackID]
 //				DBHelper.createTagTable(dbconfig);
 //				
 //				
@@ -171,6 +177,8 @@ public class MusicLibraryServer {
 //				
 //				}
 				
+				System.out.println("END of tagTable");
+				
 				/****** END of tag ******/
 				
 				
@@ -181,7 +189,7 @@ public class MusicLibraryServer {
 //				
 //				JSONObject trackIDMusicLibObj = threadSafe_musicLibrary.getTrackIDMusicLibrary();
 //				
-//				JSONArray trackIDArray = (JSONArray) tagMusicLibObj.get("trackIDMusicLibrary");
+//				JSONArray trackIDArray = (JSONArray) trackIDMusicLibObj.get("trackIDMusicLibrary");
 //				
 //				for(int i = 0; i < trackIDArray.size(); i++){
 //					
@@ -195,12 +203,14 @@ public class MusicLibraryServer {
 //					
 //				}
 				
-				/****** END of trackID ******/
+				System.out.println("END of trackIDTable");
 				
-				
-				
-				
-				// create adminTable
+//				/****** END of trackID ******/
+//				
+//				
+//				
+//				
+//				// create adminTable
 				DBHelper.createAdminTable(dbconfig);
 				
 				// insert admin info = preset by admin only
@@ -231,18 +241,30 @@ public class MusicLibraryServer {
 				
 				// create artistDetailsInfoTable
 				DBHelper.createArtistInfoDetailsTable(dbconfig);
-					
-					
+//					
+//					
+//					
+//					/** DEBUG MSG **/
+//					System.out.println("created Usertable and Favtable, SearchHistoryTable, LoginTimeTable, top100Chart");
+////											
+//					// fetch and store artist information using lastFM API										
+//					/** DEBUG USE FOR quickly setup server **/
+////					LastFMClient.fetchSingleArtist("Radiohead", dbconfig);
+//					
+//			
+//					LastFMClient.fetchTopArtistsChart(dbconfig); 
+//					
+//					LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
+//					
+//					/** DEBUG MSG **/
+//					System.out.println("finish fetch and store artist in MusicLibraryServer");
+//					
+//					DBHelper.createArtistPlayCountTable(dbconfig);
 					
 					/** DEBUG MSG **/
-//					System.out.println("created Usertable and Favtable, SearchHistoryTable, LoginTimeTable, top100Chart");
-//											
-					// fetch and store artist information using lastFM API										
-					/** DEBUG USE FOR quickly setup server **/
-//					LastFMClient.fetchSingleArtist("Radiohead", dbconfig);
+//					System.out.println("created artistPlayCountTable  - the END");
 					
-			
-				
+					
 				/** MAIN USE - RESUME THESE AFTER
 				
 				 LastFMClient.fetchTopArtistsChart(dbconfig); 
@@ -275,30 +297,12 @@ public class MusicLibraryServer {
 				
 				sce.getServletContext().setAttribute("searchHistoryLock",  searchHistoryLock);
 				
-				
-
-					/** DEBUG MSG **/
-//					System.out.println("finish fetch and store artist in MusicLibraryServer");
-//	
-					/** DEBUG MSG **/
-//					System.out.println("finish createArtistPlayCountTable in MusicLibraryServer");
-					
-					
 					
 					
 					/** DEBUG dropUserTable **/
-					
-					// TODO: TESTING ARTIST IMAGE NOW!!
-//					DBHelper.clearTables(dbconfig, DBHelper.artistInfoTable);
-//					
-//					DBHelper.clearTables(dbconfig, "user");					
-//					DBHelper.clearTables(dbconfig, "fav");				
-//					DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
-//					DBHelper.clearTables(dbconfig, "artist");
-//					DBHelper.clearTables(dbconfig, "time");
-//					DBHelper.clearTables(dbconfig, "searchHistory");					
-//					DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);			
-//					DBHelper.clearTables(dbconfig, DBHelper.adminTable);
+														
+//					clearAllTable();
+
 					/** DEBUG dropFavTable **/
 				} 
 				catch (SQLException e) {				
@@ -367,12 +371,6 @@ public class MusicLibraryServer {
 		server.setHandler(servhandler);
 		
 		
-		
-		
-		
-		
-		
-		
 		// server start
 		server.start();
 		// waiting to join
@@ -401,6 +399,25 @@ public class MusicLibraryServer {
 		}
 		
 		return dbconfig;
+		
+	}
+	
+	// for clearing all table
+	public static void clearAllTable(){
+		
+//		DBHelper.clearTables(dbconfig, DBHelper.adminTable);
+//		DBHelper.clearTables(dbconfig, DBHelper.artistTable);
+//		DBHelper.clearTables(dbconfig, DBHelper.songTitleInfoTable);
+//		DBHelper.clearTables(dbconfig, DBHelper.tagInfoTable);
+//		DBHelper.clearTables(dbconfig, DBHelper.trackIDInfoTable);				
+//		DBHelper.clearTables(dbconfig, DBHelper.artistInfoTable);
+//		DBHelper.clearTables(dbconfig, "user");					
+//		DBHelper.clearTables(dbconfig, "fav");				
+//		DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
+//		DBHelper.clearTables(dbconfig, "time");
+//		DBHelper.clearTables(dbconfig, "searchHistory");							
+//		DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);	
+		
 		
 	}
 	
