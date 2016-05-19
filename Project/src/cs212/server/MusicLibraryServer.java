@@ -235,6 +235,9 @@ public class MusicLibraryServer {
 				// create SearchHistoryTable
 				DBHelper.createSearchHistoryTable(dbconfig);
 				
+				// create SearchSuggestionTable
+				DBHelper.createSearchSuggestionTable(dbconfig);
+				
 				
 				// create loginUserTimeTable
 				DBHelper.createUserLoginTimeTable(dbconfig);

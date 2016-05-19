@@ -164,6 +164,18 @@ public class DBHelper {
 	
 	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount ORDER BY playcount DESC";
 	
+	/** Search Suggestion Table **/
+	private static final String createSearchSuggestionTable = 	"CREATE TABLE IF NOT EXISTS searchSuggestion"
+															+ "("																														
+															+ "searchType TEXT NOT NULL, "
+															+ "searchQuery TEXT NOT NULL, "
+															+ "searchCount LONG NOT NULL"															
+															+ ")";
+	private static final String insertSearchSuggestion = "INSERT INTO searchSuggestion (searchType, searchQuery, searchCount) VALUES (?, ?, ?)";
+	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchSuggestion WHERE searchType=? GROUP BY searchQuery ORDER BY searchCount DESC";
+	private static final String checkSearchCounter = "SELECT searchCount FROM searchSuggestion WHERE searchQuery=?";
+	private static final String checkQueries = "SELECT searchQuery from searchSuggestion WHERE searchQuery=?";
+	private static final String incrementSearchCount = "UPDATE searchSuggestion SET searchCount=searchCount+1 WHERE searchQuery=?";
 	
 	/*** Search History Table ***/
 	
@@ -182,15 +194,15 @@ public class DBHelper {
 	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=? ORDER BY ID DESC";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
 	
-	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE searchQuery=?";
-	
-	private static final String checkQuery = "SELECT searchQuery from searchHistory WHERE searchQuery=?";
-	private static final String incrementSearchCount = "UPDATE searchHistory SET searchCount=searchCount+1 WHERE searchQuery=?";
 	
 	
-	/** Search Suggestion Table **/	
+	
+	
+	
+	
+		
 
-	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchHistory WHERE searchType=? GROUP BY searchQuery ORDER BY searchCount DESC";
+	
 	
 	/** Last login Time **/
 	private static final String createLoginTimeTable = 	"CREATE TABLE IF NOT EXISTS time "
@@ -556,6 +568,18 @@ public class DBHelper {
 		
 	}
 	
+	// create a search suggestion table
+	public static void createSearchSuggestionTable(DBConfig dbconfig) throws SQLException {
+		
+		Connection con = getConnection(dbconfig);
+		if(!tableExists(con, "searchSuggestion")){
+			PreparedStatement tableStmt = con.prepareStatement(createSearchSuggestionTable);		
+			tableStmt.executeUpdate();
+		}
+		
+		con.close();
+		
+	}
 	
 	
 	// TODO: added saveSearchHistory to database
@@ -564,12 +588,14 @@ public class DBHelper {
 		Connection con = getConnection(dbconfig);
 		
 		// prepare statment for check search counter
-		PreparedStatement retrieveStmt = con.prepareStatement(checkQuery);
+		PreparedStatement retrieveStmt = con.prepareStatement(checkQueries);
 		
 		PreparedStatement updateSearchCountStmt = con.prepareStatement(incrementSearchCount);
 		
 		// insert search History stmt
 		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
+		
+		PreparedStatement updateToSearchSuggestionStmt = con.prepareStatement(insertSearchSuggestion);
 		
 		PreparedStatement checkAndGetSearchCountStmt = con.prepareStatement(checkSearchCounter);
 	
@@ -598,6 +624,8 @@ public class DBHelper {
 				
 				// set most recent long
 				updateStmt.setLong(4, count);
+				// update to search suggestion
+				updateToSearchSuggestionStmt.setLong(3, count);
 				
 			}
 			countResult.close();
@@ -606,16 +634,23 @@ public class DBHelper {
 		else {
 			
 			updateStmt.setLong(4, 1);
+			updateToSearchSuggestionStmt.setLong(3, 1);
 			
 		}
 		result.close();
 	
 		username = username.trim().toLowerCase();	
-		updateStmt.setString(1, username);		
-		updateStmt.setString(2, search_type);
-		updateStmt.setString(3, query);	
 		
-		updateStmt.execute();	
+		updateStmt.setString(1, username);
+		
+		updateStmt.setString(2, search_type);
+		updateToSearchSuggestionStmt.setString(1, search_type);
+		
+		updateStmt.setString(3, query);	
+		updateToSearchSuggestionStmt.setString(2, query);
+		
+		updateStmt.execute();
+		updateToSearchSuggestionStmt.execute();
 	
 		con.close();
 	
