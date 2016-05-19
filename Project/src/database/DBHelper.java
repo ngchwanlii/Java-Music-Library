@@ -166,16 +166,20 @@ public class DBHelper {
 	
 	
 	/*** Search History Table ***/
+	
+	/** DELETE ID IF GOT BUG **/
 	private static final String createSearchHistoryTable = 	"CREATE TABLE IF NOT EXISTS searchHistory"
 															+ "("
+															+ "ID int NOT NULL AUTO_INCREMENT, "
 															+ "username VARCHAR(100) NOT NULL, "
 															+ "searchType TEXT NOT NULL, "
 															+ "searchQuery TEXT NOT NULL, "
-															+ "searchCount LONG NOT NULL"
+															+ "searchCount LONG NOT NULL, "
+															+ "PRIMARY KEY (ID)"
 															+ ")";
 	private static final String searchHistoryTable = "searchHistory";
-	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery) VALUES (?, ?, ?)";
-	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=?";
+	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery, searchCount) VALUES (?, ?, ?, ?)";
+	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=? ORDER BY ID DESC";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
 	
 	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE username=? AND searchQuery=?";
@@ -184,8 +188,8 @@ public class DBHelper {
 	
 	
 	/** Search Suggestion Table **/	
+
 	private static final String showSearchSuggestion = "SELECT  MAX(searchCount) AS searchCount, searchType, searchQuery FROM searchHistory WHERE searchType=? GROUP BY searchQuery ORDER BY searchCount DESC";
-		
 	
 	/** Last login Time **/
 	private static final String createLoginTimeTable = 	"CREATE TABLE IF NOT EXISTS time "
@@ -656,8 +660,7 @@ public class DBHelper {
 		
 		// retrieve in descending order
 		PreparedStatement retrieveStmt = con.prepareStatement(showSearchSuggestion);
-		
-		
+	
 		// set retrieveStmt !!!!!
 		retrieveStmt.setString(1, clickedSearchType);
 		

@@ -230,7 +230,8 @@ public class MusicLibraryServer {
 				DBHelper.createFavTable(dbconfig);
 
 			
-
+//				DBHelper.clearTables(dbconfig, "searchHistory");
+				
 				// create SearchHistoryTable
 				DBHelper.createSearchHistoryTable(dbconfig);
 				
