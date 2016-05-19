@@ -175,7 +175,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			
 			session.setAttribute("ERROR_QUERY", query);
 			
-			response.sendRedirect("/search");
+			response.sendRedirect("/search?" + ERROR + "=" + "searchNotFound");
 			
 			e.printStackTrace();
 		}

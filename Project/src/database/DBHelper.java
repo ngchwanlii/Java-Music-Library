@@ -184,6 +184,7 @@ public class DBHelper {
 	
 	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE searchQuery=?";
 	
+	private static final String checkQuery = "SELECT searchQuery from searchHistory WHERE searchQuery=?";
 	private static final String incrementSearchCount = "UPDATE searchHistory SET searchCount=searchCount+1 WHERE searchQuery=?";
 	
 	
@@ -558,35 +559,58 @@ public class DBHelper {
 	
 	
 	// TODO: added saveSearchHistory to database
-	public static void saveSearchHistory(DBConfig dbconfig, String username, String search_type, String  query) throws SQLException {
+	public static void saveSearchHistory(DBConfig dbconfig, String username, String search_type, String query) throws SQLException {
 		
 		Connection con = getConnection(dbconfig);
 		
 		// prepare statment for check search counter
-		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
-
-		// set retrieveStmt for checking
-
-		retrieveStmt.setString(1, query);
+		PreparedStatement retrieveStmt = con.prepareStatement(checkQuery);
+		
+		PreparedStatement updateSearchCountStmt = con.prepareStatement(incrementSearchCount);
 		
 		// insert search History stmt
 		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
 		
+		PreparedStatement checkAndGetSearchCountStmt = con.prepareStatement(checkSearchCounter);
+	
+		// set retrieveStmt for checking
+		retrieveStmt.setString(1, query);
+	
 		ResultSet result = retrieveStmt.executeQuery();
 		
-		// means there is a record on this search
+		// means has query recorded 
 		if(result.next()){
-			updateStmt.setLong(4, result.getLong("searchCount") + 1);
+			
+			updateSearchCountStmt.setString(1, query);
+			
+			// update search count
+			updateSearchCountStmt.execute();
+			
+			// ready to get most current search count
+			checkAndGetSearchCountStmt.setString(1, query);
+		
+			// get this search count
+			ResultSet countResult = checkAndGetSearchCountStmt.executeQuery();
+			
+			if(countResult.next()){
+				
+				Long count =  countResult.getLong("searchCount");
+				
+				// set most recent long
+				updateStmt.setLong(4, count);
+				
+			}
+			countResult.close();
+			
 		}
 		else {
+			
 			updateStmt.setLong(4, 1);
+			
 		}
-		
 		result.close();
-		
-		
-		username = username.trim().toLowerCase();
-		
+	
+		username = username.trim().toLowerCase();	
 		updateStmt.setString(1, username);		
 		updateStmt.setString(2, search_type);
 		updateStmt.setString(3, query);	
@@ -594,27 +618,9 @@ public class DBHelper {
 		updateStmt.execute();	
 	
 		con.close();
-		
-		
+	
 	}
-	
-	// update search count
-//	public static void updateSearchCount (DBConfig dbconfig, String query) throws SQLException {
-//	
-//		Connection con = getConnection(dbconfig);
-//		
-//		PreparedStatement updateStmt = con.prepareStatement(incrementSearchCount);
-//		
-//		updateStmt.setString(1, query);
-//		
-//		updateStmt.execute();	
-//		
-//		con.close();
-//		
-//		
-//	}
-	
-	
+
 	
 	// TODO: retrieve searchedHistory table content 
 	// retrieve searchedHistory table content
