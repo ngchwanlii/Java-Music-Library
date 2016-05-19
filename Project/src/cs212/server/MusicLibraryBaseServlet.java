@@ -253,6 +253,12 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "width:250px;"
 				+ "padding-top: 100px;}"
 				
+				+ ".fb_or_change_form {" 
+				+ "margin: auto;"				
+				+ "width:250px;"
+				+ "width:250px;"
+				+ "padding-top: 5px;}"
+				
 				+ ".bottom_form {"				
 				+ "margin: auto;"				
 				+ "width:250px;"
@@ -350,17 +356,17 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "console.log('statusChangeCallback');"
 				+ "console.log(response);"
 				+ "if (response.status === 'connected') {"
-				+ "testAPI();}" 
+				+ "loginAPI();}" 
 				+ "else if (response.status === 'not_authorized') {"
 				+ "document.getElementById('status').innerHTML = 'Please log ' + 'into this app.';}"
 				+ " else {"
 				+ "document.getElementById('status').innerHTML = 'Please log ' + 'into Facebook.';}"
 				+ "}"
-//				+ "function checkLoginState() {"
-//				+ "FB.getLoginStatus(function(response) {"
-//				+ "statusChangeCallback(response);"
-//				+ "});"
-//				+ "}"
+				+ "function checkLoginState() {"
+				+ "FB.getLoginStatus(function(response) {"
+				+ "statusChangeCallback(response);"
+				+ "});"
+				+ "}"
 				
 				+ "function checkLoginState() {"
 				+ "FB.getLoginStatus(function(response) {"
@@ -377,9 +383,9 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "};"
 				
 				
-//				+ "FB.getLoginStatus(function(response) {"
-//				+ "statusChangeCallback(response);"
-//				+ "});"
+				+ "FB.getLoginStatus(function(response) {"
+				+ "statusChangeCallback(response);"
+				+ "});"
 				
 				
 				+ "(function(d, s, id){"
@@ -390,17 +396,23 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "fjs.parentNode.insertBefore(js, fjs);"
 				+ "}(document, 'script', 'facebook-jssdk'));"
 				
-				+ "function testAPI() {"
-				+ "console.log('Welcome!  Fetching your information.... ');"
-				+ "FB.api('/me', function(response) {"
-				+ "console.log('Successful login for: ' + response.name);"
-				+ "document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';"
+				+ "function loginAPI() {"				
+				+ "FB.api('/me', function(response) {"				
+				+ "var email = response.email;"
+				+ "var name = response.name;"
+				+ "var first_name = response.first_name;"
+				+ "var last_name = response.last_name;"
+				
+				
+				
+				
+				
+				
+				
+				
 				+ "});"
 				+ "}"
-				
-				
-				
-				
+			
 				+ "</script>";
 	}
 	
@@ -813,6 +825,15 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 				+ "</form>";
 	}
 	
+	protected String goToFacebookButton(){
+		
+		return "<div class =\"fb_or_change_form\">"
+				+ "<form action=\"facebooklogin\" method=\"get\">"
+				+ "<div class='submit_blue'>" 
+				+ "<input type=\"submit\" style=\"width: 200px\" value=\"Facebook Login\" id='button-blue'>"
+				+ "</div>"
+				+ "</form></div>";
+	}
 	
 	
 	// option signUpButton that let user navigate back to signup page
@@ -838,7 +859,7 @@ public class MusicLibraryBaseServlet extends HttpServlet {
 	// option to go to change password button
 	protected String goToChangePasswordButton(){
 		
-		return "<div class =\"form\">"
+		return "<div class =\"fb_or_change_form\">"
 				+ "<form action=\"changepassword\" method=\"post\">"
 				+ "<div class='submit_grey'>" 
 				+ "<input type=\"submit\" style=\"width: 200px\" value=\"Change New Password?\" id='button-grey'>"

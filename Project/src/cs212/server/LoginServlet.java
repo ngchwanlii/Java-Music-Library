@@ -116,7 +116,10 @@ public class LoginServlet extends MusicLibraryBaseServlet {
 		
 //		buffer.append(divClass("facebook"));
 		
-		buffer.append(faceBookLoginButton());
+//		buffer.append(faceBookLoginButton());
+		
+		;
+		buffer.append(goToFacebookButton());
 		
 		buffer.append(divClose());
 		

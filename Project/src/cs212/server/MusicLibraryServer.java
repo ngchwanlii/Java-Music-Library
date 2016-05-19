@@ -411,6 +411,9 @@ public class MusicLibraryServer {
 		// Gracefully shutdown servlet
 		servhandler.addServlet(ShutdownServlet.class, "/shutdown");
 		
+		// Facebook Servlet
+		servhandler.addServlet(FacebookLoginServlet.class, "/facebooklogin");
+		
 		
 		//set the list of handlers for the server
 		server.setHandler(servhandler);
