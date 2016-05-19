@@ -559,29 +559,29 @@ public class DBHelper {
 		Connection con = getConnection(dbconfig);
 		
 		// prepare statment for check search counter
-//		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
-//		
+		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
+
 //		// set retrieveStmt for checking
-//		retrieveStmt.setString(1, username);
+		retrieveStmt.setString(1, username);
 //		
-//		retrieveStmt.setString(2, query);
+		retrieveStmt.setString(2, query);
 		
 		// insert search History stmt
 		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
 		
-//		ResultSet result = retrieveStmt.executeQuery();
+		ResultSet result = retrieveStmt.executeQuery();
 		
 		// means there is a record on this search
-//		if(result.next()){
-//			updateStmt.setLong(4, result.getLong("searchCount") + 1);
-//		}
-//		else {
-//			updateStmt.setLong(4, 1);
-//		}
+		if(result.next()){
+			updateStmt.setLong(4, result.getLong("searchCount") + 1);
+		}
+		else {
+			updateStmt.setLong(4, 1);
+		}
 		
-//		result.close();
-		// trim all white space and make it to lower case (because mySQL SELECT is case and space sensitive)
-		// easier for retrieving data when user at login page
+		result.close();
+		
+		
 		username = username.trim().toLowerCase();
 		
 		updateStmt.setString(1, username);		
@@ -596,20 +596,20 @@ public class DBHelper {
 	}
 	
 	// update search count
-	public static void updateSearchCount (DBConfig dbconfig, String query) throws SQLException {
-	
-		Connection con = getConnection(dbconfig);
-		
-		PreparedStatement updateStmt = con.prepareStatement(incrementSearchCount);
-		
-		updateStmt.setString(1, query);
-		
-		updateStmt.execute();	
-		
-		con.close();
-		
-		
-	}
+//	public static void updateSearchCount (DBConfig dbconfig, String query) throws SQLException {
+//	
+//		Connection con = getConnection(dbconfig);
+//		
+//		PreparedStatement updateStmt = con.prepareStatement(incrementSearchCount);
+//		
+//		updateStmt.setString(1, query);
+//		
+//		updateStmt.execute();	
+//		
+//		con.close();
+//		
+//		
+//	}
 	
 	
 	
@@ -634,9 +634,7 @@ public class DBHelper {
 			String searchQuery = result.getString("searchQuery");
 			
 			JSONObject jsonObj = new JSONObject();
-			
 		
-			
 			jsonObj.put("searchType", searchType);
 			jsonObj.put("searchQuery", searchQuery);
 		
