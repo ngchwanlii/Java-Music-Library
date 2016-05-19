@@ -112,9 +112,10 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				
 				// added advance feature 5 - save search history
 				searchHistoryLock.lockWrite();
-				
+				// saving search history
 				DBHelper.saveSearchHistory(dbconfig, username, search_type, query);
-				
+				// update search query
+				DBHelper.updateSearchCount(dbconfig, query);
 				searchHistoryLock.unlockWrite();
 				
 			} catch (SQLException e1) {
@@ -172,7 +173,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		catch ( NullPointerException | SQLException e) {
 					
 			session.setAttribute(ERROR, "searchNotFound");
-			System.out.println(QUERY);
+			
 			session.setAttribute("ERROR_QUERY", query);
 			
 			response.sendRedirect("/search");

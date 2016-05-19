@@ -157,7 +157,7 @@ public class MusicLibraryServer {
 //				
 //			
 //				/****** Tag in mySQL ******/					
-//				// create TagTable - [tag, trackID]
+				// create TagTable - [tag, trackID]
 //				DBHelper.createTagTable(dbconfig);
 //				
 //				
@@ -185,6 +185,7 @@ public class MusicLibraryServer {
 //				
 //				
 //				/****** TrackID in mySQL ******/
+//				
 //				// create TrackIDTable [trackID, songTitle]
 //				DBHelper.createTrackIDTable(dbconfig);
 //				
@@ -239,10 +240,11 @@ public class MusicLibraryServer {
 
 				/** DOG **/
 //				DBHelper.createArtistPlayCountTable(dbconfig);
+								
 				
+				/** TAG **/
 				
-				
-				
+//				DBHelper.clearTables(dbconfig, DBHelper.tagInfoTable);
 				
 				
 				

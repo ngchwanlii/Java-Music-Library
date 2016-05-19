@@ -199,9 +199,13 @@ public class AllArtistServlet extends MusicLibraryBaseServlet {
 					}
 					
 					
-				} catch (SQLException e) {
+				} 
+				catch (SQLException e) {
 					
-					e.printStackTrace();
+					session.setAttribute(ERROR, "byPlayCountError");
+
+					response.sendRedirect("/search");
+					
 				}
 				
 			}

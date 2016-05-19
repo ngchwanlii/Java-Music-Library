@@ -118,8 +118,8 @@ public class DBHelper {
 	// Song Title table
 	private static final String createSongTitleTable = "CREATE TABLE IF NOT EXISTS songTitle" 
 													   + "(" 
-													   + "name LONGTEXT NOT NULL, " 			  			     			   
-													   + "songtitle LONGTEXT, "
+													   + "name LONGTEXT NOT NULL," 			  			     			   
+													   + "songtitle LONGTEXT NOT NULL,"
 													   + "trackID LONGTEXT NOT NULL"
 													   + ")";
 	private static final String insertSongTitleStatement = "INSERT INTO songTitle (name, songtitle, trackID) VALUES (?, ?, ?)";
@@ -141,7 +141,7 @@ public class DBHelper {
 	private static final String createTrackIDTable = "CREATE TABLE IF NOT EXISTS trackID" 
 												   + "("
 												   + "songTrackID LONGTEXT NOT NULL"
-												   + "songtitle LONGTEXT NOT NULL, " 			  			     			   			   			   
+												   + "songtitle LONGTEXT NOT NULL" 			  			     			   			   			   
 												   + ")";
 	private static final String insertTrackIDStatement = "INSERT INTO trackID (songTrackID, tag) VALUES (?, ?)";
 	public static final String trackIDInfoTable = "trackID";
@@ -160,7 +160,9 @@ public class DBHelper {
 	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artistInfo ORDER BY playcount DESC";
 	
 	
-	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount";
+	
+	
+	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount ORDER BY playcount DESC";
 	
 	
 	/*** Search History Table ***/
@@ -172,11 +174,13 @@ public class DBHelper {
 															+ "searchCount LONG NOT NULL"
 															+ ")";
 	private static final String searchHistoryTable = "searchHistory";
-	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery, searchCount) VALUES (?, ?, ?, ?)";
+	private static final String insertSearchHistory = "INSERT INTO searchHistory (username, searchType, searchQuery) VALUES (?, ?, ?)";
 	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=?";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
 	
 	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE username=? AND searchQuery=?";
+	
+	private static final String incrementSearchCount = "UPDATE searchHistory SET searchCount=searchCount+1 WHERE searchQuery=?";
 	
 	
 	/** Search Suggestion Table **/	
@@ -555,27 +559,27 @@ public class DBHelper {
 		Connection con = getConnection(dbconfig);
 		
 		// prepare statment for check search counter
-		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
-		
-		// set retrieveStmt for checking
-		retrieveStmt.setString(1, username);
-		
-		retrieveStmt.setString(2, query);
+//		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
+//		
+//		// set retrieveStmt for checking
+//		retrieveStmt.setString(1, username);
+//		
+//		retrieveStmt.setString(2, query);
 		
 		// insert search History stmt
 		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
 		
-		ResultSet result = retrieveStmt.executeQuery();
+//		ResultSet result = retrieveStmt.executeQuery();
 		
 		// means there is a record on this search
-		if(result.next()){
-			updateStmt.setLong(4, result.getLong("searchCount") + 1);
-		}
-		else {
-			updateStmt.setLong(4, 1);
-		}
+//		if(result.next()){
+//			updateStmt.setLong(4, result.getLong("searchCount") + 1);
+//		}
+//		else {
+//			updateStmt.setLong(4, 1);
+//		}
 		
-		result.close();
+//		result.close();
 		// trim all white space and make it to lower case (because mySQL SELECT is case and space sensitive)
 		// easier for retrieving data when user at login page
 		username = username.trim().toLowerCase();
@@ -591,6 +595,21 @@ public class DBHelper {
 		
 	}
 	
+	// update search count
+	public static void updateSearchCount (DBConfig dbconfig, String query) throws SQLException {
+	
+		Connection con = getConnection(dbconfig);
+		
+		PreparedStatement updateStmt = con.prepareStatement(incrementSearchCount);
+		
+		updateStmt.setString(1, query);
+		
+		updateStmt.execute();	
+		
+		con.close();
+		
+		
+	}
 	
 	
 	
