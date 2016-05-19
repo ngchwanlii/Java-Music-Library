@@ -114,8 +114,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				searchHistoryLock.lockWrite();
 				// saving search history
 				DBHelper.saveSearchHistory(dbconfig, username, search_type, query);
-				// update search query
-				DBHelper.updateSearchCount(dbconfig, query);
+				// update search query				
 				searchHistoryLock.unlockWrite();
 				
 			} catch (SQLException e1) {
