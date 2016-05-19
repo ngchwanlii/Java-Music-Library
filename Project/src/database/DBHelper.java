@@ -11,6 +11,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import java.sql.Timestamp;
 
+
+/*** ARTIST INFO GOT BUG - NO BEATLES **/
+
+
 public class DBHelper {
 		
 	
@@ -151,7 +155,10 @@ public class DBHelper {
 	
 	private static final String insertLastFMArtistPlayCount = "INSERT INTO artistPlayCount (name, playcount) VALUES (?, ?)";
 	public static final String artistPlayCountTable = "artistPlayCount";
-	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artistInfo ORDER BY playcount";
+	
+	private static final String checkArtistInfoOrderByPlayCount = "SELECT name, playcount FROM artistInfo ORDER BY playcount DESC";
+	
+	
 	private static final String showArtistNameByPlayCount = "SELECT * FROM artistPlayCount";
 	
 	

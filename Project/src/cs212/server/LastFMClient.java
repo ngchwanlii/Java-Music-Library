@@ -38,7 +38,6 @@ public class LastFMClient {
 		
 		
 		// limit on 100 
-
 		String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0?"
 												+ "page=1"
 												+ "&limit=100"
@@ -123,127 +122,7 @@ public class LastFMClient {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	/** FOR DEBUG USE - quickly setup server for running and test code
-	 * 
-	 * @param artists
-	 * @param dbconfig
-	 * @throws SQLException
-	 */
-	public static void fetchSingleArtist(String artist, DBConfig dbconfig) throws SQLException {
-		
-	
-		String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0?" 
-												+ "artist=" + artist 
-												+ "&api_key=" + API_KEY 
-												+ "&method=" + GET_ARTIST_INFO_METHOD 
-												+ "&format=" + FORMAT);
-		
-			
-			// parse header page 
-			// create scanner
-			Scanner instream = new Scanner(page);
-			boolean statusOK = false;
-			
-			// check status head
-			if(instream.hasNext()){
-				String line = instream.nextLine();
-							
-				statusOK = checkStatus(line);
-			}
-			
-			// if status is not HTTP/1.1 200 OK - print error message				
-			if(!statusOK){
-				// means got erro status code from response
-			}
-			
-			// process and read rest of line + extract JSONObject which is in String representation
-			else {
-				
-				// read line until it hit a blank line -> then extract the JSONObj in String representation
-				String info = extractInfo(instream);
-				
-				
-				// if we can get info for a given artist and not null
-				if(info != null){
-										
-					// convert to JSONObject and extract [name, listeners, playcount, bio]
-					// listners & playcount under "stats" object
-					try {
-						
-						JSONParser infoParse = new JSONParser();
-						// get jsonObj
-						JSONObject jsonObj = (JSONObject)infoParse.parse(info);
-						
-						JSONObject jsonArtist = (JSONObject) jsonObj.get("artist");
-						
-						// extract artist information
-				
-						String artistName = (String)jsonArtist.get("name");
-						
 
-						// bio
-						JSONObject bioObj = (JSONObject)jsonArtist.get("bio");
-						
-						String bio = (String) bioObj.get("summary");
-						
-						// get stats object 1st before getting listeners & playcount
-						JSONObject stats = (JSONObject)jsonArtist.get("stats");
-						
-						// listeners
-						String listeners = (String)stats.get("listeners");
-														
-						// playcount
-						String playcount = (String)stats.get("playcount");
-						
-						// convert string listener -> int num
-						int listenerInt = Integer.parseInt(listeners);
-						// conver string playcount -> int playcount
-						int playcountInt = Integer.parseInt(playcount);
-						
-						
-						// get artist image
-						JSONArray artistImageArray = (JSONArray) jsonArtist.get("image");
-						
-						// ready to pickup the right image with correct size
-						String image = null;
-						
-						for(int i = 0; i < artistImageArray.size(); i++){
-							
-							JSONObject obj = (JSONObject) artistImageArray.get(i);
-							
-							// pick large image
-							if(obj.get("size").equals("large")){
-								
-								image = (String) obj.get("#text");
-								
-							}
-							
-						}
-									
-						// update/insert artist info to table
-						DBHelper.addArtistInfoLastFM(dbconfig, artistName, listenerInt, playcountInt, bio, image);
-							
-						
-					} 
-					catch ( ParseException  | NumberFormatException | NullPointerException e) {
-						// catch but do nothing
-						
-					}			
-				}
-			}
-		}
-		
-	
-	
-	
-	
-	
 	
 	
 	
@@ -252,18 +131,10 @@ public class LastFMClient {
 	// save ArtistInfo + ArtistPlayCount table into mySQL once initialized
 	public static void fetchAndStoreArtists(TreeSet<String> artists, DBConfig dbconfig) throws SQLException {
 		
-		
-		// intialize list array
-//		list = new ArrayList<ArtistPlayCountInfo>();
-		
-//		System.out.println(artists);
-		
-		// initialize 2 map
-		
 
 		for(String str : artists) {
 			
-			// TODO: create a HTTPFetcher class		
+					
 			String artist = str;
 			
 			String page = HTTPFetcher.download("ws.audioscrobbler.com", "/2.0?" 
@@ -281,9 +152,6 @@ public class LastFMClient {
 			// check status head
 			if(instream.hasNext()){
 				String line = instream.nextLine();
-				
-				/**  DEBUG USE **/
-//				System.out.println(line);
 				
 				statusOK = checkStatus(line);
 			}

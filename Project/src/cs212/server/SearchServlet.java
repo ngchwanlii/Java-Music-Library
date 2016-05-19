@@ -44,10 +44,14 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		
 	
 		
-		
 		// get username from session's object that bind with attribute name [USERNAME]
 		String username = (String) session.getAttribute(USERNAME);
 		
+		String searchNotFoundError = (String) session.getAttribute(ERROR);
+		
+		String errorQuery = (String) session.getAttribute("ERROR_QUERY");
+		
+		session.removeAttribute("ERROR_QUERY");
 		
 		/****************************************
 		 *	CONDITION 1 - check user login 	 	*
@@ -79,8 +83,7 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 				session.setAttribute(HAS_FAV_SONG_LIST_RECORD, username);
 				
 			}
-			
-			
+		
 		} 
 		catch (SQLException e) {
 			
@@ -143,8 +146,13 @@ public class SearchServlet extends MusicLibraryBaseServlet {
 		buffer.append(divClass("welcome_msg_style"));
 		
 		// welcome message
-		buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
 		
+		if(errorQuery != null && searchNotFoundError != null){
+			buffer.append(errorMsg("Can't find \"" + errorQuery + "\" in music library"));
+		}
+		else {
+			buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));	
+		}
 		buffer.append(divClose());
 		
 		// horizontal line

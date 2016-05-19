@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.TreeSet;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -235,21 +236,38 @@ public class MusicLibraryServer {
 				
 				// create loginUserTimeTable
 				DBHelper.createUserLoginTimeTable(dbconfig);
+			
+//				DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
+				
+				DBHelper.createArtistPlayCountTable(dbconfig);
+				
 				
 		
 				// create artistDetailsInfoTable
-				DBHelper.createArtistInfoDetailsTable(dbconfig);
+//				DBHelper.createArtistInfoDetailsTable(dbconfig);
 				
+//				LastFMClient.fetchAndStoreArtists(threadSafe_musicLibrary.getSortedArtistName(), dbconfig);
+				
+				// after this create play count
+//				DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
+				
+				
+//				DBHelper.clearTables(dbconfig, DBHelper.artistInfoTable);
+				
+			
 
+				// create Top 100 Artist Chart - FIXED - DONT TOUCH THIS
+//				DBHelper.createTop100ArtistChart(dbconfig);
 				
-				// create Top 100 Artist Chart 
-				DBHelper.createTop100ArtistChart(dbconfig);
 				
-				/** RESUME LATER **/
-				LastFMClient.fetchTopArtistsChart(dbconfig); 
+//				LastFMClient.fetchTopArtistsChart(dbconfig); 
 				
 				
 //				DBHelper.clearTables(dbconfig, DBHelper.top100ArtistChartTable);
+				
+				
+//				DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
+				
 				
 				
 //					/** DEBUG MSG **/
@@ -267,7 +285,9 @@ public class MusicLibraryServer {
 //					/** DEBUG MSG **/
 //					System.out.println("finish fetch and store artist in MusicLibraryServer");
 //					
-//					DBHelper.createArtistPlayCountTable(dbconfig);
+				
+				
+
 					
 					
 					
@@ -379,6 +399,8 @@ public class MusicLibraryServer {
 		
 		//set the list of handlers for the server
 		server.setHandler(servhandler);
+		
+		
 		
 		
 		// server start

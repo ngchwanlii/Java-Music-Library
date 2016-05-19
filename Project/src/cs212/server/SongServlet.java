@@ -75,7 +75,6 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		String privateMode = getParameterValue(request, "private");
 		
 
-		
 		boolean userClickedSearchButton = checkLoginUserClickedSearchButton(search_type, query);
 	
 		
@@ -100,6 +99,9 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// get username from session
 		String username = (String) session.getAttribute(USERNAME);
 		
+		// result not found status
+		String resultNotFoundStatus = request.getParameter(STATUS);
+		
 		// user search using private mode - don't save search to history
 		if(privateMode != null){
 			
@@ -117,10 +119,12 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				
 			} catch (SQLException e1) {
 				
+				
 				e1.printStackTrace();
 			}
 		}
 		
+	
 		// perform search task on musiclibrary		
 		// 2. load song_data_processor content
 		
@@ -140,7 +144,8 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		try {
 			if(search_type.equals(ARTIST)){
 			
-				query = DBHelper.artistPartialSearchResult(dbconfig, query);
+				
+//				query = DBHelper.artistPartialSearchResult(dbconfig, query);
 			
 				session.setAttribute("DISPLAYQUERY", query);
 				
@@ -149,7 +154,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			else if(search_type.equals(SONG_TITLE)){
 					
 					
-				query = DBHelper.titlePartialSearchResult(dbconfig, query);
+//				query = DBHelper.titlePartialSearchResult(dbconfig, query);
 				
 				session.setAttribute("DISPLAYQUERY", query);
 				
@@ -158,19 +163,25 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			else if(search_type.equals(TAG)){
 				
 				
-				query = DBHelper.tagPartialSearchResult(dbconfig, query);
+//				query = DBHelper.tagPartialSearchResult(dbconfig, query);
 				session.setAttribute("DISPLAYQUERY", query);
 				
 				searchResultsArray = threadSafeML.searchByTag(query);
 			}
 		}
-		catch (SQLException e) {
+		catch ( NullPointerException e) {
+				/** DEBUG **/	
+			session.setAttribute(ERROR, "searchNotFound");
+			System.out.println(QUERY);
+			session.setAttribute("ERROR_QUERY", query);
+			
+			response.sendRedirect("/search");
 			
 			e.printStackTrace();
 		}
 		
 		// prepare to build html page
-	
+		
 		String displaySearchedQuery = (String) session.getAttribute("DISPLAYQUERY");
 		session.removeAttribute("DISPLAYQUERY");
 		
@@ -201,7 +212,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		// css style float right
 		buffer.append(divClass("alignright"));	
 		
-		// login welcome message
+		// login welcome message		
 		buffer.append(loginWelcomeMsg(username));		
 	
 		// logout link
@@ -232,11 +243,14 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			buffer.append("<center>Searched Query: "  + displaySearchedQuery + "</center>" );
 			buffer.append(divClose());
 			
-		}
+		}		
 		else {
 			// welcome message
 			buffer.append(welcomeMsg("Welcome to song finder! Select a search type and type in a query and we'll display you a list of similar songs you might like!"));
 		}
+		
+		
+		
 		buffer.append(divClose());
 		
 		// horizontal line
@@ -255,16 +269,12 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		// show all artist button
 		buffer.append(showAllArtistsAlphabeticallyButton());
-		
-		
+	
 		// add show all artist playcount
 		buffer.append(showAllArtistByPlayCountButton());
 	
 		buffer.append(divClose());
-		
-		
-		
-		
+	
 		// css style
 		buffer.append(divClass("alignright"));
 		
@@ -289,6 +299,8 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		
 		// table format - artist <-> song title
 		buffer.append(tableFormat("Artist", "Song Title", "Favorites"));
+		
+		
 		
 		// check if searchResults is empty or have results
 		if(!searchResultsArray.isEmpty()){
@@ -353,12 +365,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			buffer.append(footer());
 			
 		}
-		else {
-			// error message
-			buffer.append(goToSearchButton());
-			buffer.append(notFound(search_type, query));
-			
-		}
+		
 				
 		// print out html page
 		writer.println(buffer);  
