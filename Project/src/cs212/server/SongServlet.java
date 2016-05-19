@@ -145,7 +145,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			if(search_type.equals(ARTIST)){
 			
 				
-//				query = DBHelper.artistPartialSearchResult(dbconfig, query);
+				query = DBHelper.artistPartialSearchResult(dbconfig, query);
 			
 				session.setAttribute("DISPLAYQUERY", query);
 				
@@ -154,7 +154,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			else if(search_type.equals(SONG_TITLE)){
 					
 					
-//				query = DBHelper.titlePartialSearchResult(dbconfig, query);
+				query = DBHelper.titlePartialSearchResult(dbconfig, query);
 				
 				session.setAttribute("DISPLAYQUERY", query);
 				
@@ -163,14 +163,14 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 			else if(search_type.equals(TAG)){
 				
 				
-//				query = DBHelper.tagPartialSearchResult(dbconfig, query);
+				query = DBHelper.tagPartialSearchResult(dbconfig, query);
 				session.setAttribute("DISPLAYQUERY", query);
 				
 				searchResultsArray = threadSafeML.searchByTag(query);
 			}
 		}
-		catch ( NullPointerException e) {
-				/** DEBUG **/	
+		catch ( NullPointerException | SQLException e) {
+					
 			session.setAttribute(ERROR, "searchNotFound");
 			System.out.println(QUERY);
 			session.setAttribute("ERROR_QUERY", query);
@@ -263,7 +263,7 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 		buffer.append(goToSearchSuggestionButton());
 		
 		
-		/**** DEBUG THIS **/
+
 		// added view search history
 		buffer.append(goToViewSearchHistoryButton());
 		
@@ -312,9 +312,6 @@ public class SongServlet extends MusicLibraryBaseServlet  {
 				// get each similar song
 				JSONObject song = (JSONObject) searchResultsArray.get(i);
 				
-				
-				/** GOOD DEBUG  **/
-//				System.out.println(song.toJSONString());
 					
 				favLock.lockRead();
 			

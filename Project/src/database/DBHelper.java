@@ -20,9 +20,10 @@ public class DBHelper {
 	
 	
 	/** for partial search **/
-	private static final String artistPartialSearchStmt = "SELECT name FROM artist WHERE name LIKE ?"; 
-	private static final String titlePartialSearchStmt = "SELECT songtitle FROM songTitle WHERE songtitle LIKE ?";
-	private static final String tagPartialSearchStmt = "SELECT tag FROM tag WHERE tag LIKE ?";
+	
+	private static final String artistPartialSearchStmt = "SELECT name FROM artist WHERE name LIKE (LOWER(CONCAT('%', ?, '%')))"; 
+	private static final String titlePartialSearchStmt = "SELECT songtitle FROM songTitle WHERE songtitle LIKE (LOWER(CONCAT('%', ?, '%')))";
+	private static final String tagPartialSearchStmt = "SELECT tag FROM tag WHERE tag LIKE (LOWER(CONCAT('%', ?, '%')))";
 	
 	
 
@@ -227,7 +228,7 @@ public class DBHelper {
 		PreparedStatement retrieveStmt = con.prepareStatement(artistPartialSearchStmt); 
 	
 	
-		retrieveStmt.setString(1, "%" + artist + "%");				
+		retrieveStmt.setString(1, artist);				
 		
 		
 		ResultSet result = retrieveStmt.executeQuery();
@@ -235,14 +236,9 @@ public class DBHelper {
 		try {
 			if(result.next()){
 				
-				/** DEBUG **/
-				System.out.println(result.next());
 				
 				completeName = result.getString("name");
-				
-				/** DEBUG **/
-				System.out.println(completeName);
-			
+		
 			}
 			
 		}

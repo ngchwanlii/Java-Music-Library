@@ -236,10 +236,19 @@ public class MusicLibraryServer {
 				
 				// create loginUserTimeTable
 				DBHelper.createUserLoginTimeTable(dbconfig);
-			
+
+				/** DOG **/
+//				DBHelper.createArtistPlayCountTable(dbconfig);
+				
+				
+				
+				
+				
+				
+				
 //				DBHelper.clearTables(dbconfig, DBHelper.artistPlayCountTable);
 				
-				DBHelper.createArtistPlayCountTable(dbconfig);
+
 				
 				
 		
