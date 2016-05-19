@@ -182,7 +182,7 @@ public class DBHelper {
 	private static final String showSearchHistoryByUsername = "SELECT searchType, searchQuery FROM searchHistory WHERE username=? ORDER BY ID DESC";
 	private static final String clearSearchHistoryStmt = "DELETE FROM searchHistory WHERE username=?";
 	
-	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE username=? AND searchQuery=?";
+	private static final String checkSearchCounter = "SELECT searchCount FROM searchHistory WHERE searchQuery=?";
 	
 	private static final String incrementSearchCount = "UPDATE searchHistory SET searchCount=searchCount+1 WHERE searchQuery=?";
 	
@@ -565,10 +565,9 @@ public class DBHelper {
 		// prepare statment for check search counter
 		PreparedStatement retrieveStmt = con.prepareStatement(checkSearchCounter);
 
-//		// set retrieveStmt for checking
-		retrieveStmt.setString(1, username);
-//		
-		retrieveStmt.setString(2, query);
+		// set retrieveStmt for checking
+
+		retrieveStmt.setString(1, query);
 		
 		// insert search History stmt
 		PreparedStatement updateStmt = con.prepareStatement(insertSearchHistory);
