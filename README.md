@@ -1,3 +1,7 @@
+Java Music Library
+===============
+![alt text](./music_library_logo.png)
+
 CS 212 Projects
 ===============
 
